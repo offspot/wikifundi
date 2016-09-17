@@ -130,6 +130,11 @@ sudo mkae clean all
 cd ..
 sudo chown -R www-data:www-data .
 
+== Clean cache ==
+
+got to /var/www/fr.africapack.kiwix.org/w/maintenance/ and run:
+./update.php --skip-external-dependencies
+
 == Login to the Mediawiki ==
 
 user: Admin
