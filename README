@@ -24,8 +24,8 @@ sudo chown -R www-data:www-data /var/www/
 == Install a few packages necessary ==
 
 sudo apt-get install nginx php5-fpm memcached nodejs imagemagick
-texlive php5-curl php5-sqlite libav-tools librsvg2-bin poppler-utils
-redis npm
+texlive php-pear php5-curl php5-sqlite libav-tools librsvg2-bin
+poppler-utils redis npm
 
 == Configure Nginx ==
 
