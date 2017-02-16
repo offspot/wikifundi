@@ -16,7 +16,7 @@ sudo apt-get dist-ugprade
 == Get the Wikifundi dump ==
 
 sudo mkdir /var/www
-wget http://download.kiwix.org/other/wikifundi/fr.africapack.kiwix.org_2016-08.tar.bz2
+wget http://download.kiwix.org/other/wikifundi/
 tar -xvf fr.africapack.kiwix.org_2016-08.tar.bz2
 sudo mv fr.africapack.kiwix.org /var/www/
 sudo chown -R www-data:www-data /var/www/
