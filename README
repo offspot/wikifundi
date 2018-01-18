@@ -25,7 +25,7 @@ sudo chown -R www-data:www-data /var/www/
 
 sudo apt-get install nginx php5-fpm memcached nodejs imagemagick
 texlive texlive-latex-extra php-pear php5-curl php5-sqlite libav-tools
-librsvg2-bin poppler-utils redis npm dvipng
+librsvg2-bin poppler-utils redis-server npm dvipng
 
 == Configure Nginx ==
 
@@ -126,7 +126,7 @@ texlive-fonts-recommended texlive-lang-greek texlive-latex-recommended
 cd /var/www/fr.africapack.kiwix.org/w/extensions/Math/math
 sudo make clean all
 cd /var/www/fr.africapack.kiwix.org/w/extensions/Math/texvccheck
-sudo mkae clean all
+sudo make clean all
 cd ..
 sudo chown -R www-data:www-data .
 
