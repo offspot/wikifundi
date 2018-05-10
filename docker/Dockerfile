@@ -144,6 +144,9 @@ RUN chown -R www-data:www-data extensions
 RUN cd maintenance \
   && ./update.php \
   && cd ..
+  
+# Run Parsoid
+ENTRYPOINT ["nodejs", "parsoid/bin/server.js"]
 	
 # Copy images
 #COPY ./data/images/* images/
