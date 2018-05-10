@@ -5,6 +5,7 @@ MAINTAINER kiwix
 # System Dependencies.
 RUN apt-get update && apt-get install -y \
 		git \
+		unzip \
 		imagemagick \
 		libicu-dev \
 		libav-tools \
@@ -80,17 +81,69 @@ RUN curl -fSL "http://download.kiwix.org/other/wikifundi/parsoid_${PARSOID_VERSI
 COPY ./config/parsoid/localsettings.js ./parsoid/
 RUN chown -R www-data:www-data parsoid 
 
-# Extensions verions
-ENV MEDIAWIKI_EXT_MATH_VERSION REL1_31-a1263db
+# Install MediaWiki extensions needed by Wikifundi
 
-# copy script to install an extension
+# Extensions versions
+ENV MEDIAWIKI_EXT_NUKE_VERSION                REL1_31-c6ec842
+ENV MEDIAWIKI_EXT_MANTLE_VERSION              REL1_28-a2885d3
+ENV MEDIAWIKI_EXT_SCRIBUNTO_VERSION           REL1_31-d527a4b
+ENV MEDIAWIKI_EXT_UPLOADWIZARD_VERSION        REL1_31-1ba0e4e
+ENV MEDIAWIKI_EXT_TITLEKEY_VERSION            REL1_31-a0948c5
+ENV MEDIAWIKI_EXT_TITLEBLACKLIST_VERSION      REL1_31-1143a1f
+ENV MEDIAWIKI_EXT_VALIDATOR_VERSION           REL1_28-21254dd
+ENV MEDIAWIKI_EXT_MAPS_VERSION                REL1_28-26b399b
+ENV MEDIAWIKI_EXT_MWEMBEDSUPPORT_VERSION      REL1_31-9573c4b
+ENV MEDIAWIKI_EXT_TIMEDMEDIAHANDLER_VERSION   REL1_31-e94b232
+ENV MEDIAWIKI_EXT_WIKIHIERO_VERSION           REL1_31-dc231d0
+ENV MEDIAWIKI_EXT_MATH_VERSION                REL1_31-a1263db
+ENV MEDIAWIKI_EXT_TIMELINE_VERSION            REL1_31-083b72e 
+ENV MEDIAWIKI_EXT_ECHO_VERSION                REL1_31-ed7f8f4
+ENV MEDIAWIKI_EXT_MOBILEFRONTEND_VERSION      REL1_31-7f66849
+ENV MEDIAWIKI_EXT_THANKS_VERSION              REL1_31-a845a46
+ENV MEDIAWIKI_EXT_VISUALEDITOR_VERSION        REL1_31-2d2c8fc
+
+# Copy script to add an extension
 COPY ./add_mw_extension.sh /usr/local/bin/add_mw_extension
 RUN chmod a+x /usr/local/bin/add_mw_extension
 
-# Install MediaWiki extensions needed by Wikifundi
+# Call script to add all extensions needed by Wikifundi
+RUN add_mw_extension Nuke ${MEDIAWIKI_EXT_NUKE_VERSION}
+RUN add_mw_extension Mantle ${MEDIAWIKI_EXT_MANTLE_VERSION}
+RUN add_mw_extension Scribunto ${MEDIAWIKI_EXT_SCRIBUNTO_VERSION}
+RUN add_mw_extension UploadWizard ${MEDIAWIKI_EXT_UPLOADWIZARD_VERSION}
+RUN add_mw_extension TitleKey ${MEDIAWIKI_EXT_TITLEKEY_VERSION}
+RUN add_mw_extension TitleBlacklist ${MEDIAWIKI_EXT_TITLEBLACKLIST_VERSION}
+RUN add_mw_extension Validator ${MEDIAWIKI_EXT_VALIDATOR_VERSION}
+RUN add_mw_extension Maps ${MEDIAWIKI_EXT_MAPS_VERSION}
+RUN add_mw_extension MwEmbedSupport ${MEDIAWIKI_EXT_MWEMBEDSUPPORT_VERSION}
+RUN add_mw_extension TimedMediaHandler ${MEDIAWIKI_EXT_TIMEDMEDIAHANDLER_VERSION}
+RUN add_mw_extension wikihiero ${MEDIAWIKI_EXT_WIKIHIERO_VERSION}
 RUN add_mw_extension Math ${MEDIAWIKI_EXT_MATH_VERSION}
+RUN add_mw_extension timeline ${MEDIAWIKI_EXT_TIMELINE_VERSION}
+RUN add_mw_extension Echo ${MEDIAWIKI_EXT_ECHO_VERSION}
+RUN add_mw_extension MobileFrontend ${MEDIAWIKI_EXT_MOBILEFRONTEND_VERSION}
+RUN add_mw_extension Thanks ${MEDIAWIKI_EXT_THANKS_VERSION}
+RUN add_mw_extension VisualEditor ${MEDIAWIKI_EXT_VISUALEDITOR_VERSION}
 
+# Install MetaDescriptionTag extension from GitHub beacause it is not in official repository
+RUN curl -fSL https://github.com/kolzchut/mediawiki-extensions-MetaDescriptionTag/archive/master.zip -o MetaDescriptionTag.zip \
+ && unzip MetaDescriptionTag.zip -d extensions/ \
+ && mv extensions/mediawiki-extensions-MetaDescriptionTag-master extensions/MetaDescriptionTag
+
+# Fix naming issue of timeline extension
+RUN mv extensions/timeline extensions/TimeLine
+
+# Clean Math extension
+RUN make -C extensions/Math/math clean all \
+ && make -C extensions/Math/texvccheck clean all
+
+# Fix owner
 RUN chown -R www-data:www-data extensions
+
+# WikiMedia maintenance
+RUN cd maintenance \
+  && ./update.php \
+  && cd ..
 	
 # Copy images
 #COPY ./data/images/* images/

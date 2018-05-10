@@ -18,7 +18,7 @@ if [ $# -ne 2 ]
     exit 1
 fi
 
-echo "Install ${NAME} extension"
+echo "Add ${NAME} extension"
 
 cd ${MEDIAWIKI_PATH}/extensions
 
