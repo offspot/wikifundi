@@ -20,7 +20,7 @@ exports.setup = function( parsoidConfig ) {
 	// (overrides defaultAPIProxyURI), or null to disable proxying for
 	// this end point.
 
-        parsoidConfig.setMwApi({ uri: 'http://localhost/api.php', domain: 'fr.africapack.kiwix.org', prefix: 'fr_africapack' });
+        parsoidConfig.setMwApi({ uri: 'http://localhost/api.php', domain: 'localhost' , prefix: 'fr_africapack' });
  //       parsoidConfig.setMwApi({ uri: 'http://fr.africapack.kiwix.org/w/api.php', domain: 'fr.africapack.kiwix.org', prefix: 'fr_africapack' });
 
 	// A default proxy to connect to the API endpoints. Default: undefined
@@ -28,7 +28,7 @@ exports.setup = function( parsoidConfig ) {
 	// parsoidConfig.defaultAPIProxyURI = 'http://proxy.example.org:8080';
 
 	// Enable debug mode (prints extra debugging messages)
-        // parsoidConfig.debug = true;
+    //    parsoidConfig.debug = true;
 
 	// Use the PHP preprocessor to expand templates via the MW API (default true)
 	//parsoidConfig.usePHPPreProcessor = false;

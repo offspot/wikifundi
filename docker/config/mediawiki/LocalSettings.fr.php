@@ -170,7 +170,10 @@ $wgUploadWizardConfig['enableMultiFileSelect'] = true;
 $wgUploadWizardConfig['enableChunked'] = true;
 $wgUploadWizardConfig['uwLanguages'] = array( 'fr' => 'French' );
 
+
+# TimedMediaHandler (videos)
 wfLoadExtension('MwEmbedSupport');
+require_once("$IP/extensions/TimedMediaHandler/TimedMediaHandler.php");
 
 # Mantle extensions
 require_once("$IP/extensions/Mantle/Mantle.php");
@@ -180,10 +183,6 @@ require_once("$IP/extensions/Validator/Validator.php");
 
 # Maps
 require_once("$IP/extensions/Maps/Maps.php");
-
-# TimedMediaHandler (videos)
-#require_once("$IP/extensions//MwEmbedSupport.php");
-require_once("$IP/extensions/TimedMediaHandler/TimedMediaHandler.php");
 
 $wgFileExtensions = array_merge( $wgFileExtensions, array( 'doc', 'docx' ) );
 
@@ -219,7 +218,7 @@ $wgScriptPath = "";
 $wgRightsPage = ""; # Set to the title of a wiki page that describes your license/copyright
 $wgRightsUrl  = "http://creativecommons.org/licenses/by-sa/3.0/";
 $wgRightsText = "Creative Commons Attribution Share Alike";
-#$wgRightsIcon = "cc-by-nc-sa.png";
+$wgRightsIcon = "cc-by-nc-sa.png";
 
 # Robots policies
 $wgDefaultRobotPolicy = 'noindex,nofollow';

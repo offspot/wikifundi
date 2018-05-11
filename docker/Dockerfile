@@ -1,6 +1,49 @@
+#APACHE+PHP on ubuntu
 FROM php:7.1-apache
 
+#
+# Author : Florent Kaisser <florent.pro@kaisser.name>
+#
 MAINTAINER kiwix
+
+#Volumes to store database and medias (images...) files
+VOLUME /var/www/html/images
+VOLUME /var/www/data
+
+# Wikifundi config
+ENV WIKIFUNDI_LANG fr
+
+# Media Wiki Version
+ENV MEDIAWIKI_MAJOR_VERSION 1.31
+ENV MEDIAWIKI_VERSION 1.31.0
+ENV MEDIAWIKI_RC rc.0
+
+# Parsoid Version
+ENV PARSOID_VERSION_YEAR 2016
+ENV PARSOID_VERSION_MONTH 08
+
+# Extensions versions
+ENV MEDIAWIKI_EXT_NUKE_VERSION                REL1_31-c6ec842
+ENV MEDIAWIKI_EXT_MANTLE_VERSION              REL1_28-a2885d3
+ENV MEDIAWIKI_EXT_SCRIBUNTO_VERSION           REL1_31-d527a4b
+ENV MEDIAWIKI_EXT_UPLOADWIZARD_VERSION        REL1_31-1ba0e4e
+ENV MEDIAWIKI_EXT_TITLEKEY_VERSION            REL1_31-a0948c5
+ENV MEDIAWIKI_EXT_TITLEBLACKLIST_VERSION      REL1_31-1143a1f
+ENV MEDIAWIKI_EXT_VALIDATOR_VERSION           REL1_28-21254dd
+ENV MEDIAWIKI_EXT_MAPS_VERSION                REL1_28-26b399b
+ENV MEDIAWIKI_EXT_MWEMBEDSUPPORT_VERSION      REL1_31-9573c4b
+ENV MEDIAWIKI_EXT_TIMEDMEDIAHANDLER_VERSION   REL1_31-e94b232
+ENV MEDIAWIKI_EXT_WIKIHIERO_VERSION           REL1_31-dc231d0
+ENV MEDIAWIKI_EXT_MATH_VERSION                REL1_31-a1263db
+ENV MEDIAWIKI_EXT_TIMELINE_VERSION            REL1_31-083b72e 
+ENV MEDIAWIKI_EXT_ECHO_VERSION                REL1_31-ed7f8f4
+ENV MEDIAWIKI_EXT_MOBILEFRONTEND_VERSION      REL1_31-7f66849
+ENV MEDIAWIKI_EXT_THANKS_VERSION              REL1_31-a845a46
+ENV MEDIAWIKI_EXT_VISUALEDITOR_VERSION        REL1_31-2d2c8fc
+
+###################
+# SOFTWARES SETUP #
+###################
 
 # System Dependencies.
 RUN apt-get update && apt-get install -y \
@@ -47,51 +90,21 @@ RUN { \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-# Wikifundi config
-ENV WIKIFUNDI_LANG fr
-
-# Media Wiki Version
-ENV MEDIAWIKI_MAJOR_VERSION 1.31
-ENV MEDIAWIKI_VERSION 1.31.0
-ENV MEDIAWIKI_RC rc.0
-
 # MediaWiki setup
 RUN curl -fSL "https://releases.wikimedia.org/mediawiki/${MEDIAWIKI_MAJOR_VERSION}/mediawiki-${MEDIAWIKI_VERSION}-${MEDIAWIKI_RC}.tar.gz" -o mediawiki.tar.gz \
 	&& tar -xz --strip-components=1 -f mediawiki.tar.gz \
 	&& rm mediawiki.tar.gz \
 	&& chown -R www-data:www-data skins cache images
 
-# Parsoid Version
-ENV PARSOID_VERSION_YEAR 2016
-ENV PARSOID_VERSION_MONTH 08
-
 # Parsoid setup
 RUN curl -fSL "http://download.kiwix.org/other/wikifundi/parsoid_${PARSOID_VERSION_YEAR}-${PARSOID_VERSION_MONTH}.tar.bz2" -o parsoid.tar.gz \
   && tar -xf parsoid.tar.gz \
   && rm parsoid.tar.gz
-COPY ./config/parsoid/localsettings.js ./parsoid/
 RUN chown -R www-data:www-data parsoid 
 
-# Install MediaWiki extensions needed by Wikifundi
-
-# Extensions versions
-ENV MEDIAWIKI_EXT_NUKE_VERSION                REL1_31-c6ec842
-ENV MEDIAWIKI_EXT_MANTLE_VERSION              REL1_28-a2885d3
-ENV MEDIAWIKI_EXT_SCRIBUNTO_VERSION           REL1_31-d527a4b
-ENV MEDIAWIKI_EXT_UPLOADWIZARD_VERSION        REL1_31-1ba0e4e
-ENV MEDIAWIKI_EXT_TITLEKEY_VERSION            REL1_31-a0948c5
-ENV MEDIAWIKI_EXT_TITLEBLACKLIST_VERSION      REL1_31-1143a1f
-ENV MEDIAWIKI_EXT_VALIDATOR_VERSION           REL1_28-21254dd
-ENV MEDIAWIKI_EXT_MAPS_VERSION                REL1_28-26b399b
-ENV MEDIAWIKI_EXT_MWEMBEDSUPPORT_VERSION      REL1_31-9573c4b
-ENV MEDIAWIKI_EXT_TIMEDMEDIAHANDLER_VERSION   REL1_31-e94b232
-ENV MEDIAWIKI_EXT_WIKIHIERO_VERSION           REL1_31-dc231d0
-ENV MEDIAWIKI_EXT_MATH_VERSION                REL1_31-a1263db
-ENV MEDIAWIKI_EXT_TIMELINE_VERSION            REL1_31-083b72e 
-ENV MEDIAWIKI_EXT_ECHO_VERSION                REL1_31-ed7f8f4
-ENV MEDIAWIKI_EXT_MOBILEFRONTEND_VERSION      REL1_31-7f66849
-ENV MEDIAWIKI_EXT_THANKS_VERSION              REL1_31-a845a46
-ENV MEDIAWIKI_EXT_VISUALEDITOR_VERSION        REL1_31-2d2c8fc
+################################################
+# ADD MEDIAWIKI EXTENSIONS NEEDED BY WIKIFUNDI #
+################################################
 
 # Copy script to add an extension
 COPY ./add_mw_extension.sh /usr/local/bin/add_mw_extension
@@ -131,9 +144,16 @@ RUN make -C extensions/Math/math clean all \
 # Fix owner
 RUN chown -R www-data:www-data extensions
 
+##########################
+# FINALIZE CONFIGURATION #
+##########################
+
 # Configure Mediawiki
 COPY ./config/mediawiki/LocalSettings.${WIKIFUNDI_LANG}.php ./LocalSettings.php
 COPY ./config/mediawiki/LocalSettings.custom.${WIKIFUNDI_LANG}.php ./LocalSettings.custom.php
+
+# Configure Parsoid
+COPY ./config/parsoid/localsettings.js ./parsoid/
 
 # Copy assets
 COPY ./assets/images/logo.png ./
@@ -142,22 +162,11 @@ COPY ./assets/images/cc-by-sa.png ./
 # Remove configuration by web
 RUN rm -rf mw-config
 
-# Init SQLite database (to remplace with "data" volume)
-RUN mkdir -p /var/www/data
-COPY ./data/sqlite/my_wiki.sqlite /var/www/data/mw_fr_africapack.sqlite
-RUN chown -R www-data:www-data /var/www/data
-
-# WikiMedia maintenance
-RUN cd maintenance \
-  && ./update.php \
-  && cd ..
+###########
+# START ! #
+###########
   
-# Run Parsoid
+# Run start script
 COPY ./start.sh /usr/local/bin/start.sh
 RUN chmod a+x /usr/local/bin/start.sh
 ENTRYPOINT start.sh 
-	
-# Copy images
-#COPY ./data/images/* images/
-#RUN chown -R www-data:www-data images
-	

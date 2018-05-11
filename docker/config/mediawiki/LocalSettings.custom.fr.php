@@ -78,7 +78,7 @@ $wgDefaultUserOptions['visualeditor-enable'] = 1;
 $wgVisualEditorNamespaces[] = NS_PROJECT;
 $wgVirtualRestConfig['modules']['parsoid'] = array(
 						   'url' => 'http://localhost:8000',
-						   'domain' => 'fr.africapack.kiwix.org',
+						   'domain' => 'localhost',
 						   'prefix' => 'fr_africapack',
 						   'forwardCookies' => true
 						   );

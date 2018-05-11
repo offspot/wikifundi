@@ -8,12 +8,17 @@ Here steps to install it with Docker or on a RaspberryPi.
 Install with Docker
 ===================
 
-Install Docker on your system
-Lauch :
+Initialize volumes :
+- create two directory "data" and "images"
+- copy sqlite database(s) into data/
+- copy your eventually existing images into images/
 
-docker build -t wikifundi docker && sudo docker run -p 8080:80 -t  wikifundi
+Install Docker on your system and lauch :
 
-Open in your brother :  http://localhost:8080 
+docker build -t wikifundi docker \ 
+  && sudo docker run -p 8080:80 -v data:/var/www/data -v images:/var/www/html/images -it wikifundi
+
+Go in your brother :  http://localhost:8080 
 
 ========================
 Install on a RaspberryPi
