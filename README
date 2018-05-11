@@ -2,7 +2,22 @@ Wikifundi is a solution which propose a Mediawiki pre-configured in a
 similar way like Wikipedia. Probably the easiest way to train users if
 you do not have access to Internet!
 
-Here steps to install it on a RaspberryPi.
+Here steps to install it with Docker or on a RaspberryPi.
+
+===================
+Install with Docker
+===================
+
+Install Docker on your system
+Lauch :
+
+docker build -t wikifundi docker && sudo docker run -p 8080:80 -t  wikifundi
+
+Open in your brother :  http://localhost:8080 
+
+========================
+Install on a RaspberryPi
+========================
 
 == Install Raspbian-lite on your RaspberryPi ==
 
