@@ -20,8 +20,8 @@ exports.setup = function( parsoidConfig ) {
 	// (overrides defaultAPIProxyURI), or null to disable proxying for
 	// this end point.
 
-        parsoidConfig.setMwApi({ uri: 'http://en.africapack.kiwix.org/w/api.php', domain: 'en.africapack.kiwix.org', prefix: 'en_africapack' });
-        parsoidConfig.setMwApi({ uri: 'http://fr.africapack.kiwix.org/w/api.php', domain: 'fr.africapack.kiwix.org', prefix: 'fr_africapack' });
+        parsoidConfig.setMwApi({ uri: 'http://localhost/api.php', domain: 'fr.africapack.kiwix.org', prefix: 'fr_africapack' });
+ //       parsoidConfig.setMwApi({ uri: 'http://fr.africapack.kiwix.org/w/api.php', domain: 'fr.africapack.kiwix.org', prefix: 'fr_africapack' });
 
 	// A default proxy to connect to the API endpoints. Default: undefined
 	// (no proxying). Overridden by per-wiki proxy config in setInterwiki.

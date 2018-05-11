@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
 		libav-tools \
 		librsvg2-bin \
 		poppler-utils \
+		memcached \
 		# Required for Math renderer
 		texlive \		
     texlive-fonts-recommended \ 
@@ -46,29 +47,19 @@ RUN { \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
+# Wikifundi config
+ENV WIKIFUNDI_LANG fr
 
 # Media Wiki Version
 ENV MEDIAWIKI_MAJOR_VERSION 1.31
 ENV MEDIAWIKI_VERSION 1.31.0
 ENV MEDIAWIKI_RC rc.0
 
-# Config
-ENV DATABASE_NAME my_wiki
-
 # MediaWiki setup
 RUN curl -fSL "https://releases.wikimedia.org/mediawiki/${MEDIAWIKI_MAJOR_VERSION}/mediawiki-${MEDIAWIKI_VERSION}-${MEDIAWIKI_RC}.tar.gz" -o mediawiki.tar.gz \
 	&& tar -xz --strip-components=1 -f mediawiki.tar.gz \
 	&& rm mediawiki.tar.gz \
 	&& chown -R www-data:www-data skins cache images
-	
-# Configure Mediawiki
-COPY ./config/mediawiki/LocalSettings.php ./
-RUN rm -rf mw-config
-
-# Init SQLite database
-RUN mkdir -p /var/www/data
-COPY ./data/sqlite/${DATABASE_NAME}.sqlite /var/www/data/
-RUN chown -R www-data:www-data /var/www/data
 
 # Parsoid Version
 ENV PARSOID_VERSION_YEAR 2016
@@ -131,7 +122,7 @@ RUN curl -fSL https://github.com/kolzchut/mediawiki-extensions-MetaDescriptionTa
  && mv extensions/mediawiki-extensions-MetaDescriptionTag-master extensions/MetaDescriptionTag
 
 # Fix naming issue of timeline extension
-RUN mv extensions/timeline extensions/TimeLine
+#RUN mv extensions/timeline extensions/TimeLine
 
 # Clean Math extension
 RUN make -C extensions/Math/math clean all \
@@ -140,13 +131,31 @@ RUN make -C extensions/Math/math clean all \
 # Fix owner
 RUN chown -R www-data:www-data extensions
 
+# Configure Mediawiki
+COPY ./config/mediawiki/LocalSettings.${WIKIFUNDI_LANG}.php ./LocalSettings.php
+COPY ./config/mediawiki/LocalSettings.custom.${WIKIFUNDI_LANG}.php ./LocalSettings.custom.php
+
+# Copy assets
+COPY ./assets/images/logo.png ./
+COPY ./assets/images/cc-by-sa.png ./
+
+# Remove configuration by web
+RUN rm -rf mw-config
+
+# Init SQLite database (to remplace with "data" volume)
+RUN mkdir -p /var/www/data
+COPY ./data/sqlite/my_wiki.sqlite /var/www/data/mw_fr_africapack.sqlite
+RUN chown -R www-data:www-data /var/www/data
+
 # WikiMedia maintenance
 RUN cd maintenance \
   && ./update.php \
   && cd ..
   
 # Run Parsoid
-ENTRYPOINT ["nodejs", "parsoid/bin/server.js"]
+COPY ./start.sh /usr/local/bin/start.sh
+RUN chmod a+x /usr/local/bin/start.sh
+ENTRYPOINT start.sh 
 	
 # Copy images
 #COPY ./data/images/* images/
