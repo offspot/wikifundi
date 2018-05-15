@@ -11,7 +11,7 @@ VOLUME /var/www/html/images
 VOLUME /var/www/data
 
 # Wiki name
-ENV WIKI_NAME kiwix
+ENV WIKI_NAME en_africapack
 
 # Database name
 ENV DATABASE_NAME mw_${WIKI_NAME}

@@ -8,17 +8,19 @@ Here steps to install it with Docker or on a RaspberryPi.
 Install with Docker
 ===================
 
-Initialize volumes :
-- create two directory "data" and "images"
-- copy sqlite database(s) into data/
-- copy your eventually existing images into images/
-
 Install Docker on your system and lauch :
 
-docker build -t wikifundi docker \ 
-  && sudo docker run -p 8080:80 -v data:/var/www/data -v images:/var/www/html/images -it wikifundi
-
+docker build -t en_africapack -f docker/Dockerfile.en_africapack docker \ 
+  && mkdir -p data image 
+  && sudo docker run -p 8080:80 -v data:/var/www/data -v images:/var/www/html/images -it en_africapack
+  
 Go in your brother :  http://localhost:8080 
+
+=================
+Bakcup your datas
+=================
+
+Copy the content of `data` and `image` directories
 
 ========================
 Install on a RaspberryPi
