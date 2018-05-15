@@ -1,7 +1,8 @@
 #!/bin/sh
 
 cd maintenance \ && ./update.php --quick \ && cd ..
-#chown www-data:www-data -R /var/www/html/images
+chown www-data:www-data /var/www/html/images 
+chown www-data:www-data /var/www/data
 
 echo "Database : $DATABASE_NAME"
 DATABASE_FILE=/var/www/data/${DATABASE_NAME}.sqlite

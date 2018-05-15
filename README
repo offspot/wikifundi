@@ -11,8 +11,8 @@ Install with Docker
 Install Docker on your system and lauch :
 
 docker build -t en_africapack -f docker/Dockerfile.en_africapack docker \ 
-  && mkdir -p data image 
-  && sudo docker run -p 8080:80 -v data:/var/www/data -v images:/var/www/html/images -it en_africapack
+  && mkdir -p data images \
+  && sudo docker run -p 8080:80 -v ${PWD}/data:/var/www/data -v ${PWD}/images:/var/www/html/images -it en_africapack
   
 Go in your brother :  http://localhost:8080 
 
