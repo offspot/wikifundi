@@ -1,11 +1,10 @@
 #!/bin/sh
 
-cd maintenance \ && ./update.php --quick \ && cd ..
-chown www-data:www-data /var/www/html/images 
-chown www-data:www-data /var/www/data
-
 echo "Database : $DATABASE_NAME"
 DATABASE_FILE=/var/www/data/${DATABASE_NAME}.sqlite
+
+chown www-data:www-data /var/www/html/images 
+chown www-data:www-data /var/www/data
 
 #Init database
 if [ -e ${DATABASE_FILE} ]
@@ -20,6 +19,8 @@ chmod 644 ${DATABASE_FILE} && chown www-data:www-data ${DATABASE_FILE}
 
 #Fix latence problem
 rm -rf /var/www/data/locks
+
+cd maintenance \ && ./update.php --quick \ && cd ..
 
 echo "Starting Persoid ..."
 nodejs parsoid/bin/server.js &
