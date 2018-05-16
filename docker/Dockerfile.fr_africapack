@@ -51,6 +51,8 @@ ENV MEDIAWIKI_EXT_ECHO_VERSION                REL1_31-ed7f8f4
 ENV MEDIAWIKI_EXT_MOBILEFRONTEND_VERSION      REL1_31-7f66849
 ENV MEDIAWIKI_EXT_THANKS_VERSION              REL1_31-a845a46
 ENV MEDIAWIKI_EXT_VISUALEDITOR_VERSION        REL1_31-2d2c8fc
+ENV MEDIAWIKI_EXT_EVENTLOGGIN_VERSION         REL1_31-3fddc40 
+ENV MEDIAWIKI_EXT_GUIDEDTOUR_VERSION          REL1_31-9cd5306
 
 ###################
 # SOFTWARES SETUP #
@@ -139,6 +141,8 @@ RUN add_mw_extension Echo ${MEDIAWIKI_EXT_ECHO_VERSION}
 RUN add_mw_extension MobileFrontend ${MEDIAWIKI_EXT_MOBILEFRONTEND_VERSION}
 RUN add_mw_extension Thanks ${MEDIAWIKI_EXT_THANKS_VERSION}
 RUN add_mw_extension VisualEditor ${MEDIAWIKI_EXT_VISUALEDITOR_VERSION}
+RUN add_mw_extension EventLogging ${MEDIAWIKI_EXT_EVENTLOGGIN_VERSION}
+RUN add_mw_extension GuidedTour ${MEDIAWIKI_EXT_GUIDEDTOUR_VERSION}
 
 # Install MetaDescriptionTag extension from GitHub beacause it is not in official repository
 RUN curl -fSL https://github.com/kolzchut/mediawiki-extensions-MetaDescriptionTag/archive/master.zip -o MetaDescriptionTag.zip \

@@ -188,6 +188,11 @@ wfLoadExtension( 'Echo' );
 wfLoadExtension( 'MobileFrontend' );
 $wgMFAutodetectMobileView = true;
 
+# EventLogging used by GuidedTour
+wfLoadExtension( 'EventLogging' );
+# Allow to provides a framework for creating "guided tours,"
+wfLoadExtension( 'GuidedTour' );
+
 # Thanks
 wfLoadExtension( 'Thanks' );
 
