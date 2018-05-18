@@ -28,6 +28,9 @@ PageList = List[Page]
 def syncPages(src : Site, dst : Site, pages : PageList) -> int: 
   nbSyncPage = 0
   
+  #disable mechanics to slow down wiki read and/or write
+  dst.throttle.maxdelay=0
+  
   for p in pages:
     print ("== Sync " + p.title())
     
@@ -44,7 +47,6 @@ def syncPages(src : Site, dst : Site, pages : PageList) -> int:
     else:
       print ("Error on saving page")
 
-  
   return nbSyncPage
 
 def test() -> bool:
