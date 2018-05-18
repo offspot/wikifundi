@@ -18,35 +18,39 @@
 # See : https://www.mediawiki.org/wiki/Manual:Pywikibot/user-config.py
 #
 
-# Typing configuration
+# To use WikiMedia API
+from pywikibot import Site,Page,Category,logging
+
+# Typing 
 from typing import List
 PageList = List[Page]
 
-# Logging is rule
-import logging as log 
-
-# To use WikiMedia API
-from pywikibot import Site,Page,Category
-
 def syncPages(src : Site, dst : Site, pages : PageList) -> int: 
   nbSyncPage = 0
-
+  
   for p in pages:
+    print ("== Sync " + p.title())
+    
     # create a new page on dest wiki
-    newPage = Page(dst, p.title)
+    newPage = Page(dst, p.title())
+    
     # copy the content of the page
     newPage.text = p.text
-    # commit a the new page on dest wiki
-    dst.editpage(newPage)
     
-    nbSyncPage = nbSyncPage + 1
+    # commit the new page on dest wiki
+    #if (dst.editpage(newPage)):
+    if (dst.editpage(newPage)):
+      nbSyncPage = nbSyncPage + 1
+    else:
+      print ("Error on saving page")
+
   
   return nbSyncPage
 
 def test() -> bool:
   siteSrc = Site(fam="wikipedia",code="en")
   siteDst = Site(fam="kiwix")
-  pages = [Page(siteSrc,"Lille"), 
+  pages = [Page(siteSrc,"New_York_City"), 
            Page(siteSrc,"Paris"), 
            Page(siteSrc,"Geneva") ]
            
