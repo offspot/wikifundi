@@ -62,34 +62,50 @@ def syncPages(src : Site, dst : Site, pages : PageList) -> int:
 def syncPagesAndCategories(
   srcFam : str, srcCode : str, dstFam : str, dstCode : str, 
   pagesName : List[str], categoriesName : List[str]) -> int :
+  """Synchronize wiki pages from named page list
+        and named categories list
+    
+    return the number of synchronized pages succes
+  """  
   
+  # configure sites
   siteSrc = Site(fam=srcFam,code=srcCode)
   siteDst = Site(fam=dstFam,code=dstCode)
   
+  # pages from their names
   pages = [ Page(siteSrc, name) for name in pagesName ]
   
-  #retrieve all pages from categories
+  # retrieve all pages from categories
   categories = [ Category(siteSrc,name) for name in categoriesName ]
-  
   for cat in categories :
     print ("Retrieve pages from " + cat.title())
+    # add pages of this categorie to pages list to sync
     pages += [ p for p in cat.articles() ]
   
   return syncPages(siteSrc, siteDst, pages )
 
+######################################
+# Main parts
+
 def main(fileconfig):
   with open(fileconfig, 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
-    src = cfg['sites'].src
-    dst = cfg['sites'].dst
+    src = cfg['sites']['src']
+    dst = cfg['sites']['dst']
     pages = cfg['pages']
     cats = cfg['categories']
     
-    nb = syncPagesAndCategories(src.fam, src.code, dst.fam, 
-      dst.code, pages, cats)
+    nb = syncPagesAndCategories(src['fam'], src['code'], dst['fam'], 
+      dst['code'], pages, cats)
       
-    print (nb + "pages synchronized")
+    print ("%i pages synchronized" % nb)
 
+if __name__ == "__main__":
+  if(len(sys.argv)>1):
+    main(sys.argv[1])
+  else:
+    print ("Usage : ./wikimedia_sync.py <config_file.py>")
+  
 
 ######################################
 # Test parts
@@ -111,9 +127,8 @@ def test() -> bool:
   
   return simpleTest and mainTest
 
-if __name__ == "__main__":
-#  main()
-  if test():
-    print ("Test OK")
-  else:
-    print ("Test Error")
+#if __name__ == "__main__":
+#  if test():
+#    print ("Test OK")
+#  else:
+#    print ("Test Error")
