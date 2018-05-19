@@ -4,7 +4,7 @@
 """
  wikimedia_sync.py
 
- usage : ./wikimedia_sync.py <config_file.py>
+ usage : ./wikimedia_sync.py <config_file.yml>
 
  author : Florent Kaisser
 
@@ -104,7 +104,7 @@ if __name__ == "__main__":
   if(len(sys.argv)>1):
     main(sys.argv[1])
   else:
-    print ("Usage : ./wikimedia_sync.py <config_file.py>")
+    print ("Usage : ./wikimedia_sync.py <config_file.yml>")
   
 
 ######################################
