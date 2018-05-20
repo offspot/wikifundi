@@ -20,7 +20,7 @@
 """
 
 # For use WikiMedia API
-from pywikibot import Site,Page,Category,logging
+from pywikibot import Site,Page,FilePage,Category,logging
 
 # For load YAML file config
 import sys
@@ -29,7 +29,19 @@ import yaml
 # We use typing 
 from typing import List
 PageList = List[Page]
+FileList = List[FilePage]
 
+def uploadImages(src : Site, dst : Site, files : FileList) -> int :
+
+  nbImages = len(files)
+  for i,f in enumerate(files):
+    try:
+      pageDst = FilePage(dst, f.title())
+      if(not pageDst.exists()):
+        print ("== %i/%i Upload file %s" % (i+1, nbImages,  f.title()))
+        dst.upload(pageDst,source_url=f.get_file_url(),comment="sync",text=f.text,ignore_warnings=True)
+    except Exception:
+      print ("Error on sync page %s" % title)
 
 def syncPages(src : Site, dst : Site, pages : PageList) -> int: 
   """Synchronize wiki pages from src to dst
@@ -40,32 +52,75 @@ def syncPages(src : Site, dst : Site, pages : PageList) -> int:
   nbSyncPage = 0
   nbPage = len(pages)
   
-  #disable mechanics to slow down wiki write
-  dst.throttle.maxdelay=0
-  
   for i,p in enumerate(pages):
+
     title = p.title()
     print ("== %i/%i Sync %s " % (i+1,nbPage,title))
     
-    # create a new page on dest wiki
-    newPage = Page(dst, title)
-    
-    if(newPage.exists()):  
-      print ("Page %s exist" % title)
-    elif(newPage.site == dst):
-    #elif(newPage.canBeEdited()):
-      # copy the content of the page
-      newPage.text = p.text
+    try:      
+      # create a new page on dest wiki
+      newPage = Page(dst, title)
       
-      # commit the new page on dest wiki
-      if (dst.editpage(newPage)):
-        nbSyncPage = nbSyncPage + 1
+      if(newPage.exists()):  
+        print ("Page %s exist" % title)
+      elif(newPage.site == dst):
+      #elif(newPage.canBeEdited()):
+        # copy the content of the page
+        newPage.text = p.text
+        
+        # commit the new page on dest wiki
+        if (dst.editpage(newPage)):
+          nbSyncPage = nbSyncPage + 1
+        else:
+          print ("Error on saving page %s" % title)
       else:
-        print ("Error on saving page %s" % title)
-    else:
-      print ("Page %s not editable on dest" % title)
-
+        print ("Page %s not editable on dest" % title)
+    except Exception:
+      print ("Error on sync page %s" % title)
+      
   return nbSyncPage
+  
+def getTemplatesFromPages(pages : PageList) -> PageList :
+  templates = []
+  for p in pages :
+    tplt = p.templates()
+    nbTplt = len(tplt)
+    if(nbTplt > 0):
+      print ("Add %i templates of %s" % (nbTplt, p.title()))
+      templates += tplt
+      
+  return list(set(templates))  
+  
+def getImagesFromPages(pages : PageList) -> FileList :
+  images = []
+  for p in pages :
+    img = list(p.imagelinks())
+    nbImg = len(img)
+    if(nbImg > 0):
+      print ("Add %i images of %s" % (nbImg, p.title()))
+      images += img  
+  return list(set(images))
+  
+def syncPagesWithDependances(src : Site, dst : Site, pages : PageList) -> int: 
+
+  #get dependances
+  images = getImagesFromPages(pages)
+  templates = getTemplatesFromPages(pages)
+  dependances = getTemplatesFromPages(templates)
+  
+  #sync all pages, templates and associated files
+  nbPageSync = 0
+  
+  print ("====== Sync template dependances")
+  nbPageSync += syncPages(siteSrc, siteDst, dependances )
+  print ("====== Sync template")
+  nbPageSync += syncPages(siteSrc, siteDst, templates )
+  print ("====== Sync pages")
+  nbPageSync += syncPages(siteSrc, siteDst, pages )  
+  print ("====== Upload images")
+  uploadImages (siteSrc, siteDst, images)  
+  
+  return nbPageSync;  
   
 def syncPagesAndCategories(
   srcFam : str, srcCode : str, dstFam : str, dstCode : str, 
@@ -79,6 +134,11 @@ def syncPagesAndCategories(
   # configure sites
   siteSrc = Site(fam=srcFam,code=srcCode)
   siteDst = Site(fam=dstFam,code=dstCode)
+  
+  siteDst.login()
+  
+  #disable mechanics to slow down wiki write
+  siteDst.throttle.maxdelay=0  
   
   pages = []
   
@@ -94,26 +154,10 @@ def syncPagesAndCategories(
       print ("Retrieve pages from " + cat.title())
       # add pages of this categorie to pages list to sync
       pages += list( cat.articles() )
-    
-  templates = []
-  for p in pages :
-    tplt = list(p.itertemplates())
-    nbTplt = len(tplt)
-    if(nbTplt > 0):
-      print ("Add %i templates of %s" % (nbTplt, p.title()))
-      templates += tplt
-      
-  references = []    
-  for t in set(templates) :
-    ref = list(t.itertemplates())
-    nbRef = len(ref)
-    if(nbRef > 0):
-      print ("Add %i reference of %s" % (nbRef, t.title()))
-      references += ref      
-
-  uniqReference = list(set(references + templates))
   
-  return syncPages(siteSrc, siteDst, pages + uniqReference )
+  #sync all pages !
+  return syncPagesWithDependances(siteSrc, siteDst, pages)    
+
 
 ######################################
 # Main parts
