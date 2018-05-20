@@ -79,6 +79,8 @@ RUN apt-get update && apt-get install -y \
 		# Required for Parsoid
 		redis-server \
 		npm \
+		# Ruired for Scribunto
+		lua5.1 \
 		# Required for SyntaxHighlighting
 		python \
 	--no-install-recommends && rm -r /var/lib/apt/lists/*

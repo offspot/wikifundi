@@ -38,24 +38,32 @@ def syncPages(src : Site, dst : Site, pages : PageList) -> int:
   """
   
   nbSyncPage = 0
+  nbPage = len(pages)
   
   #disable mechanics to slow down wiki write
   dst.throttle.maxdelay=0
   
-  for p in pages:
-    print ("== Sync " + p.title())
+  for i,p in enumerate(pages):
+    title = p.title()
+    print ("== %i/%i Sync %s " % (i+1,nbPage,title))
     
     # create a new page on dest wiki
-    newPage = Page(dst, p.title())
+    newPage = Page(dst, title)
     
-    # copy the content of the page
-    newPage.text = p.text
-    
-    # commit the new page on dest wiki
-    if (dst.editpage(newPage)):
-      nbSyncPage = nbSyncPage + 1
+    if(newPage.exists()):  
+      print ("Page %s exist" % title)
+    elif(newPage.site == dst):
+    #elif(newPage.canBeEdited()):
+      # copy the content of the page
+      newPage.text = p.text
+      
+      # commit the new page on dest wiki
+      if (dst.editpage(newPage)):
+        nbSyncPage = nbSyncPage + 1
+      else:
+        print ("Error on saving page %s" % title)
     else:
-      print ("Error on saving page")
+      print ("Page %s not editable on dest" % title)
 
   return nbSyncPage
   
@@ -72,17 +80,40 @@ def syncPagesAndCategories(
   siteSrc = Site(fam=srcFam,code=srcCode)
   siteDst = Site(fam=dstFam,code=dstCode)
   
-  # pages from their names
-  pages = [ Page(siteSrc, name) for name in pagesName ]
+  pages = []
   
-  # retrieve all pages from categories
-  categories = [ Category(siteSrc,name) for name in categoriesName ]
-  for cat in categories :
-    print ("Retrieve pages from " + cat.title())
-    # add pages of this categorie to pages list to sync
-    pages += [ p for p in cat.articles() ]
+  if( pagesName ):
+    # pages from their names
+    pages += [ Page(siteSrc, name) for name in pagesName ]
   
-  return syncPages(siteSrc, siteDst, pages )
+  if( categoriesName ):
+    # retrieve all pages from categories
+    categories = [ Category(siteSrc,name) for name in categoriesName ]
+    for cat in categories :
+      pages += [ Page(siteSrc, cat.title()) ]
+      print ("Retrieve pages from " + cat.title())
+      # add pages of this categorie to pages list to sync
+      pages += list( cat.articles() )
+    
+  templates = []
+  for p in pages :
+    tplt = list(p.itertemplates())
+    nbTplt = len(tplt)
+    if(nbTplt > 0):
+      print ("Add %i templates of %s" % (nbTplt, p.title()))
+      templates += tplt
+      
+  references = []    
+  for t in set(templates) :
+    ref = list(t.itertemplates())
+    nbRef = len(ref)
+    if(nbRef > 0):
+      print ("Add %i reference of %s" % (nbRef, t.title()))
+      references += ref      
+
+  uniqReference = list(set(references + templates))
+  
+  return syncPages(siteSrc, siteDst, pages + uniqReference )
 
 ######################################
 # Main parts
