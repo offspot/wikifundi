@@ -197,6 +197,9 @@ wfLoadExtension( 'GuidedTour' );
 # Thanks
 wfLoadExtension( 'Thanks' );
 
+# Geo
+wfLoadExtension( 'GeoData' );
+
 # Visual Editor
 wfLoadExtension( 'VisualEditor' );
 $wgDefaultUserOptions['visualeditor-enable'] = 1;
@@ -222,6 +225,14 @@ require_once("$IP/extensions/Validator/Validator.php");
 require_once("$IP/extensions/Maps/Maps.php");
 
 $wgFileExtensions = array_merge( $wgFileExtensions, array( 'doc', 'docx' ) );
+
+# Wikibase
+$wgEnableWikibaseRepo = true;
+$wgEnableWikibaseClient = true; 
+require_once "$IP/extensions/Wikibase/repo/Wikibase.php";
+require_once "$IP/extensions/Wikibase/repo/ExampleSettings.php"; 
+require_once "$IP/extensions/Wikibase/client/WikibaseClient.php";
+require_once "$IP/extensions/Wikibase/client/ExampleSettings.php";
 
 # Add specific path                                                                                                                  
 function add_include_path ($path) {
