@@ -101,7 +101,7 @@ def getImagesFromPages(pages : PageList) -> FileList :
       images += img  
   return list(set(images))
   
-def syncPagesWithDependances(src : Site, dst : Site, pages : PageList) -> int: 
+def syncPagesWithDependances(siteSrc : Site, siteDst : Site, pages : PageList) -> int: 
 
   #get dependances
   images = getImagesFromPages(pages)

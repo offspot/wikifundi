@@ -157,6 +157,7 @@ $wgScribuntoDefaultEngine = 'luastandalone';
 #$wgScribuntoUseGeSHi = true;
 #$wgScribuntoUseCodeEditor = true;
 $wgScribuntoEngineConf['luastandalone']['luaPath'] = "/usr/bin/lua5.1";
+$wgScribuntoEngineConf['luastandalone']['cpuLimit'] = 30000;
 
 # UploadWizard extension
 wfLoadExtension('UploadWizard');
