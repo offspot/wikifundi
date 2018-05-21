@@ -62,6 +62,7 @@ ENV MEDIAWIKI_EXT_WIKIBASE_VERSION            REL1_31-8178d16
 # System Dependencies.
 RUN apt-get update && apt-get install -y \
 		git \
+		vim \
 		unzip \
 		imagemagick \
 		libicu-dev \
@@ -83,7 +84,7 @@ RUN apt-get update && apt-get install -y \
 		# Ruired for Scribunto
 		lua5.1 \
 		# Required for SyntaxHighlighting
-		python \
+		python3 \
 	--no-install-recommends && rm -r /var/lib/apt/lists/*
 	
 # Install the PHP extensions we need

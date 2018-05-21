@@ -25,7 +25,7 @@ fi
 
 
 echo "Starting Persoid ..."
-nodejs parsoid/bin/server.js &
+nodejs parsoid/bin/server.js 2>> /var/log/parsoid &
 
 service memcached start 
 
