@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# author : Florent Kaisser
+# maintainer : kwix
+
 """
  wikimedia_sync.py
 
- usage : ./wikimedia_sync.py <config_file.yml>
-
- author : Florent Kaisser
+ usage : ./wikimedia_sync.py [options] config_file1.json, config_file2.json, ...
 
  Copy WikiMedia pages from a Wiki source (ex : a Wikipedia) to a Wiki 
  destionation (like a third-party wikis).
@@ -22,14 +23,21 @@
 # For use WikiMedia API
 from pywikibot import Site,Page,FilePage,Category,logging
 
-# For load YAML file config
+# For load JSON file config and check options
 import sys
 import json
+import getopt
 
 # We use typing 
 from typing import List
 PageList = List[Page]
 FileList = List[FilePage]
+
+DEFAULT_OPTIONS = dict(
+    force = False, 
+    templatesSync = True, 
+    templatesDepSync = True, 
+    filesUpload = True)
 
 def uploadFiles(src : Site, dst : Site, files : FileList) -> int :
 
@@ -86,6 +94,7 @@ def syncPages(src : Site, dst : Site, pages : PageList, force = False) -> int:
 def getTemplatesFromPages(pages : PageList) -> PageList :
   templates = []
   for p in pages :
+    # get templates used by p
     tplt = p.templates()
     nbTplt = len(tplt)
     if(nbTplt > 0):
@@ -95,19 +104,21 @@ def getTemplatesFromPages(pages : PageList) -> PageList :
   return list(set(templates))  
   
 def getFilesFromPages(pages : PageList) -> FileList :
-  images = []
+  files = []
   for p in pages :
-    img = list(p.imagelinks())
-    nbImg = len(img)
+    # get files used by p
+    f = list(p.imagelinks())
+    nbFiles = len(f)
     if(nbImg > 0):
-      print ("Process %i images of %s" % (nbImg, p.title()))
-      images += img  
+      print ("Process %i images of %s" % (nbFiles, p.title()))
+      images += f  
   return list(set(images))
   
 def syncPagesWithDependances( siteSrc : Site, siteDst : Site, 
                               pages : PageList, options : dict) -> int: 
 
-  #get dependances
+  #get templates and files used by pages
+  
   if(options['filesUpload']) :
     images = getFilesFromPages(pages)
     
@@ -175,11 +186,8 @@ def syncPagesAndCategories(
   return syncPagesWithDependances(siteSrc, siteDst, pages, options)    
 
 
-######################################
-# Main parts
-
-def main(fileconfig):
-  options = dict(force = False, templatesSync = True, templatesDepSync = True, filesUpload = True)
+def syncFromJSONFile(fileconfig, options):
+  print ("Process %s" % fileconfig)
 
   with open(fileconfig, 'r') as jsonfile:
     cfg = json.load(jsonfile)
@@ -193,35 +201,55 @@ def main(fileconfig):
       
     print ("%i pages synchronized" % nb)
 
-if __name__ == "__main__":
-  if(len(sys.argv)>1):
-    main(sys.argv[1])
-  else:
-    print ("Usage : ./wikimedia_sync.py <config_file.yml>")
+######################################
+# Main parts
+
+def main():
+  options = DEFAULT_OPTIONS
   
+  try:
+    opts, args = getopt.getopt(sys.argv[1:], 
+      "hftdu", 
+      [ "help",
+        "force",
+        "sync-templates",
+        "sync-dependances-templates",
+        "upload-files"
+      ]
+    )
+  except (getopt.error, msg):
+    print (("args error : %s" % str(msg)))
+    print ("Use --help to show help instructions")
+    sys.exit(2)
+
+  # parse args
+  for (opt, arg) in opts:
+    if opt in ("-h", "--help"):
+      print(__doc__)
+      sys.exit(0)
+    if opt in ("-f", "--force"):
+      options["force"] = True
+    if opt in ("-t", "--sync-templates"):
+      options["templatesSync"] = True
+    if opt in ("-d", "--sync-dependances-templates"):
+      options["templatesDepSync"] = True
+    if opt in ("-u", "--upload-files"):  
+      options["filesUpload"] = True
+      
+  # check coherence, fix if needed
+  if(options["templatesDepSync"] and not options["templatesSync"]):
+      options["templatesSync"] = True
+
+  # process each config file
+  for arg in args:
+    syncFromJSONFile(arg,options)
+    
+if __name__ == "__main__":
+  main()
 
 ######################################
 # Test parts
 
-def test() -> bool:
-  siteSrc = Site(fam="wikipedia",code="en")
-  siteDst = Site(fam="kiwix")
-  pages = [Page(siteSrc,"New_York_City"), 
-           Page(siteSrc,"Paris"), 
-           Page(siteSrc,"Geneva") ]
-           
-  simpleTest = (syncPages(siteSrc, siteDst, pages) == 3)
-  
-  pagesName = ["The_Handmaid's_Tale_(TV_series)","Black_Mirror","The_Wire"]
-  catsName = ["Cuba","Lille"]
-  
-  mainTest = ( syncPagesAndCategories("wikipedia","en","kiwix","kiwix",
-                pagesName, catsName ) == 27)
-  
-  return simpleTest and mainTest
+def test():
+  syncFromJSONFile("test.json", DEFAULT_OPTIONS)
 
-#if __name__ == "__main__":
-#  if test():
-#    print ("Test OK")
-#  else:
-#    print ("Test Error")
