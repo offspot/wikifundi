@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.5
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -24,14 +24,14 @@ from pywikibot import Site,Page,FilePage,Category,logging
 
 # For load YAML file config
 import sys
-import yaml
+import json
 
 # We use typing 
 from typing import List
 PageList = List[Page]
 FileList = List[FilePage]
 
-def uploadImages(src : Site, dst : Site, files : FileList) -> int :
+def uploadFiles(src : Site, dst : Site, files : FileList) -> int :
 
   nbImages = len(files)
   for i,f in enumerate(files):
@@ -39,11 +39,12 @@ def uploadImages(src : Site, dst : Site, files : FileList) -> int :
       pageDst = FilePage(dst, f.title())
       if(not pageDst.exists()):
         print ("== %i/%i Upload file %s" % (i+1, nbImages,  f.title()))
-        dst.upload(pageDst,source_url=f.get_file_url(),comment="sync",text=f.text,ignore_warnings=True)
+        dst.upload( pageDst, source_url=f.get_file_url(), comment=f.title(), text=f.text, ignore_warnings = False)
+                    
     except Exception:
-      print ("Error on sync page %s" % title)
+      print ("Error on upload file %s" % f.title())
 
-def syncPages(src : Site, dst : Site, pages : PageList) -> int: 
+def syncPages(src : Site, dst : Site, pages : PageList, force = False) -> int: 
   """Synchronize wiki pages from src to dst
     
     return the number of synchronized pages succes
@@ -61,8 +62,10 @@ def syncPages(src : Site, dst : Site, pages : PageList) -> int:
       # create a new page on dest wiki
       newPage = Page(dst, title)
       
-      if(newPage.exists()):  
+      if((not force) and newPage.exists()):  
         print ("Page %s exist" % title)
+      # sometime, pywikibot return a page in a different site, 
+      # here check this
       elif(newPage.site == dst):
       #elif(newPage.canBeEdited()):
         # copy the content of the page
@@ -86,45 +89,58 @@ def getTemplatesFromPages(pages : PageList) -> PageList :
     tplt = p.templates()
     nbTplt = len(tplt)
     if(nbTplt > 0):
-      print ("Add %i templates of %s" % (nbTplt, p.title()))
+      print ("Process %i templates of %s" % (nbTplt, p.title()))
       templates += tplt
       
   return list(set(templates))  
   
-def getImagesFromPages(pages : PageList) -> FileList :
+def getFilesFromPages(pages : PageList) -> FileList :
   images = []
   for p in pages :
     img = list(p.imagelinks())
     nbImg = len(img)
     if(nbImg > 0):
-      print ("Add %i images of %s" % (nbImg, p.title()))
+      print ("Process %i images of %s" % (nbImg, p.title()))
       images += img  
   return list(set(images))
   
-def syncPagesWithDependances(siteSrc : Site, siteDst : Site, pages : PageList) -> int: 
+def syncPagesWithDependances( siteSrc : Site, siteDst : Site, 
+                              pages : PageList, options : dict) -> int: 
 
   #get dependances
-  images = getImagesFromPages(pages)
-  templates = getTemplatesFromPages(pages)
-  dependances = getTemplatesFromPages(templates)
+  if(options['filesUpload']) :
+    images = getFilesFromPages(pages)
+    
+  if(options['templatesSync']):
+    templates = getTemplatesFromPages(pages)
+    
+  if(options['templatesDepSync']):    
+    dependances = getTemplatesFromPages(templates)
   
   #sync all pages, templates and associated files
   nbPageSync = 0
   
-  print ("====== Sync template dependances")
-  nbPageSync += syncPages(siteSrc, siteDst, dependances )
-  print ("====== Sync template")
-  nbPageSync += syncPages(siteSrc, siteDst, templates )
+  if(options['templatesDepSync']):
+    print ("====== Sync template dependances")
+    nbPageSync += syncPages(siteSrc, siteDst, dependances, options['force'] )
+    
+  if(options['templatesSync']):
+    print ("====== Sync template")
+    nbPageSync += syncPages(siteSrc, siteDst, templates, options['force'] )
+    
   print ("====== Sync pages")
-  nbPageSync += syncPages(siteSrc, siteDst, pages )  
-  print ("====== Upload images")
-  uploadImages (siteSrc, siteDst, images)  
+  nbPageSync += syncPages(siteSrc, siteDst, pages, options['force'] )  
+  
+  if(options['filesUpload']):
+    print ("====== Upload files")
+    uploadFiles (siteSrc, siteDst, images)  
   
   return nbPageSync;  
   
 def syncPagesAndCategories(
   srcFam : str, srcCode : str, dstFam : str, dstCode : str, 
-  pagesName : List[str], categoriesName : List[str]) -> int :
+  pagesName : List[str], categoriesName : List[str], 
+  options : dict) -> int :
   """Synchronize wiki pages from named page list
         and named categories list
     
@@ -156,22 +172,24 @@ def syncPagesAndCategories(
       pages += list( cat.articles() )
   
   #sync all pages !
-  return syncPagesWithDependances(siteSrc, siteDst, pages)    
+  return syncPagesWithDependances(siteSrc, siteDst, pages, options)    
 
 
 ######################################
 # Main parts
 
 def main(fileconfig):
-  with open(fileconfig, 'r') as ymlfile:
-    cfg = yaml.load(ymlfile)
+  options = dict(force = False, templatesSync = True, templatesDepSync = True, filesUpload = True)
+
+  with open(fileconfig, 'r') as jsonfile:
+    cfg = json.load(jsonfile)
     src = cfg['sites']['src']
     dst = cfg['sites']['dst']
     pages = cfg['pages']
     cats = cfg['categories']
     
     nb = syncPagesAndCategories(src['fam'], src['code'], dst['fam'], 
-      dst['code'], pages, cats)
+      dst['code'], pages, cats, options)
       
     print ("%i pages synchronized" % nb)
 
