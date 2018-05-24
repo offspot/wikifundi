@@ -8,6 +8,45 @@
  wikimedia_sync.py
 
  usage : ./wikimedia_sync.py [options] config_file1.json, config_file2.json, ...
+ 
+ options :
+  -f, --force : always copy  the content (even if page exist on site dest). Default : False
+  -t, --sync-templates : copy templates used by the pages to sync. Default : True
+  -d, --sync-dependances-templates : copy templates used by templates. Involve sync-templates. Default : True
+  -u", --upload-files : copy files (images, css, js, sounds, ...) used by the pages to sync. Default : True
+  
+ json file config :
+   
+   {
+    //the site must be configured in user-config.py file (see below)
+    "sites":{ 
+      "src":{ //set the site where to get the pages. 
+        "fam": "wikipedia",
+        "code": "en"
+      },
+      "dst":{ //set the site where to copy the pages
+        "fam": "kiwix",
+        "code": "en"    
+      }
+    },
+
+    // list of page to copy
+    "pages":[
+     "Page1",
+     "Page2"
+     "MediaWiki:Common.css",
+     "MediaWiki:Vector.js",
+     ...
+    ],
+    
+    // list of categories to copy
+    "categories":[
+      "Categorie 1",
+      "Catgegorie 2"
+      ...
+    ]
+
+  }
 
  Copy WikiMedia pages from a Wiki source (ex : a Wikipedia) to a Wiki 
  destionation (like a third-party wikis).
@@ -40,22 +79,32 @@ DEFAULT_OPTIONS = dict(
     filesUpload = True)
 
 def uploadFiles(src : Site, dst : Site, files : FileList) -> int :
-
+  """Download files from src site and upload on dst site
+    
+    return the number of succes uploaded files
+  """
+  
   nbImages = len(files)
   for i,f in enumerate(files):
     try:
+      # create a new file on dest wiki
       pageDst = FilePage(dst, f.title())
       if(not pageDst.exists()):
         print ("== %i/%i Upload file %s" % (i+1, nbImages,  f.title()))
-        dst.upload( pageDst, source_url=f.get_file_url(), comment=f.title(), text=f.text, ignore_warnings = False)
+        # start upload !
+        dst.upload( pageDst, source_url=f.get_file_url(), 
+                    comment=f.title(), text=f.text, 
+                    ignore_warnings = False)
                     
     except Exception:
       print ("Error on upload file %s" % f.title())
 
 def syncPages(src : Site, dst : Site, pages : PageList, force = False) -> int: 
   """Synchronize wiki pages from src to dst
+  
+    force : if true, always copy  the content (even if page exist on site dest) 
     
-    return the number of synchronized pages succes
+    return the number of succes synchronized pages 
   """
   
   nbSyncPage = 0
@@ -116,6 +165,13 @@ def getFilesFromPages(pages : PageList) -> FileList :
   
 def syncPagesWithDependances( siteSrc : Site, siteDst : Site, 
                               pages : PageList, options : dict) -> int: 
+  """ Get the dependances of pages (templates and files),
+      sync all pages and upload files contained in the pages
+  
+    options : dict from args scripts
+    
+    return the number of succes synchronized pages and files 
+  """
 
   #get templates and files used by pages
   
@@ -155,7 +211,7 @@ def syncPagesAndCategories(
   """Synchronize wiki pages from named page list
         and named categories list
     
-    return the number of synchronized pages succes
+    return the number of succes synchronized pages and files
   """  
   
   # configure sites
@@ -187,6 +243,10 @@ def syncPagesAndCategories(
 
 
 def syncFromJSONFile(fileconfig, options):
+  """Synchronize wiki pages from JSON file
+    
+    return the number of succes synchronized pages and files
+  """
   print ("Process %s" % fileconfig)
 
   with open(fileconfig, 'r') as jsonfile:
