@@ -86,7 +86,14 @@ RUN apt-get update && apt-get install -y \
 		lua5.1 \
 		# Required for SyntaxHighlighting
 		python3 \
+		# to generate locales
+		locales \
 	--no-install-recommends && rm -r /var/lib/apt/lists/*
+	
+# generate locale (set locale is used by MediaWiki scripts)
+RUN {  echo "LANG=en_US.UTF-8"
+       echo "LC_ALL=en_US.utf8"
+} > /etc/default/locale && locale-gen en_US.UTF-8
 	
 # Install the PHP extensions we need
 # mysqli needed for sqlite
