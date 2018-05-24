@@ -4,6 +4,10 @@
 $wgLanguageCode     = "fr";
 $wgSitename         = "WikiFundi";
 
+# Site language 
+$wgLanguageCode = "fr";
+$wgUploadWizardConfig['uwLanguages'] = array( 'fr' => 'French' );
+
 # Database settings
 $wgDBtype        = "sqlite";
 $wgDBserver      = "";

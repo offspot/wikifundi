@@ -77,9 +77,6 @@ $wgShellLocale = "en_US.utf8";
 ## this, if it's not already uncommented:
 #$wgHashedUploadDirectory = false;
 
-# Site language code, should be one of the list in ./languages/Names.php
-$wgLanguageCode = "fr";
-
 ## Default skin: you can change the default skin. Use the internal symbolic
 ## names, ie 'standard', 'nostalgia', 'cologneblue', 'monobook', 'vector':
 wfLoadSkin( 'Vector' );
@@ -158,6 +155,7 @@ $wgScribuntoDefaultEngine = 'luastandalone';
 #$wgScribuntoUseCodeEditor = true;
 $wgScribuntoEngineConf['luastandalone']['luaPath'] = "/usr/bin/lua5.1";
 $wgScribuntoEngineConf['luastandalone']['cpuLimit'] = 30000;
+$wgScribuntoEngineConf['luastandalone']['memoryLimit'] = 209715200; # bytes
 
 # UploadWizard extension
 wfLoadExtension('UploadWizard');
@@ -170,7 +168,6 @@ $wgUploadWizardConfig['skipTutorial'] = false;
 $wgUploadWizardConfig['fallbackToAltUploadForm'] = false;
 $wgUploadWizardConfig['enableMultiFileSelect'] = true;
 $wgUploadWizardConfig['enableChunked'] = true;
-$wgUploadWizardConfig['uwLanguages'] = array( 'fr' => 'French' );
 
 
 # Hieroglyphs
