@@ -54,6 +54,7 @@ ENV MEDIAWIKI_EXT_VISUALEDITOR_VERSION        REL1_31-2d2c8fc
 ENV MEDIAWIKI_EXT_EVENTLOGGIN_VERSION         REL1_31-3fddc40 
 ENV MEDIAWIKI_EXT_GUIDEDTOUR_VERSION          REL1_31-9cd5306
 ENV MEDIAWIKI_EXT_WIKIBASE_VERSION            REL1_31-8178d16
+ENV MEDIAWIKI_EXT_GEODATA_VERSION             REL1_31-96cda6b
 
 ###################
 # SOFTWARES SETUP #
@@ -148,7 +149,7 @@ RUN add_mw_extension VisualEditor ${MEDIAWIKI_EXT_VISUALEDITOR_VERSION}
 RUN add_mw_extension EventLogging ${MEDIAWIKI_EXT_EVENTLOGGIN_VERSION}
 RUN add_mw_extension GuidedTour ${MEDIAWIKI_EXT_GUIDEDTOUR_VERSION}
 RUN add_mw_extension Wikibase ${MEDIAWIKI_EXT_WIKIBASE_VERSION}
-RUN add_mw_extension GeoData REL1_31-96cda6b
+RUN add_mw_extension GeoData ${MEDIAWIKI_EXT_GEODATA_VERSION}
 
 # Install MetaDescriptionTag extension from GitHub beacause it is not in official repository
 RUN curl -fSL https://github.com/kolzchut/mediawiki-extensions-MetaDescriptionTag/archive/master.zip -o MetaDescriptionTag.zip \
