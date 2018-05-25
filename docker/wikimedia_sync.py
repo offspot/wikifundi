@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # author : Florent Kaisser
-# maintainer : kwix
+# maintainer : kiwix
 
 """
  wikimedia_sync.py

@@ -20,6 +20,9 @@ ENV DATABASE_NAME mw_${WIKI_NAME}
 ENV MEDIAWIKI_CONFIG_FILE_CUSTOM ./config/mediawiki/LocalSettings.${WIKI_NAME}.php
 ENV MEDIAWIKI_CONFIG_FILE_BASE ./config/mediawiki/LocalSettings.php
 ENV PARSOID_CONFIG_FILE ./config/parsoid/localsettings.js
+ENV PYWIKIBOT_CONFIG_FILE ./config/pywikibot/user-config.py
+ENV PYWIKIBOT_PASSWORD_FILE ./config/pywikibot/user-password.py
+ENV WIKIFUNDI_CONFIG_FILE ./config/wikifundi/${WIKI_NAME}.json
 
 # Custom image
 ENV MEDIAWIKI_LOGO_FILE ./assets/images/logo.${WIKI_NAME}.png
@@ -34,27 +37,27 @@ ENV PARSOID_VERSION_YEAR 2016
 ENV PARSOID_VERSION_MONTH 08
 
 # Extensions versions
-ENV MEDIAWIKI_EXT_NUKE_VERSION                REL1_31-c6ec842
-ENV MEDIAWIKI_EXT_MANTLE_VERSION              REL1_28-a2885d3
-ENV MEDIAWIKI_EXT_SCRIBUNTO_VERSION           REL1_31-106fbf4
-ENV MEDIAWIKI_EXT_UPLOADWIZARD_VERSION        REL1_31-1ba0e4e
-ENV MEDIAWIKI_EXT_TITLEKEY_VERSION            REL1_31-a0948c5
-ENV MEDIAWIKI_EXT_TITLEBLACKLIST_VERSION      REL1_31-1143a1f
-ENV MEDIAWIKI_EXT_VALIDATOR_VERSION           REL1_28-21254dd
-ENV MEDIAWIKI_EXT_MAPS_VERSION                REL1_28-26b399b
-ENV MEDIAWIKI_EXT_MWEMBEDSUPPORT_VERSION      REL1_31-9573c4b
-ENV MEDIAWIKI_EXT_TIMEDMEDIAHANDLER_VERSION   REL1_31-e94b232
-ENV MEDIAWIKI_EXT_WIKIHIERO_VERSION           REL1_31-dc231d0
-ENV MEDIAWIKI_EXT_MATH_VERSION                REL1_31-a1263db
-ENV MEDIAWIKI_EXT_TIMELINE_VERSION            REL1_31-083b72e 
-ENV MEDIAWIKI_EXT_ECHO_VERSION                REL1_31-ed7f8f4
-ENV MEDIAWIKI_EXT_MOBILEFRONTEND_VERSION      REL1_31-7f66849
-ENV MEDIAWIKI_EXT_THANKS_VERSION              REL1_31-a845a46
-ENV MEDIAWIKI_EXT_VISUALEDITOR_VERSION        REL1_31-2d2c8fc
-ENV MEDIAWIKI_EXT_EVENTLOGGIN_VERSION         REL1_31-3fddc40 
-ENV MEDIAWIKI_EXT_GUIDEDTOUR_VERSION          REL1_31-9cd5306
-ENV MEDIAWIKI_EXT_WIKIBASE_VERSION            REL1_31-8178d16
-ENV MEDIAWIKI_EXT_GEODATA_VERSION             REL1_31-96cda6b
+ENV MEDIAWIKI_EXT_NUKE_VERSION                REL1_31
+ENV MEDIAWIKI_EXT_MANTLE_VERSION              REL1_28
+ENV MEDIAWIKI_EXT_SCRIBUNTO_VERSION           REL1_31
+ENV MEDIAWIKI_EXT_UPLOADWIZARD_VERSION        REL1_31
+ENV MEDIAWIKI_EXT_TITLEKEY_VERSION            REL1_31
+ENV MEDIAWIKI_EXT_TITLEBLACKLIST_VERSION      REL1_31
+ENV MEDIAWIKI_EXT_VALIDATOR_VERSION           REL1_28
+ENV MEDIAWIKI_EXT_MAPS_VERSION                REL1_28
+ENV MEDIAWIKI_EXT_MWEMBEDSUPPORT_VERSION      REL1_31
+ENV MEDIAWIKI_EXT_TIMEDMEDIAHANDLER_VERSION   REL1_31
+ENV MEDIAWIKI_EXT_WIKIHIERO_VERSION           REL1_31
+ENV MEDIAWIKI_EXT_MATH_VERSION                REL1_31
+ENV MEDIAWIKI_EXT_TIMELINE_VERSION            REL1_31
+ENV MEDIAWIKI_EXT_ECHO_VERSION                REL1_31
+ENV MEDIAWIKI_EXT_MOBILEFRONTEND_VERSION      REL1_31
+ENV MEDIAWIKI_EXT_THANKS_VERSION              REL1_31
+ENV MEDIAWIKI_EXT_VISUALEDITOR_VERSION        REL1_31
+ENV MEDIAWIKI_EXT_EVENTLOGGIN_VERSION         REL1_31
+ENV MEDIAWIKI_EXT_GUIDEDTOUR_VERSION          REL1_31
+ENV MEDIAWIKI_EXT_WIKIBASE_VERSION            REL1_31
+ENV MEDIAWIKI_EXT_GEODATA_VERSION             REL1_31
 
 ###################
 # SOFTWARES SETUP #
@@ -86,6 +89,8 @@ RUN apt-get update && apt-get install -y \
 		lua5.1 \
 		# Required for SyntaxHighlighting
 		python3 \
+		# Required for add_mw_extension script
+		python-subprocess32 \
 		# to generate locales
 		locales \
 	--no-install-recommends && rm -r /var/lib/apt/lists/*
@@ -132,7 +137,7 @@ RUN chown -R www-data:www-data parsoid
 ######################################################
 
 # Copy script to add an extension
-COPY ./add_mw_extension.sh /usr/local/bin/add_mw_extension
+COPY ./add_mw_extension.py /usr/local/bin/add_mw_extension
 RUN chmod a+x /usr/local/bin/add_mw_extension
 
 # Call script to add all extensions needed by MediaWiki/Kiwix
@@ -184,6 +189,13 @@ COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./LocalSettings.custom.php
 # Configure Parsoid
 COPY ${PARSOID_CONFIG_FILE} ./parsoid/
 
+# Configure Pywikibot (must be in same directory of wikimedia_sync.py)
+COPY ${PYWIKIBOT_CONFIG_FILE} /usr/local/bin/
+COPY ${PYWIKIBOT_PASSWORD_FILE} /usr/local/bin/
+
+# Configure Wikifundi config
+COPY ${WIKIFUNDI_CONFIG_FILE} ./wikifundi.json
+
 # Copy assets
 COPY ${MEDIAWIKI_LOGO_FILE} ./
 
@@ -196,6 +208,10 @@ COPY ./data/my_wiki.sqlite /tmp/
 ###########
 # START ! #
 ###########
+
+# Copy script used by start.sh to sync wikimedia pages
+COPY ./wikimedia_sync.py /usr/local/bin/wikimedia_sync
+RUN chmod a+x /usr/local/bin/wikimedia_sync
   
 # Run start script
 COPY ./start.sh /usr/local/bin/start.sh
