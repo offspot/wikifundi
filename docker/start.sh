@@ -18,7 +18,10 @@ else
   #Allow to write on database
   chmod 644 ${DATABASE_FILE} && chown www-data:www-data ${DATABASE_FILE}
   #Sync page
-  #call pywikibot script
+  #web serveur must be lauch to sync pages
+  service apache2 start
+  #lauch sync script
+  wikimedia_sync wikifundi.json
   #Mediawik init database 
   cd maintenance \ && ./update.php --quick \ && cd ..
 fi
@@ -29,13 +32,13 @@ nodejs parsoid/bin/server.js 2>> /var/log/parsoid &
 
 service memcached start 
 
-if [ -z "$1" ]
-then
-  echo "Starting Apache 2 ..."
-  apache2ctl -D FOREGROUND
-else
-  service apache2 start
-  # for debug
-  exec "$@"
-fi
+#if [ -z "$1" ]
+#then
+#  echo "Starting Apache 2 ..."
+#  apache2ctl -D FOREGROUND
+#else
+service apache2 start
+# for debug
+exec "$@"
+#fi
 
