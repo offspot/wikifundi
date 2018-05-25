@@ -6,6 +6,12 @@
 
 """
  wikimedia_sync.py
+ 
+ Copy WikiMedia pages from a Wiki source (ex : a Wikipedia) to a Wiki 
+ destionation (like a third-party wikis).
+
+ A config file given in args contain name of pages and categories to 
+ synchronize, and Wiki source and destination. 
 
  usage : ./wikimedia_sync.py [options] config_file1.json, config_file2.json, ...
  
@@ -47,12 +53,6 @@
     ]
 
   }
-
- Copy WikiMedia pages from a Wiki source (ex : a Wikipedia) to a Wiki 
- destionation (like a third-party wikis).
-
- A config file given in args contain name of pages and categories to 
- synchronize, and Wiki source and destination.
 
  IMPORTANT : We must have user-password.py and user-config.py in same 
  directory of this script to congigure pywikibot. 
@@ -96,8 +96,42 @@ def uploadFiles(src : Site, dst : Site, files : FileList) -> int :
                     comment=f.title(), text=f.text, 
                     ignore_warnings = False)
                     
-    except Exception:
-      print ("Error on upload file %s" % f.title())
+    except Exception as e:
+      print ("Error on upload file %s (%s)" % (f.title(),e))
+
+def syncPage(src : Site, dst : Site, p : Page, force = False, checkRedirect = True) -> bool:
+  """Synchronize ONE wiki pages from src to dst
+  
+     return true if success
+  """
+
+  # create a new page on dest wiki
+  newPage = Page(dst, p.title())
+  
+  try:      
+    # if page exist on dest and no force -> do not sync this page
+    if((not force) and newPage.exists()):  
+      return False
+      
+    # sometime, pywikibot return a page in a different site, 
+    # here check this
+    elif(newPage.site == dst):
+    
+      #sync also the redirect target 
+      if(p.isRedirectPage()):
+        syncPage(src, dst, p.getRedirectTarget(), force, False)
+        
+      # copy the content of the page
+      newPage.text = p.text
+      
+      # commit the new page on dest wiki
+      return dst.editpage(newPage)
+      
+  except Exception as e:
+    print ("Error on sync page %s (%s)" % (p.title(), e))
+    return False
+    
+  return False
 
 def syncPages(src : Site, dst : Site, pages : PageList, force = False) -> int: 
   """Synchronize wiki pages from src to dst
@@ -111,32 +145,9 @@ def syncPages(src : Site, dst : Site, pages : PageList, force = False) -> int:
   nbPage = len(pages)
   
   for i,p in enumerate(pages):
-
-    title = p.title()
-    print ("== %i/%i Sync %s " % (i+1,nbPage,title))
-    
-    try:      
-      # create a new page on dest wiki
-      newPage = Page(dst, title)
-      
-      if((not force) and newPage.exists()):  
-        print ("Page %s exist" % title)
-      # sometime, pywikibot return a page in a different site, 
-      # here check this
-      elif(newPage.site == dst):
-      #elif(newPage.canBeEdited()):
-        # copy the content of the page
-        newPage.text = p.text
-        
-        # commit the new page on dest wiki
-        if (dst.editpage(newPage)):
-          nbSyncPage = nbSyncPage + 1
-        else:
-          print ("Error on saving page %s" % title)
-      else:
-        print ("Page %s not editable on dest" % title)
-    except Exception:
-      print ("Error on sync page %s" % title)
+    print ("== %i/%i Sync %s " % (i+1,nbPage,p.title()))
+    if(syncPage(src,dst,p,force)):
+      nbSyncPage = nbSyncPage + 1
       
   return nbSyncPage
   
@@ -158,10 +169,10 @@ def getFilesFromPages(pages : PageList) -> FileList :
     # get files used by p
     f = list(p.imagelinks())
     nbFiles = len(f)
-    if(nbImg > 0):
+    if(nbFiles > 0):
       print ("Process %i images of %s" % (nbFiles, p.title()))
-      images += f  
-  return list(set(images))
+      files += f  
+  return list(set(files))
   
 def syncPagesWithDependances( siteSrc : Site, siteDst : Site, 
                               pages : PageList, options : dict) -> int: 
@@ -212,6 +223,7 @@ def syncPagesAndCategories(
         and named categories list
     
     return the number of succes synchronized pages and files
+    
   """  
   
   # configure sites
@@ -311,5 +323,6 @@ if __name__ == "__main__":
 # Test parts
 
 def test():
+  #syncPagesAndCategories("wikipedia","en","kiwix","kiwix",["Redirect_Message"],[],DEFAULT_OPTIONS)
   syncFromJSONFile("test.json", DEFAULT_OPTIONS)
 
