@@ -37,13 +37,13 @@ family = 'wikipedia'
 # The language code of the site we're working on.
 mylang = 'en'
 
-family_files['kiwix']='http://localhost:8080/api.php'
+family_files['kiwix']='http://localhost/api.php'
 
 # The dictionary usernames should contain a username for each site where you
 # have a bot account. If you have a unique username for all languages of a
 # family , you can use '*'
-usernames['wikipedia']['fr'] = u'flockies'
-usernames['wikipedia']['en'] = u'flockies'
+usernames['wikipedia']['fr'] = u'kiwix'
+usernames['wikipedia']['en'] = u'kiwix'
 usernames['kiwix']['*'] = u'Admin'
 
 # The list of BotPasswords is saved in another file. Import it if needed.
