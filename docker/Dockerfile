@@ -11,7 +11,7 @@ VOLUME /var/www/html/images
 VOLUME /var/www/data
 
 # Wiki name
-ENV WIKI_NAME kiwix
+ENV WIKI_NAME kiwix 
 
 # Database name
 ENV DATABASE_NAME mw_${WIKI_NAME}
@@ -58,6 +58,9 @@ ENV MEDIAWIKI_EXT_EVENTLOGGIN_VERSION         REL1_31
 ENV MEDIAWIKI_EXT_GUIDEDTOUR_VERSION          REL1_31
 ENV MEDIAWIKI_EXT_WIKIBASE_VERSION            REL1_31
 ENV MEDIAWIKI_EXT_GEODATA_VERSION             REL1_31
+
+# PyWikibot fileconfig directory
+ENV PYWIKIBOT2_DIR /usr/local/etc
 
 ###################
 # SOFTWARES SETUP #
@@ -190,8 +193,8 @@ COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./LocalSettings.custom.php
 COPY ${PARSOID_CONFIG_FILE} ./parsoid/
 
 # Configure Pywikibot (must be in same directory of wikimedia_sync.py)
-COPY ${PYWIKIBOT_CONFIG_FILE} /usr/local/bin/
-COPY ${PYWIKIBOT_PASSWORD_FILE} /usr/local/bin/
+COPY ${PYWIKIBOT_CONFIG_FILE} ${PYWIKIBOT2_DIR}/ 
+COPY ${PYWIKIBOT_PASSWORD_FILE} ${PYWIKIBOT2_DIR}/ 
 
 # Configure Wikifundi config
 COPY ${WIKIFUNDI_CONFIG_FILE} ./wikifundi.json
