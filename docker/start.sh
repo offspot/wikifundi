@@ -31,10 +31,14 @@ else
 fi
 
 #maintenance
-cd maintenance && ./update.php --quick && cd ..
+cd maintenance 
+ ./update.php --quick
+cd ..
 
 echo "Starting Persoid ..."
-cd parsoid && node bin/server.js &  cd .. 
+cd parsoid
+node bin/server.js
+cd .. 
 
 
 service memcached start 
