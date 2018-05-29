@@ -67,37 +67,47 @@ import sys
 import json
 import getopt
 
+# To use regular expression
+import re
+
 # We use typing 
-from typing import List
+from typing import List, Pattern
 PageList = List[Page]
 FileList = List[FilePage]
+ModList = List[(Pattern, str)]
 
 DEFAULT_OPTIONS = dict(
     force = False, 
     templatesSync = True, 
     templatesDepSync = True, 
     filesUpload = True)
-
-def uploadFiles(src : Site, dst : Site, files : FileList) -> int :
-  """Download files from src site and upload on dst site
     
-    return the number of succes uploaded files
-  """
+def modifyPage(dst : Site, p : Page, subs : ModList) -> bool :
+
   
-  nbImages = len(files)
-  for i,f in enumerate(files):
-    try:
-      # create a new file on dest wiki
-      pageDst = FilePage(dst, f.title())
-      if(not pageDst.exists()):
-        print ("== %i/%i Upload file %s" % (i+1, nbImages,  f.title()))
-        # start upload !
-        dst.upload( pageDst, source_url=f.get_file_url(), 
-                    comment=f.title(), text=f.text, 
-                    ignore_warnings = False)
-                    
-    except Exception as e:
-      print ("Error on upload file %s (%s)" % (f.title(),e))
+  try:
+  
+    for s in subs :
+      pattern = s[0]
+      repl = s[1]
+      p.text = re.sub(pattern, repl, p.text)
+    
+    return dst.editpage(p)
+    
+  except Exception as e:
+      print ("Error to modify page %s (%s)" % (p.title(), e))
+      return False 
+      
+def modifyPages(dst : Site, pages : ListPage, subs : ModList) -> bool :  
+  nbModPage = 0
+  nbPage = len(pages)
+  
+  for i,p in enumerate(pages):
+    print ("== %i/%i Modification of %s " % (i+1,nbPage,p.title()))
+    if(modifyPage(dst,p,subs)):
+      nbModPage = nbModPage + 1
+      
+  return nbModPage
 
 def syncPage(src : Site, dst : Site, p : Page, force = False, checkRedirect = True) -> bool:
   """Synchronize ONE wiki pages from src to dst
@@ -132,6 +142,27 @@ def syncPage(src : Site, dst : Site, p : Page, force = False, checkRedirect = Tr
     return False
     
   return False
+  
+def uploadFiles(src : Site, dst : Site, files : FileList) -> int :
+  """Download files from src site and upload on dst site
+    
+    return the number of succes uploaded files
+  """
+  
+  nbImages = len(files)
+  for i,f in enumerate(files):
+    try:
+      # create a new file on dest wiki
+      pageDst = FilePage(dst, f.title())
+      if(not pageDst.exists()):
+        print ("== %i/%i Upload file %s" % (i+1, nbImages,  f.title()))
+        # start upload !
+        dst.upload( pageDst, source_url=f.get_file_url(), 
+                    comment=f.title(), text=f.text, 
+                    ignore_warnings = False)
+                    
+    except Exception as e:
+      print ("Error on upload file %s (%s)" % (f.title(),e))  
 
 def syncPages(src : Site, dst : Site, pages : PageList, force = False) -> int: 
   """Synchronize wiki pages from src to dst
@@ -215,10 +246,12 @@ def syncPagesWithDependances( siteSrc : Site, siteDst : Site,
   
   return nbPageSync;  
   
-def syncPagesAndCategories(
+#############
+  
+def syncAndModifyPages(
   srcFam : str, srcCode : str, dstFam : str, dstCode : str, 
   pagesName : List[str], categoriesName : List[str], 
-  options : dict) -> int :
+  modifications : List[dict], options : dict) -> int :
   """Synchronize wiki pages from named page list
         and named categories list
     
@@ -232,7 +265,7 @@ def syncPagesAndCategories(
   
   siteDst.login()
   
-  #disable mechanics to slow down wiki write
+  #disable slow down wiki write mechanics 
   siteDst.throttle.maxdelay=0  
   
   pages = []
@@ -247,14 +280,39 @@ def syncPagesAndCategories(
     for cat in categories :
       pages += [ Page(siteSrc, cat.title()) ]
       print ("Retrieve pages from " + cat.title())
-      # add pages of this categorie to pages list to sync
+      # add pages to sync of this categorie 
       pages += list( cat.articles() )
   
   #sync all pages !
-  return syncPagesWithDependances(siteSrc, siteDst, pages, options)    
+  #nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)    
+  
+  print (pages)
+  print (modifications)
+  
+  nbMods = 0
+  
+  if( modifications ):
+    for mod in modifications :
+      # get all pages to modify from regex mod['pages']
+      pageMod = list(filter( 
+               lambda p : re.search(mod['pages'],p.title()),
+               pages
+             ))
+      # get all supstitution to apply on list of pages
+      subs = list(map( 
+               lambda s : (re.compile(s['pattern']),s['repl']), 
+               mod['substitutions']
+             ))
+      
+      #modifyPages(siteDst, pageMod, subs)
+      print(pageMod)
+      print(subs)
+      
+  
+  return (nbPages,nbMod)
 
 
-def syncFromJSONFile(fileconfig, options):
+def processFromJSONFile(fileconfig, options):
   """Synchronize wiki pages from JSON file
     
     return the number of succes synchronized pages and files
@@ -267,11 +325,15 @@ def syncFromJSONFile(fileconfig, options):
     dst = cfg['sites']['dst']
     pages = cfg['pages']
     cats = cfg['categories']
+    mods = cfg['modifications']
     
-    nb = syncPagesAndCategories(src['fam'], src['code'], dst['fam'], 
-      dst['code'], pages, cats, options)
+    (nbPages,nbMods) = syncAndModifyPages(
+      src['fam'], src['code'], 
+      dst['fam'], dst['code'], 
+      pages, cats, mods, options
+    )
       
-    print ("%i pages synchronized" % nb)
+    print ("%i pages synchronized and %i pages modify" % (nbPages, nbMods))
 
 ######################################
 # Main parts
@@ -314,7 +376,7 @@ def main():
 
   # process each config file
   for arg in args:
-    syncFromJSONFile(arg,options)
+    processFromJSONFile(arg,options)
     
 if __name__ == "__main__":
   main()
@@ -324,5 +386,5 @@ if __name__ == "__main__":
 
 def test():
   #syncPagesAndCategories("wikipedia","en","kiwix","kiwix",["Redirect_Message"],[],DEFAULT_OPTIONS)
-  syncFromJSONFile("test.json", DEFAULT_OPTIONS)
+  processFromJSONFile("test.json", DEFAULT_OPTIONS)
 

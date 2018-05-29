@@ -14,50 +14,29 @@ VOLUME /var/www/data
 ENV WIKI_NAME kiwix 
 
 # Database name
-ENV DATABASE_NAME mw_${WIKI_NAME}
+ENV DATABASE_NAME mw_kiwix
 
 # Files config
-ENV MEDIAWIKI_CONFIG_FILE_CUSTOM ./config/mediawiki/LocalSettings.${WIKI_NAME}.php
+ENV MEDIAWIKI_CONFIG_FILE_CUSTOM ./config/mediawiki/LocalSettings.custom.php
 ENV MEDIAWIKI_CONFIG_FILE_BASE ./config/mediawiki/LocalSettings.php
+ENV MEDIAWIKI_CONFIG_FILE_COMPOSER ./config/mediawiki/composer.json
 ENV PARSOID_CONFIG_FILE ./config/parsoid/localsettings.js
 ENV PYWIKIBOT_CONFIG_FILE ./config/pywikibot/user-config.py
 ENV PYWIKIBOT_PASSWORD_FILE ./config/pywikibot/user-password.py
-ENV WIKIFUNDI_CONFIG_FILE ./config/wikifundi/${WIKI_NAME}.json
+ENV WIKIFUNDI_CONFIG_FILE ./config/wikifundi/wikifundi.json
 
 # Custom image
-ENV MEDIAWIKI_LOGO_FILE ./assets/images/logo.${WIKI_NAME}.png
+ENV MEDIAWIKI_LOGO_FILE ./assets/images/logo.png
 
 # Media Wiki Version
 ENV MEDIAWIKI_MAJOR_VERSION 1.31
 ENV MEDIAWIKI_VERSION 1.31.0
 ENV MEDIAWIKI_RC rc.0
+ENV MEDIAWIKI_EXT_VERSION REL1_31
 
 # Parsoid Version
 ENV PARSOID_VERSION_YEAR 2016
 ENV PARSOID_VERSION_MONTH 08
-
-# Extensions versions
-ENV MEDIAWIKI_EXT_NUKE_VERSION                REL1_31
-ENV MEDIAWIKI_EXT_MANTLE_VERSION              REL1_28
-ENV MEDIAWIKI_EXT_SCRIBUNTO_VERSION           REL1_31
-ENV MEDIAWIKI_EXT_UPLOADWIZARD_VERSION        REL1_31
-ENV MEDIAWIKI_EXT_TITLEKEY_VERSION            REL1_31
-ENV MEDIAWIKI_EXT_TITLEBLACKLIST_VERSION      REL1_31
-ENV MEDIAWIKI_EXT_VALIDATOR_VERSION           REL1_28
-ENV MEDIAWIKI_EXT_MAPS_VERSION                REL1_28
-ENV MEDIAWIKI_EXT_MWEMBEDSUPPORT_VERSION      REL1_31
-ENV MEDIAWIKI_EXT_TIMEDMEDIAHANDLER_VERSION   REL1_31
-ENV MEDIAWIKI_EXT_WIKIHIERO_VERSION           REL1_31
-ENV MEDIAWIKI_EXT_MATH_VERSION                REL1_31
-ENV MEDIAWIKI_EXT_TIMELINE_VERSION            REL1_31
-ENV MEDIAWIKI_EXT_ECHO_VERSION                REL1_31
-ENV MEDIAWIKI_EXT_MOBILEFRONTEND_VERSION      REL1_31
-ENV MEDIAWIKI_EXT_THANKS_VERSION              REL1_31
-ENV MEDIAWIKI_EXT_VISUALEDITOR_VERSION        REL1_31
-ENV MEDIAWIKI_EXT_EVENTLOGGIN_VERSION         REL1_31
-ENV MEDIAWIKI_EXT_GUIDEDTOUR_VERSION          REL1_31
-ENV MEDIAWIKI_EXT_WIKIBASE_VERSION            REL1_31
-ENV MEDIAWIKI_EXT_GEODATA_VERSION             REL1_31
 
 # PyWikibot fileconfig directory
 ENV PYWIKIBOT2_DIR /usr/local/etc
@@ -92,15 +71,13 @@ RUN apt-get update && apt-get install -y \
 		lua5.1 \
 		# Required for SyntaxHighlighting
 		python3 \
-		# Required for add_mw_extension script
-		python-subprocess32 \
 		# to generate locales
 		locales \
 	--no-install-recommends && rm -r /var/lib/apt/lists/*
 	
 # generate locale (set locale is used by MediaWiki scripts)
-RUN {  echo "LANG=en_US.UTF-8"
-       echo "LC_ALL=en_US.utf8"
+RUN {  echo "LANG=en_US.UTF-8"; \
+       echo "LC_ALL=en_US.utf8"; \
 } > /etc/default/locale && locale-gen en_US.UTF-8
 	
 # Install the PHP extensions we need
@@ -144,35 +121,34 @@ COPY ./add_mw_extension.py /usr/local/bin/add_mw_extension
 RUN chmod a+x /usr/local/bin/add_mw_extension
 
 # Call script to add all extensions needed by MediaWiki/Kiwix
-RUN add_mw_extension Nuke ${MEDIAWIKI_EXT_NUKE_VERSION}
-RUN add_mw_extension Mantle ${MEDIAWIKI_EXT_MANTLE_VERSION}
-RUN add_mw_extension Scribunto ${MEDIAWIKI_EXT_SCRIBUNTO_VERSION}
-RUN add_mw_extension UploadWizard ${MEDIAWIKI_EXT_UPLOADWIZARD_VERSION}
-RUN add_mw_extension TitleKey ${MEDIAWIKI_EXT_TITLEKEY_VERSION}
-RUN add_mw_extension TitleBlacklist ${MEDIAWIKI_EXT_TITLEBLACKLIST_VERSION}
-RUN add_mw_extension Validator ${MEDIAWIKI_EXT_VALIDATOR_VERSION}
-RUN add_mw_extension Maps ${MEDIAWIKI_EXT_MAPS_VERSION}
-RUN add_mw_extension MwEmbedSupport ${MEDIAWIKI_EXT_MWEMBEDSUPPORT_VERSION}
-RUN add_mw_extension TimedMediaHandler ${MEDIAWIKI_EXT_TIMEDMEDIAHANDLER_VERSION}
-RUN add_mw_extension wikihiero ${MEDIAWIKI_EXT_WIKIHIERO_VERSION}
-RUN add_mw_extension Math ${MEDIAWIKI_EXT_MATH_VERSION}
-RUN add_mw_extension timeline ${MEDIAWIKI_EXT_TIMELINE_VERSION}
-RUN add_mw_extension Echo ${MEDIAWIKI_EXT_ECHO_VERSION}
-RUN add_mw_extension MobileFrontend ${MEDIAWIKI_EXT_MOBILEFRONTEND_VERSION}
-RUN add_mw_extension Thanks ${MEDIAWIKI_EXT_THANKS_VERSION}
-RUN add_mw_extension VisualEditor ${MEDIAWIKI_EXT_VISUALEDITOR_VERSION}
-RUN add_mw_extension EventLogging ${MEDIAWIKI_EXT_EVENTLOGGIN_VERSION}
-RUN add_mw_extension GuidedTour ${MEDIAWIKI_EXT_GUIDEDTOUR_VERSION}
-RUN add_mw_extension Wikibase ${MEDIAWIKI_EXT_WIKIBASE_VERSION}
-RUN add_mw_extension GeoData ${MEDIAWIKI_EXT_GEODATA_VERSION}
+RUN add_mw_extension Nuke ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension Scribunto ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension UploadWizard ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension TitleKey ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension TitleBlacklist ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension MwEmbedSupport ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension TimedMediaHandler ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension wikihiero ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension Math ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension timeline ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension Echo ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension MobileFrontend ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension Thanks ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension VisualEditor ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension EventLogging ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension GuidedTour ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension Wikibase ${MEDIAWIKI_EXT_VERSION}
+RUN add_mw_extension GeoData ${MEDIAWIKI_EXT_VERSION}
+
+# To install Maps and Validator extensions with composer
+COPY ${MEDIAWIKI_CONFIG_FILE_COMPOSER} ./
+RUN curl -fSL https://getcomposer.org/composer.phar -o composer.phar \
+ && php composer.phar update --no-dev
 
 # Install MetaDescriptionTag extension from GitHub beacause it is not in official repository
 RUN curl -fSL https://github.com/kolzchut/mediawiki-extensions-MetaDescriptionTag/archive/master.zip -o MetaDescriptionTag.zip \
  && unzip MetaDescriptionTag.zip -d extensions/ \
  && mv extensions/mediawiki-extensions-MetaDescriptionTag-master extensions/MetaDescriptionTag
-
-# Fix naming issue of timeline extension
-#RUN mv extensions/timeline extensions/TimeLine
 
 # Clean Math extension
 RUN make -C extensions/Math/math clean all \
@@ -219,4 +195,4 @@ RUN chmod a+x /usr/local/bin/wikimedia_sync
 # Run start script
 COPY ./start.sh /usr/local/bin/start.sh
 RUN chmod a+x /usr/local/bin/start.sh
-ENTRYPOINT ["start.sh"] 
+ENTRYPOINT "start.sh"

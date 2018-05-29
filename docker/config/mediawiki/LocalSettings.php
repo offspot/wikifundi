@@ -214,13 +214,13 @@ wfLoadExtension('MwEmbedSupport');
 require_once("$IP/extensions/TimedMediaHandler/TimedMediaHandler.php");
 
 # Mantle extensions
-require_once("$IP/extensions/Mantle/Mantle.php");
+#require_once("$IP/extensions/Mantle/Mantle.php");
 
 # Validator
-require_once("$IP/extensions/Validator/Validator.php");
+#require_once("$IP/extensions/Validator/Validator.php");
 
 # Maps
-require_once("$IP/extensions/Maps/Maps.php");
+#require_once("$IP/extensions/Maps/Maps.php");
 
 $wgFileExtensions = array_merge( $wgFileExtensions, array( 'doc', 'docx' ) );
 
