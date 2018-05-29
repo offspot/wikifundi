@@ -8,9 +8,6 @@ chown www-data:www-data /var/www/data
 #Fix latence problem
 rm -rf /var/www/data/locks
 
-#update extensions, 
-#TODO retest in Dockerfile
-#php composer.phar update --no-dev
 
 #Init database
 if [ -e ${DATABASE_FILE} ]
@@ -34,12 +31,17 @@ else
 fi
 
 #maintenance
-cd maintenance \ && ./update.php --quick \ && cd ..
+cd maintenance && ./update.php --quick && cd ..
 
 echo "Starting Persoid ..."
-nodejs parsoid/bin/server.js 2>> /var/log/parsoid &
+cd parsoid && node bin/server.js &  cd .. 
+
 
 service memcached start 
+
+#service apache2 start
+
+#/bin/bash
 
 echo "Starting Apache 2 ..."
 apache2ctl -D FOREGROUND

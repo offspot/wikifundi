@@ -107,9 +107,16 @@ RUN curl -fSL "https://releases.wikimedia.org/mediawiki/${MEDIAWIKI_MAJOR_VERSIO
 	&& chown -R www-data:www-data skins cache images
 
 # Parsoid setup
-RUN curl -fSL "http://download.kiwix.org/other/wikifundi/parsoid_${PARSOID_VERSION_YEAR}-${PARSOID_VERSION_MONTH}.tar.bz2" -o parsoid.tar.gz \
-  && tar -xf parsoid.tar.gz \
-  && rm parsoid.tar.gz
+RUN git clone --quiet https://gerrit.wikimedia.org/r/p/mediawiki/services/parsoid \
+  # install modules
+  && cd parsoid \
+  && npm install \
+  && cd .. \
+  # update node
+  && npm cache clean -f \
+  && npm install -g n \
+  && n stable 
+
 RUN chown -R www-data:www-data parsoid 
 
 ######################################################
@@ -167,6 +174,7 @@ COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./LocalSettings.custom.php
 
 # Configure Parsoid
 COPY ${PARSOID_CONFIG_FILE} ./parsoid/
+COPY ./config/parsoid/config.yaml ./parsoid/
 
 # Configure Pywikibot (must be in same directory of wikimedia_sync.py)
 COPY ${PYWIKIBOT_CONFIG_FILE} ${PYWIKIBOT2_DIR}/ 
