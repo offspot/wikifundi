@@ -20,10 +20,10 @@ ENV DATABASE_NAME mw_kiwix
 ENV MEDIAWIKI_CONFIG_FILE_CUSTOM ./config/mediawiki/LocalSettings.custom.php
 ENV MEDIAWIKI_CONFIG_FILE_BASE ./config/mediawiki/LocalSettings.php
 ENV MEDIAWIKI_CONFIG_FILE_COMPOSER ./config/mediawiki/composer.json
-ENV PARSOID_CONFIG_FILE ./config/parsoid/localsettings.js
+ENV PARSOID_CONFIG_FILE ./config/parsoid/config.yaml
 ENV PYWIKIBOT_CONFIG_FILE ./config/pywikibot/user-config.py
 ENV PYWIKIBOT_PASSWORD_FILE ./config/pywikibot/user-password.py
-ENV WIKIFUNDI_CONFIG_FILE ./config/wikifundi/wikifundi.json
+ENV MIRRORING_CONFIG_FILE ./config/mirroring/mirroring.json
 
 # Custom image
 ENV MEDIAWIKI_LOGO_FILE ./assets/images/logo.png
@@ -33,10 +33,6 @@ ENV MEDIAWIKI_MAJOR_VERSION 1.31
 ENV MEDIAWIKI_VERSION 1.31.0
 ENV MEDIAWIKI_RC rc.0
 ENV MEDIAWIKI_EXT_VERSION REL1_31
-
-# Parsoid Version
-ENV PARSOID_VERSION_YEAR 2016
-ENV PARSOID_VERSION_MONTH 08
 
 # PyWikibot fileconfig directory
 ENV PYWIKIBOT2_DIR /usr/local/etc
@@ -174,14 +170,13 @@ COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./LocalSettings.custom.php
 
 # Configure Parsoid
 COPY ${PARSOID_CONFIG_FILE} ./parsoid/
-COPY ./config/parsoid/config.yaml ./parsoid/
 
 # Configure Pywikibot (must be in same directory of wikimedia_sync.py)
 COPY ${PYWIKIBOT_CONFIG_FILE} ${PYWIKIBOT2_DIR}/ 
 COPY ${PYWIKIBOT_PASSWORD_FILE} ${PYWIKIBOT2_DIR}/ 
 
 # Configure Wikifundi config
-COPY ${WIKIFUNDI_CONFIG_FILE} ./wikifundi.json
+COPY ${MIRRORING_CONFIG_FILE} ./mirroring.json
 
 # Copy assets
 COPY ${MEDIAWIKI_LOGO_FILE} ./

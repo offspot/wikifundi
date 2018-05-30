@@ -23,7 +23,7 @@ else
   #web serveur must be lauch to sync pages
   #service apache2 start
   #lauch sync script
-  #wikimedia_sync wikifundi.json
+  #wikimedia_sync mirroring.json 
   #Mediawik init database 
   #service apache2 stop
   
@@ -32,12 +32,12 @@ fi
 
 #maintenance
 cd maintenance 
- ./update.php --quick
+./update.php --quick
 cd ..
 
 echo "Starting Persoid ..."
 cd parsoid
-node bin/server.js
+node bin/server.js &
 cd .. 
 
 
