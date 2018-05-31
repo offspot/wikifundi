@@ -42,34 +42,35 @@ ENV PYWIKIBOT2_DIR /usr/local/etc
 ###################
 
 # System Dependencies.
-RUN apt-get update && apt-get install -y \
-		git \
-		vim \
-		unzip \
-		imagemagick \
-		libicu-dev \
-		libav-tools \
-		librsvg2-bin \
-		poppler-utils \
-		memcached \
-		# Required for Math renderer
-		texlive \		
-    texlive-fonts-recommended \ 
-    texlive-lang-greek \ 
-    texlive-latex-recommended	\			
-    build-essential \ 
-    dvipng ocaml \ 
-    cjk-latex \
-		# Required for Parsoid
-		redis-server \
-		npm \
-		# Ruired for Scribunto
-		lua5.1 \
-		# Required for SyntaxHighlighting
-		python3 \
-		# to generate locales
-		locales \
-	--no-install-recommends && rm -r /var/lib/apt/lists/*
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
+    && apt-get install -y \
+		  git \
+		  vim \
+		  unzip \
+		  imagemagick \
+		  libicu-dev \
+		  libav-tools \
+		  librsvg2-bin \
+		  poppler-utils \
+		  memcached \
+		  # Required for Math renderer
+		  texlive \		
+      texlive-fonts-recommended \ 
+      texlive-lang-greek \ 
+      texlive-latex-recommended	\			
+      build-essential \ 
+      dvipng ocaml \ 
+      cjk-latex \
+		  # Required for Parsoid
+		  redis-server \
+		  nodejs \
+		  # Ruired for Scribunto
+		  lua5.1 \
+		  # Required for SyntaxHighlighting
+		  python3 \
+		  # to generate locales
+		  locales \
+	  --no-install-recommends && rm -r /var/lib/apt/lists/*
 	
 # generate locale (set locale is used by MediaWiki scripts)
 RUN {  echo "LANG=en_US.UTF-8"; \
