@@ -17,9 +17,9 @@
  
  options :
   -f, --force : always copy  the content (even if page exist on site dest). Default : False
-  -t, --sync-templates : copy templates used by the pages to sync. Default : True
-  -d, --sync-dependances-templates : copy templates used by templates. Involve sync-templates. Default : True
-  -u", --upload-files : copy files (images, css, js, sounds, ...) used by the pages to sync. Default : True
+  -t, --no-sync-templates : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates. Default : False
+  -d, --no-sync-dependances-templates : do not copy templates used by templates.  Default : False
+  -u", --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync. Default : False
   
  json file config :
    
@@ -360,9 +360,9 @@ def main():
       "hftdu", 
       [ "help",
         "force",
-        "sync-templates",
-        "sync-dependances-templates",
-        "upload-files"
+        "no-sync-templates",
+        "no-sync-dependances-templates",
+        "no-upload-files"
       ]
     )
   except (getopt.error, msg):
@@ -377,12 +377,12 @@ def main():
       sys.exit(0)
     if opt in ("-f", "--force"):
       options["force"] = True
-    if opt in ("-t", "--sync-templates"):
-      options["templatesSync"] = True
-    if opt in ("-d", "--sync-dependances-templates"):
-      options["templatesDepSync"] = True
-    if opt in ("-u", "--upload-files"):  
-      options["filesUpload"] = True
+    if opt in ("-t", "--no-sync-templates"):
+      options["templatesSync"] = False
+    if opt in ("-d", "--no-sync-dependances-templates"):
+      options["templatesDepSync"] = False
+    if opt in ("-u", "--no-upload-files"):  
+      options["filesUpload"] = False
       
   # check coherence, fix if needed
   if(options["templatesDepSync"] and not options["templatesSync"]):
