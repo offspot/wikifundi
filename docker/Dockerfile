@@ -41,9 +41,12 @@ ENV PYWIKIBOT2_DIR /usr/local/etc
 # SOFTWARES SETUP #
 ###################
 
+# add repos to install nodejs
+RUN apt-get update && apt-get install gnupg \
+    && curl -sL https://deb.nodesource.com/setup_10.x | bash - 
+
 # System Dependencies.
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
-    && apt-get install -y \
+RUN apt-get install -y \
 		  git \
 		  vim \
 		  unzip \
