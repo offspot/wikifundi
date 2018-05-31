@@ -74,7 +74,6 @@ import re
 from typing import List, Pattern
 PageList = List[Page]
 FileList = List[FilePage]
-ModList = List[(Pattern, str)]
 
 DEFAULT_OPTIONS = dict(
     force = False, 
@@ -82,7 +81,7 @@ DEFAULT_OPTIONS = dict(
     templatesDepSync = True, 
     filesUpload = True)
     
-def modifyPage(dst : Site, p : Page, subs : ModList) -> bool :
+def modifyPage(dst : Site, p : Page, subs) -> bool :
 
   
   try:
@@ -91,14 +90,14 @@ def modifyPage(dst : Site, p : Page, subs : ModList) -> bool :
       pattern = s[0]
       repl = s[1]
       p.text = re.sub(pattern, repl, p.text)
-    
+    print ("edit " + p.title())
     return dst.editpage(p)
     
   except Exception as e:
       print ("Error to modify page %s (%s)" % (p.title(), e))
       return False 
       
-def modifyPages(dst : Site, pages : ListPage, subs : ModList) -> bool :  
+def modifyPages(dst : Site, pages : PageList, subs) -> bool :  
   nbModPage = 0
   nbPage = len(pages)
   
@@ -192,6 +191,7 @@ def getTemplatesFromPages(pages : PageList) -> PageList :
       print ("Process %i templates of %s" % (nbTplt, p.title()))
       templates += tplt
       
+  # apply set() to delete duplicate
   return list(set(templates))  
   
 def getFilesFromPages(pages : PageList) -> FileList :
@@ -203,6 +203,8 @@ def getFilesFromPages(pages : PageList) -> FileList :
     if(nbFiles > 0):
       print ("Process %i images of %s" % (nbFiles, p.title()))
       files += f  
+      
+  # apply set() to delete duplicate
   return list(set(files))
   
 def syncPagesWithDependances( siteSrc : Site, siteDst : Site, 
@@ -284,32 +286,33 @@ def syncAndModifyPages(
       pages += list( cat.articles() )
   
   #sync all pages !
-  #nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)    
-  
-  print (pages)
-  print (modifications)
-  
-  nbMods = 0
+  nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)    
   
   if( modifications ):
     for mod in modifications :
       # get all pages to modify from regex mod['pages']
-      pageMod = list(filter( 
-               lambda p : re.search(mod['pages'],p.title()),
+      pageModsOnSrc = filter( 
+               lambda p : re.search(mod['pages'],p.title()), 
                pages
-             ))
+             )
+      # We must modify on dest site, 
+      # then get pages to modify on this site
+      pageMods = map(
+               lambda p : Page(siteDst, p.title()),
+               pageModsOnSrc
+             )   
+      
       # get all supstitution to apply on list of pages
-      subs = list(map( 
+      subs = map( 
                lambda s : (re.compile(s['pattern']),s['repl']), 
                mod['substitutions']
-             ))
+             )
       
-      #modifyPages(siteDst, pageMod, subs)
-      print(pageMod)
-      print(subs)
+      # apply set() on pageMods to delete duplicate
+      nbMods = modifyPages(siteDst, list(set(pageMods)), list(subs))
       
   
-  return (nbPages,nbMod)
+  return (nbPages,nbMods)
 
 
 def processFromJSONFile(fileconfig, options):
