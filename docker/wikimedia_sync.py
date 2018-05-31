@@ -59,6 +59,8 @@
  See : https://www.mediawiki.org/wiki/Manual:Pywikibot/user-config.py
 """
 
+#TODO add logging
+
 # For use WikiMedia API
 from pywikibot import Site,Page,FilePage,Category,logging
 
@@ -252,7 +254,7 @@ def syncPagesWithDependances( siteSrc : Site, siteDst : Site,
   
 def syncAndModifyPages(
   srcFam : str, srcCode : str, dstFam : str, dstCode : str, 
-  pagesName : List[str], categoriesName : List[str], 
+  pagesName : List[str], categories : List[dict], 
   modifications : List[dict], options : dict) -> int :
   """Synchronize wiki pages from named page list
         and named categories list
@@ -276,18 +278,24 @@ def syncAndModifyPages(
     # pages from their names
     pages += [ Page(siteSrc, name) for name in pagesName ]
   
-  if( categoriesName ):
+  if( categories ):
+    cats = [(Category(
+                siteSrc,
+                c['title']),
+                c['namespace'],
+                c['recurse']
+            ) for c in categories ]
     # retrieve all pages from categories
-    categories = [ Category(siteSrc,name) for name in categoriesName ]
-    for cat in categories :
+    for (cat,ns,r) in cats :
       pages += [ Page(siteSrc, cat.title()) ]
       print ("Retrieve pages from " + cat.title())
       # add pages to sync of this categorie 
-      pages += list( cat.articles() )
-  
-  #sync all pages !
+      pages += list( cat.articles( namespaces=ns, recurse=r ) )
+    
+  # copy all pages !
   nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)    
   
+  # apply modifications
   if( modifications ):
     for mod in modifications :
       # get all pages to modify from regex mod['pages']
@@ -324,6 +332,8 @@ def processFromJSONFile(fileconfig, options):
 
   with open(fileconfig, 'r') as jsonfile:
     cfg = json.load(jsonfile)
+    
+    # TODO add Exceptions
     src = cfg['sites']['src']
     dst = cfg['sites']['dst']
     pages = cfg['pages']
@@ -335,6 +345,7 @@ def processFromJSONFile(fileconfig, options):
       dst['fam'], dst['code'], 
       pages, cats, mods, options
     )
+    #TODO end exception
       
     print ("%i pages synchronized and %i pages modify" % (nbPages, nbMods))
 
