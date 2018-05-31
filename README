@@ -10,9 +10,9 @@ Install with Docker
 
 Install Docker on your system and lauch :
 
-docker build -t en_africapack -f docker/Dockerfile.en_africapack docker \ 
+docker build -t mw_kiwix docker \ 
   && mkdir -p data images \
-  && sudo docker run -p 8080:80 -v ${PWD}/data:/var/www/data -v ${PWD}/images:/var/www/html/images -it en_africapack
+  && sudo docker run -p 8080:80 -v ${PWD}/data:/var/www/data -v ${PWD}/images:/var/www/html/images -it mw_kiwix
   
 Go in your brother :  http://localhost:8080 
 
