@@ -31,20 +31,21 @@ node bin/server.js &
 cd .. 
 
 service memcached start 
-service apache2 start
 
 #mirroring
+service apache2 start
 wikimedia_sync -dut mirroring.json 
+service apache2 stop
 
 #maintenance
 cd maintenance 
 ./update.php --quick
 cd ..
 
-/bin/bash
+#/bin/bash
 
-#echo "Starting Apache 2 ..."
-#apache2ctl -D FOREGROUND
+echo "Starting Apache 2 ..."
+apache2ctl -D FOREGROUND
 
 # for debug
 #if [ -z "$1" ]
