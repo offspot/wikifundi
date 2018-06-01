@@ -21,6 +21,9 @@ COPY ${PYWIKIBOT_PASSWORD_FILE} ${PYWIKIBOT2_DIR}/
 COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./LocalSettings.custom.php
 COPY ${MEDIAWIKI_LOGO_FILE} ./
 
+# Configure Parsoid with specific domain
+COPY ${PARSOID_CONFIG_FILE} ./parsoid/
+
 # Copy the Mirroring Script
 COPY ${MIRRORING_CONFIG_FILE} ./mirroring.json
 RUN chmod 600 /usr/local/etc/user-password.py
