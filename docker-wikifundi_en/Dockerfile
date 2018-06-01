@@ -1,4 +1,4 @@
-FROM mw_kiwix 
+FROM florentk/wikifundi
 
 ENV PYWIKIBOT_CONFIG_FILE ./config/pywikibot/user-config.py
 ENV PYWIKIBOT_PASSWORD_FILE ./config/pywikibot/user-password.py
