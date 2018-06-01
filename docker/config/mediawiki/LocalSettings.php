@@ -203,8 +203,8 @@ wfLoadExtension( 'VisualEditor' );
 $wgDefaultUserOptions['visualeditor-enable'] = 1;
 $wgVisualEditorNamespaces[] = NS_PROJECT;
 $wgVirtualRestConfig['modules']['parsoid'] = array(
-						   'url' => 'http://localhost:8000',
-						   'domain' => 'localhost',
+						   'url' => 'http://wikifundi-en.sloppy.zone:8000',
+						   'domain' => 'wikifundi-en.sloppy.zone',
 						   'prefix' => 'mediawiki_kiwix',
 						   'forwardCookies' => true
 						   );
