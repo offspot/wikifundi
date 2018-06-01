@@ -36,7 +36,9 @@ This directory contain the config of :
     See : https://www.mediawiki.org/wiki/Manual:Pywikibot/user-config.py
 - mirroring/mirroring.json : 
     Pages to copy from an other wiki and modifications after copy 
-    Lauch docker/wikimedia_sync.py --help to get file structure    
+    To get file structure :    
+      export PYWIKIBOT2_DIR=docker-wikifundi_en/config/pywikibot/
+      ./docker-wikifundi_en/wikimedia_sync.py --help
     
 You can also customize your logo in assets/images
     
