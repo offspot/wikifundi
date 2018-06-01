@@ -35,6 +35,10 @@ ENV MEDIAWIKI_EXT_VERSION REL1_31
 # SOFTWARES SETUP #
 ###################
 
+# add repos to install nodejs
+RUN apt-get update && apt-get install gnupg -y --no-install-recommends \
+    && curl -sL https://deb.nodesource.com/setup_10.x | bash - 
+
 # System Dependencies.
 RUN apt-get update && apt-get install -y \
   git \
@@ -56,7 +60,7 @@ RUN apt-get update && apt-get install -y \
   cjk-latex \
   # Required for Parsoid
   redis-server \
-  npm \
+  nodejs \
   # Ruired for Scribunto
   lua5.1 \
   # Required for SyntaxHighlighting
