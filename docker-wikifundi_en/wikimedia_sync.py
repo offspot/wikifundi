@@ -72,10 +72,7 @@ import getopt
 # To use regular expression
 import re
 
-# We use typing 
-from typing import List, Pattern
-PageList = List[Page]
-FileList = List[FilePage]
+
 
 DEFAULT_OPTIONS = dict(
     force = False, 
@@ -83,7 +80,7 @@ DEFAULT_OPTIONS = dict(
     templatesDepSync = True, 
     filesUpload = True)
     
-def modifyPage(dst : Site, p : Page, subs) -> bool :
+def modifyPage(dst, p, subs)  :
 
   
   try:
@@ -99,7 +96,7 @@ def modifyPage(dst : Site, p : Page, subs) -> bool :
       print ("Error to modify page %s (%s)" % (p.title(), e))
       return False 
       
-def modifyPages(dst : Site, pages : PageList, subs) -> bool :  
+def modifyPages(dst, pages, subs) :  
   nbModPage = 0
   nbPage = len(pages)
   
@@ -110,7 +107,7 @@ def modifyPages(dst : Site, pages : PageList, subs) -> bool :
       
   return nbModPage
 
-def syncPage(src : Site, dst : Site, p : Page, force = False, checkRedirect = True) -> bool:
+def syncPage(src, dst, p, force = False, checkRedirect = True):
   """Synchronize ONE wiki pages from src to dst
   
      return true if success
@@ -144,7 +141,7 @@ def syncPage(src : Site, dst : Site, p : Page, force = False, checkRedirect = Tr
     
   return False
   
-def uploadFiles(src : Site, dst : Site, files : FileList) -> int :
+def uploadFiles(src, dst, files) :
   """Download files from src site and upload on dst site
     
     return the number of succes uploaded files
@@ -165,7 +162,7 @@ def uploadFiles(src : Site, dst : Site, files : FileList) -> int :
     except Exception as e:
       print ("Error on upload file %s (%s)" % (f.title(),e))  
 
-def syncPages(src : Site, dst : Site, pages : PageList, force = False) -> int: 
+def syncPages(src, dst, pages, force = False) -> int: 
   """Synchronize wiki pages from src to dst
   
     force : if true, always copy  the content (even if page exist on site dest) 
@@ -183,7 +180,7 @@ def syncPages(src : Site, dst : Site, pages : PageList, force = False) -> int:
       
   return nbSyncPage
   
-def getTemplatesFromPages(pages : PageList) -> PageList :
+def getTemplatesFromPages(pages) :
   templates = []
   for p in pages :
     # get templates used by p
@@ -196,7 +193,7 @@ def getTemplatesFromPages(pages : PageList) -> PageList :
   # apply set() to delete duplicate
   return list(set(templates))  
   
-def getFilesFromPages(pages : PageList) -> FileList :
+def getFilesFromPages(pages) :
   files = []
   for p in pages :
     # get files used by p
@@ -209,8 +206,8 @@ def getFilesFromPages(pages : PageList) -> FileList :
   # apply set() to delete duplicate
   return list(set(files))
   
-def syncPagesWithDependances( siteSrc : Site, siteDst : Site, 
-                              pages : PageList, options : dict) -> int: 
+def syncPagesWithDependances( siteSrc, siteDst, 
+                              pages, options) : 
   """ Get the dependances of pages (templates and files),
       sync all pages and upload files contained in the pages
   
@@ -253,9 +250,9 @@ def syncPagesWithDependances( siteSrc : Site, siteDst : Site,
 #############
   
 def syncAndModifyPages(
-  srcFam : str, srcCode : str, dstFam : str, dstCode : str, 
-  pagesName : List[str], categories : List[dict], 
-  modifications : List[dict], options : dict) -> int :
+  srcFam, srcCode, dstFam, dstCode, 
+  pagesName, categories, 
+  modifications, options) :
   """Synchronize wiki pages from named page list
         and named categories list
     
@@ -296,6 +293,7 @@ def syncAndModifyPages(
   nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)    
   
   # apply modifications
+  nbMods = 0
   if( modifications ):
     for mod in modifications :
       # get all pages to modify from regex mod['pages']

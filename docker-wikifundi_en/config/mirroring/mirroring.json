@@ -11,15 +11,13 @@
   },
 
   "pages":[
-   "MediaWiki:Common.css",
-   "MediaWiki:Vector.css",
-   "MediaWiki:Noscript.css",
-   "MediaWiki:Print.css",
-   "MediaWiki:Mobile.css",
-   "MediaWiki:Filepage.css "  
+    "MPEG-1_Audio_Layer_II"
   ],
   
   "categories":[
-  ]
+  ],
+  
+  "modifications":[
+  ]  
 
 }
