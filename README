@@ -33,9 +33,12 @@ This directory contain the config of :
     Parsoid config file (allow to use VisualEdit)
 - pywikibot/user-config.py and /user-password.py
     Configure pywikibot library to use MediaWiki API (needed for mirroring)
+    See : https://www.mediawiki.org/wiki/Manual:Pywikibot/user-config.py
 - mirroring/mirroring.json : 
     Pages to copy from an other wiki and modifications after copy 
     Lauch docker/wikimedia_sync.py --help to get file structure    
+    
+You can also customize your logo in assets/images
     
 =================
 Bakcup your datas
