@@ -17,9 +17,9 @@
  
  options :
   -f, --force : always copy  the content (even if page exist on site dest). Default : False
-  -t, --sync-templates : copy templates used by the pages to sync. Default : True
-  -d, --sync-dependances-templates : copy templates used by templates. Involve sync-templates. Default : True
-  -u", --upload-files : copy files (images, css, js, sounds, ...) used by the pages to sync. Default : True
+  -t, --no-sync-templates : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates. Default : False
+  -d, --no-sync-dependances-templates : do not copy templates used by templates.  Default : False
+  -u", --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync. Default : False
   
  json file config :
    
@@ -59,6 +59,8 @@
  See : https://www.mediawiki.org/wiki/Manual:Pywikibot/user-config.py
 """
 
+#TODO add logging
+
 # For use WikiMedia API
 from pywikibot import Site,Page,FilePage,Category,logging
 
@@ -74,7 +76,6 @@ import re
 from typing import List, Pattern
 PageList = List[Page]
 FileList = List[FilePage]
-ModList = List[(Pattern, str)]
 
 DEFAULT_OPTIONS = dict(
     force = False, 
@@ -82,7 +83,7 @@ DEFAULT_OPTIONS = dict(
     templatesDepSync = True, 
     filesUpload = True)
     
-def modifyPage(dst : Site, p : Page, subs : ModList) -> bool :
+def modifyPage(dst : Site, p : Page, subs) -> bool :
 
   
   try:
@@ -91,14 +92,14 @@ def modifyPage(dst : Site, p : Page, subs : ModList) -> bool :
       pattern = s[0]
       repl = s[1]
       p.text = re.sub(pattern, repl, p.text)
-    
+    print ("edit " + p.title())
     return dst.editpage(p)
     
   except Exception as e:
       print ("Error to modify page %s (%s)" % (p.title(), e))
       return False 
       
-def modifyPages(dst : Site, pages : ListPage, subs : ModList) -> bool :  
+def modifyPages(dst : Site, pages : PageList, subs) -> bool :  
   nbModPage = 0
   nbPage = len(pages)
   
@@ -192,6 +193,7 @@ def getTemplatesFromPages(pages : PageList) -> PageList :
       print ("Process %i templates of %s" % (nbTplt, p.title()))
       templates += tplt
       
+  # apply set() to delete duplicate
   return list(set(templates))  
   
 def getFilesFromPages(pages : PageList) -> FileList :
@@ -203,6 +205,8 @@ def getFilesFromPages(pages : PageList) -> FileList :
     if(nbFiles > 0):
       print ("Process %i images of %s" % (nbFiles, p.title()))
       files += f  
+      
+  # apply set() to delete duplicate
   return list(set(files))
   
 def syncPagesWithDependances( siteSrc : Site, siteDst : Site, 
@@ -250,7 +254,7 @@ def syncPagesWithDependances( siteSrc : Site, siteDst : Site,
   
 def syncAndModifyPages(
   srcFam : str, srcCode : str, dstFam : str, dstCode : str, 
-  pagesName : List[str], categoriesName : List[str], 
+  pagesName : List[str], categories : List[dict], 
   modifications : List[dict], options : dict) -> int :
   """Synchronize wiki pages from named page list
         and named categories list
@@ -274,42 +278,49 @@ def syncAndModifyPages(
     # pages from their names
     pages += [ Page(siteSrc, name) for name in pagesName ]
   
-  if( categoriesName ):
+  if( categories ):
+    cats = [(Category(
+                siteSrc,
+                c['title']),
+                c['namespace'],
+                c['recurse']
+            ) for c in categories ]
     # retrieve all pages from categories
-    categories = [ Category(siteSrc,name) for name in categoriesName ]
-    for cat in categories :
+    for (cat,ns,r) in cats :
       pages += [ Page(siteSrc, cat.title()) ]
       print ("Retrieve pages from " + cat.title())
       # add pages to sync of this categorie 
-      pages += list( cat.articles() )
+      pages += list( cat.articles( namespaces=ns, recurse=r ) )
+    
+  # copy all pages !
+  nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)    
   
-  #sync all pages !
-  #nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)    
-  
-  print (pages)
-  print (modifications)
-  
-  nbMods = 0
-  
+  # apply modifications
   if( modifications ):
     for mod in modifications :
       # get all pages to modify from regex mod['pages']
-      pageMod = list(filter( 
-               lambda p : re.search(mod['pages'],p.title()),
+      pageModsOnSrc = filter( 
+               lambda p : re.search(mod['pages'],p.title()), 
                pages
-             ))
+             )
+      # We must modify on dest site, 
+      # then get pages to modify on this site
+      pageMods = map(
+               lambda p : Page(siteDst, p.title()),
+               pageModsOnSrc
+             )   
+      
       # get all supstitution to apply on list of pages
-      subs = list(map( 
+      subs = map( 
                lambda s : (re.compile(s['pattern']),s['repl']), 
                mod['substitutions']
-             ))
+             )
       
-      #modifyPages(siteDst, pageMod, subs)
-      print(pageMod)
-      print(subs)
+      # apply set() on pageMods to delete duplicate
+      nbMods = modifyPages(siteDst, list(set(pageMods)), list(subs))
       
   
-  return (nbPages,nbMod)
+  return (nbPages,nbMods)
 
 
 def processFromJSONFile(fileconfig, options):
@@ -321,6 +332,8 @@ def processFromJSONFile(fileconfig, options):
 
   with open(fileconfig, 'r') as jsonfile:
     cfg = json.load(jsonfile)
+    
+    # TODO add Exceptions
     src = cfg['sites']['src']
     dst = cfg['sites']['dst']
     pages = cfg['pages']
@@ -332,6 +345,7 @@ def processFromJSONFile(fileconfig, options):
       dst['fam'], dst['code'], 
       pages, cats, mods, options
     )
+    #TODO end exception
       
     print ("%i pages synchronized and %i pages modify" % (nbPages, nbMods))
 
@@ -346,9 +360,9 @@ def main():
       "hftdu", 
       [ "help",
         "force",
-        "sync-templates",
-        "sync-dependances-templates",
-        "upload-files"
+        "no-sync-templates",
+        "no-sync-dependances-templates",
+        "no-upload-files"
       ]
     )
   except (getopt.error, msg):
@@ -363,12 +377,12 @@ def main():
       sys.exit(0)
     if opt in ("-f", "--force"):
       options["force"] = True
-    if opt in ("-t", "--sync-templates"):
-      options["templatesSync"] = True
-    if opt in ("-d", "--sync-dependances-templates"):
-      options["templatesDepSync"] = True
-    if opt in ("-u", "--upload-files"):  
-      options["filesUpload"] = True
+    if opt in ("-t", "--no-sync-templates"):
+      options["templatesSync"] = False
+    if opt in ("-d", "--no-sync-dependances-templates"):
+      options["templatesDepSync"] = False
+    if opt in ("-u", "--no-upload-files"):  
+      options["filesUpload"] = False
       
   # check coherence, fix if needed
   if(options["templatesDepSync"] and not options["templatesSync"]):

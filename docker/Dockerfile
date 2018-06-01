@@ -21,9 +21,6 @@ ENV MEDIAWIKI_CONFIG_FILE_CUSTOM ./config/mediawiki/LocalSettings.custom.php
 ENV MEDIAWIKI_CONFIG_FILE_BASE ./config/mediawiki/LocalSettings.php
 ENV MEDIAWIKI_CONFIG_FILE_COMPOSER ./config/mediawiki/composer.json
 ENV PARSOID_CONFIG_FILE ./config/parsoid/config.yaml
-ENV PYWIKIBOT_CONFIG_FILE ./config/pywikibot/user-config.py
-ENV PYWIKIBOT_PASSWORD_FILE ./config/pywikibot/user-password.py
-ENV MIRRORING_CONFIG_FILE ./config/mirroring/mirroring.json
 
 # Custom image
 ENV MEDIAWIKI_LOGO_FILE ./assets/images/logo.png
@@ -34,46 +31,39 @@ ENV MEDIAWIKI_VERSION 1.31.0
 ENV MEDIAWIKI_RC rc.0
 ENV MEDIAWIKI_EXT_VERSION REL1_31
 
-# PyWikibot fileconfig directory
-ENV PYWIKIBOT2_DIR /usr/local/etc
-
 ###################
 # SOFTWARES SETUP #
 ###################
 
-# add repos to install nodejs
-RUN apt-get update && apt-get install gnupg -y --no-install-recommends \
-    && curl -sL https://deb.nodesource.com/setup_10.x | bash - 
-
 # System Dependencies.
-RUN apt-get install -y \
-		  git \
-		  vim \
-		  unzip \
-		  imagemagick \
-		  libicu-dev \
-		  libav-tools \
-		  librsvg2-bin \
-		  poppler-utils \
-		  memcached \
-		  # Required for Math renderer
-		  texlive \		
-      texlive-fonts-recommended \ 
-      texlive-lang-greek \ 
-      texlive-latex-recommended	\			
-      build-essential \ 
-      dvipng ocaml \ 
-      cjk-latex \
-		  # Required for Parsoid
-		  redis-server \
-		  nodejs \
-		  # Ruired for Scribunto
-		  lua5.1 \
-		  # Required for SyntaxHighlighting
-		  python3 \
-		  # to generate locales
-		  locales \
-	  --no-install-recommends && rm -r /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+  git \
+  vim \
+  unzip \
+  imagemagick \
+  libicu-dev \
+  libav-tools \
+  librsvg2-bin \
+  poppler-utils \
+  memcached \
+  # Required for Math renderer
+  texlive \		
+  texlive-fonts-recommended \ 
+  texlive-lang-greek \ 
+  texlive-latex-recommended	\			
+  build-essential \ 
+  dvipng ocaml \ 
+  cjk-latex \
+  # Required for Parsoid
+  redis-server \
+  npm \
+  # Ruired for Scribunto
+  lua5.1 \
+  # Required for SyntaxHighlighting
+  python3 \
+  # to generate locales
+  locales \
+  --no-install-recommends && rm -r /var/lib/apt/lists/*
 	
 # generate locale (set locale is used by MediaWiki scripts)
 RUN {  echo "LANG=en_US.UTF-8"; \
@@ -112,12 +102,10 @@ RUN git clone --quiet https://gerrit.wikimedia.org/r/p/mediawiki/services/parsoi
   && cd parsoid \
   && npm install \
   && cd .. \
-  # update node
+  # update node (need last version)
   && npm cache clean -f \
   && npm install -g n \
-  && n stable 
-
-RUN chown -R www-data:www-data parsoid 
+  && n stable   
 
 ######################################################
 # ADD MEDIAWIKI EXTENSIONS NEEDED BY MEDIAWIKI/KIWIX #
@@ -175,13 +163,6 @@ COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./LocalSettings.custom.php
 # Configure Parsoid
 COPY ${PARSOID_CONFIG_FILE} ./parsoid/
 
-# Configure Pywikibot (must be in same directory of wikimedia_sync.py)
-COPY ${PYWIKIBOT_CONFIG_FILE} ${PYWIKIBOT2_DIR}/ 
-COPY ${PYWIKIBOT_PASSWORD_FILE} ${PYWIKIBOT2_DIR}/ 
-
-# Configure Wikifundi config
-COPY ${MIRRORING_CONFIG_FILE} ./mirroring.json
-
 # Copy assets
 COPY ${MEDIAWIKI_LOGO_FILE} ./
 
@@ -194,10 +175,6 @@ COPY ./data/my_wiki.sqlite /tmp/
 ###########
 # START ! #
 ###########
-
-# Copy script used by start.sh to sync wikimedia pages
-COPY ./wikimedia_sync.py /usr/local/bin/wikimedia_sync
-RUN chmod a+x /usr/local/bin/wikimedia_sync
   
 # Run start script
 COPY ./start.sh /usr/local/bin/start.sh
