@@ -27,7 +27,7 @@ cd ..
 
 echo "Starting Persoid ..."
 cd parsoid
-nodejs bin/server.js &
+node bin/server.js &
 cd .. 
 
 service memcached start 
