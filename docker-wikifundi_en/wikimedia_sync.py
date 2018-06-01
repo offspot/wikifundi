@@ -19,7 +19,7 @@
   -f, --force : always copy  the content (even if page exist on site dest). Default : False
   -t, --no-sync-templates : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates. Default : False
   -d, --no-sync-dependances-templates : do not copy templates used by templates.  Default : False
-  -u", --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync. Default : False
+  -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync. Default : False
   
  json file config :
    
@@ -47,11 +47,44 @@
     
     // list of categories to copy
     "categories":[
-      "Categorie 1",
-      "Catgegorie 2"
+      {
+        "title":"Category 1",
+        "namespace":0,
+        "recurse":1
+      },
+      {
+        "title":"Category 2",
+        "namespace":4,
+        "recurse":0
+      }
       ...
     ]
-
+    
+    // list of modification on dest after copy
+    "modifications":[
+      {
+        "pages":"RegEx1",
+        "substitutions":[
+          {
+            "pattern":"Pattern 1",
+            "repl":"Remplacement 1"
+          },
+          {
+            "pattern":"Pattern 2",
+            "repl":"Remplacement 2"
+          }        
+        ]
+      },
+      {
+        "pages":"RegEx2",
+        "substitutions":[
+          {
+            "pattern":"Pattern 3",
+            "repl":"Remplacement 3"
+          }     
+        ]
+      }      
+    ]
   }
 
  IMPORTANT : We must have user-password.py and user-config.py in same 

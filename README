@@ -10,17 +10,38 @@ Install with Docker
 
 Install Docker on your system and lauch :
 
-docker build -t mw_kiwix docker \ 
-  && mkdir -p data images \
-  && sudo docker run -p 8080:80 -v ${PWD}/data:/var/www/data -v ${PWD}/images:/var/www/html/images -it mw_kiwix
+docker build -t mw_kiwix docker 
+docker build -t mw_wikifundi_en docker-wikifundi_en
+mkdir -p data images 
+sudo docker run -p 8080:80 \
+  -v ${PWD}/data:/var/www/data -v ${PWD}/images:/var/www/html/images \
+  -it docker-wikifundi_en
   
 Go in your brother :  http://localhost:8080 
 
+====================
+Customize your image
+====================
+
+The config files are located in docker-wikifundi_en/config directory.
+
+This directory contain the config of :
+- mediawiki/LocalSettings.custom.php : 
+    Add statements to MediaWiki config file 
+    (name of database, language, ...)
+- parsoid/config.yaml :
+    Parsoid config file (allow to use VisualEdit)
+- pywikibot/user-config.py and /user-password.py
+    Configure pywikibot library to use MediaWiki API (needed for mirroring)
+- mirroring/mirroring.json : 
+    Pages to copy from an other wiki and modifications after copy 
+    Lauch docker/wikimedia_sync.py --help to get file structure    
+    
 =================
 Bakcup your datas
 =================
 
-Copy the content of `data` and `image` directories
+Copy the content of `data` and `image` directories    
 
 ========================
 Install on a RaspberryPi

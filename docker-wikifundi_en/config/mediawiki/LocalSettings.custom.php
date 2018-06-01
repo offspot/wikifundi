@@ -16,11 +16,4 @@ $wgDBuser        = "";
 $wgDBpassword    = "";
 $wgSQLiteDataDir = "/var/www/data";
 
-$wgVirtualRestConfig['modules']['parsoid'] = array(
-						   'url' => 'https://wikifundi-en.sloppy.zone:8000',
-						   'domain' => 'wikifundi-en.sloppy.zone',
-						   'prefix' => 'mediawiki_kiwix',
-						   'forwardCookies' => true
-						   );
-
 ?>
