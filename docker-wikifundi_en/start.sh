@@ -47,6 +47,11 @@ then
   #./update.php --quick
   #cd ..
 else
+  #maintenance
+  cd maintenance 
+  ./update.php --quick
+  cd ..
+
   #finnaly, start apache and wait
   echo "Starting Apache 2 ..."
   apache2ctl -D FOREGROUND

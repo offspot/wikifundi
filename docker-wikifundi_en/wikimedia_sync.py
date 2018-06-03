@@ -129,7 +129,8 @@ def modifyPage(dst, p, subs)  :
     return dst.editpage(p)
     
   except Exception as e:
-      print ("Error to modify page %s (%s)" % (p.title().encode('utf-8'), e))
+      print ("Error to modify page %s (%s)" % 
+        (p.title().encode('utf-8'), e))
       return False 
       
 def modifyPages(dst, pages, subs) :  
@@ -137,7 +138,8 @@ def modifyPages(dst, pages, subs) :
   nbPage = len(pages)
   
   for i,p in enumerate(pages):
-    print ("%i/%i Modification of %s " % (i+1,nbPage,p.title().encode('utf-8')))
+    print ("%i/%i Modification of %s " % 
+      (i+1,nbPage,p.title().encode('utf-8')))
     if(modifyPage(dst,p,subs)):
       nbModPage = nbModPage + 1
       
@@ -172,7 +174,8 @@ def syncPage(src, dst, p, force = False, checkRedirect = True):
       return dst.editpage(newPage)
       
   except Exception as e:
-    print ("Error on sync page %s (%s)" % (p.title().encode('utf-8'), e))
+    print ("Error on sync page %s (%s)" 
+              % (p.title().encode('utf-8'), e))
     return False
     
   return False
@@ -189,7 +192,8 @@ def uploadFiles(src, dst, files) :
       # create a new file on dest wiki
       pageDst = FilePage(dst, f.title())
       if(not pageDst.exists()):
-        print ("%i/%i Upload file %s" % (i+1, nbImages,  f.title().encode('utf-8')))
+        print ("%i/%i Upload file %s" % 
+          (i+1, nbImages,  f.title().encode('utf-8')))
         sys.stdout.flush()
         # start upload !
         dst.upload( pageDst, source_url=f.get_file_url(), 
@@ -197,7 +201,8 @@ def uploadFiles(src, dst, files) :
                     ignore_warnings = False)
                     
     except Exception as e:
-      print ("Error on upload file %s (%s)" % (f.title().encode('utf-8'),e))  
+      print ("Error on upload file %s (%s)" % 
+              (f.title().encode('utf-8'),e))  
 
 def syncPages(src, dst, pages, force = False) -> int: 
   """Synchronize wiki pages from src to dst
@@ -211,7 +216,8 @@ def syncPages(src, dst, pages, force = False) -> int:
   nbPage = len(pages)
   
   for i,p in enumerate(pages):
-    print ("%i/%i Sync %s " % (i+1,nbPage,p.title().encode('utf-8')))
+    print ("%i/%i Sync %s " % 
+            (i+1,nbPage,p.title().encode('utf-8')))
     sys.stdout.flush()
     if(syncPage(src,dst,p,force)):
       nbSyncPage = nbSyncPage + 1
@@ -226,7 +232,8 @@ def getTemplatesFromPages(pages) :
     tplt = p.templates()
     nbTplt = len(tplt)
     if(nbTplt > 0):
-      print ("%i/%i Process %s : %i templates found " % (i,nbPage,p.title().encode('utf-8'),nbTplt))
+      print ("%i/%i Process %s : %i templates found " % 
+              (i+1,nbPage,p.title().encode('utf-8'),nbTplt))
       sys.stdout.flush()
       templates += tplt
       
@@ -241,7 +248,8 @@ def getFilesFromPages(pages) :
     f = list(p.imagelinks())
     nbFiles = len(f)
     if(nbFiles > 0):
-      print ("%i/%i Process %s : %i images found" % (i,nbPage,p.title().encode('utf-8'),nbFiles))
+      print ("%i/%i Process %s : %i images found" % 
+               (i+1,nbPage,p.title().encode('utf-8'),nbFiles))
       sys.stdout.flush()
       files += f  
       
@@ -268,6 +276,8 @@ def syncPagesWithDependances( siteSrc, siteDst,
     
   if(options['templatesDepSync']):    
     dependances = getTemplatesFromPages(templates)
+    
+  #TODO export in JSON files pages/templates/dependances
   
   #sync all pages, templates and associated files
   nbPageSync = 0
@@ -392,6 +402,8 @@ def processFromJSONFile(fileconfig, options):
       print ("Syntax error in mirroring file : %s" % e)
     except KeyError as e:
       print ("KeyError error in mirroring file : %s" % e)
+    except Exception as e:
+      print ("Program exit with error : %s" % e)
       
 
 ######################################
@@ -436,6 +448,8 @@ def main():
   # process each config file
   for arg in args:
     processFromJSONFile(arg,options)
+    
+  sys.stdout.flush()
     
 if __name__ == "__main__":
   flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL);
