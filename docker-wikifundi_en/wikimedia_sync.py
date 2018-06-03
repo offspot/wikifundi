@@ -100,6 +100,7 @@ from pywikibot import Site,Page,FilePage,Category,logging
 # For load JSON file config and check options
 import sys
 import os
+import resource
 import fcntl
 import json
 import getopt
@@ -435,6 +436,7 @@ def main():
 if __name__ == "__main__":
   flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL);
   fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);
+  resource.setrlimit(resource.RLIMIT_DATA, (524288, 524288))
   main()
 
 ######################################
