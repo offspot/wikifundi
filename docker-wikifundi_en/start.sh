@@ -30,7 +30,7 @@ fi
 
 echo "Starting Persoid ..."
 cd parsoid
-node bin/server.js &
+node bin/server.js > /var/log/parsoid.log &
 cd .. 
 
 service memcached start 
