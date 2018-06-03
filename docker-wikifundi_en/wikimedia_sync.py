@@ -20,6 +20,7 @@
   -t, --no-sync-templates : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates. Default : False
   -d, --no-sync-dependances-templates : do not copy templates used by templates.  Default : False
   -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync. Default : False
+  -e, --export-dir <directory> : write json export files in this directory
   
  json file config :
    
@@ -88,28 +89,23 @@
   }
 
  IMPORTANT : We must have user-password.py and user-config.py in same 
- directory of this script to congigure pywikibot. 
+ directory of this script or set PYWIKIBOT2_DIR to congigure pywikibot. 
  See : https://www.mediawiki.org/wiki/Manual:Pywikibot/user-config.py
 """
 
-#TODO add logging
-
-# For use WikiMedia API
+# To use WikiMedia API
 from pywikibot import Site,Page,FilePage,Category,logging
 
-# For load JSON file config and check options
+# To load JSON file config and check options
 import sys
-import os
-import resource
-import gc
-import fcntl
 import json
 import getopt
 
+# To optimize memory usage
+import gc
+
 # To use regular expression
 import re
-
-
 
 DEFAULT_OPTIONS = dict(
     force = False, 
@@ -170,7 +166,7 @@ def syncPage(src, dst, pageTitle, force = False, checkRedirect = True):
     
       #sync also the redirect target 
       if(p.isRedirectPage()):
-        syncPage(src, dst, p.getRedirectTarget(), force, False)
+        syncPage(src, dst, p.getRedirectTarget().title(), force, False)
         
       # copy the content of the page
       newPage.text = p.text
@@ -180,7 +176,7 @@ def syncPage(src, dst, pageTitle, force = False, checkRedirect = True):
       
   except Exception as e:
     print ("Error on sync page %s (%s)" 
-              % (p.encode('utf-8'), e))
+              % (pageTitle.encode('utf-8'), e))
     return False
     
   return False
@@ -191,24 +187,24 @@ def uploadFiles(src, dst, files) :
     return the number of succes uploaded files
   """
   
-  nbImages = len(files)
+  nbFiles = len(files)
   for i,fileTitle in enumerate(files):
     try:
       # create a new file on dest wiki
       pageDst = FilePage(dst, fileTitle)
-      f = FilePage(dst, fileTitle)
+      f = FilePage(src, fileTitle)
       if(not pageDst.exists()):
         print ("%i/%i Upload file %s" % 
-          (i+1, nbImages,  fileTitle.encode('utf-8')))
+          (i+1, nbFiles,  fileTitle.encode('utf-8')))
         sys.stdout.flush()
         # start upload !
         dst.upload( pageDst, source_url=f.get_file_url(), 
-                    comment=f, text=f.text, 
+                    comment=fileTitle, text=f.text, 
                     ignore_warnings = False)
                     
     except Exception as e:
       print ("Error on upload file %s (%s)" % 
-              (f.encode('utf-8'),e))  
+              (fileTitle.encode('utf-8'),e))  
 
 def syncPages(src, dst, pages, force = False) -> int: 
   """Synchronize wiki pages from src to dst
@@ -254,7 +250,7 @@ def getFilesFromPages(siteSrc, pages) :
     f = list(Page(siteSrc, p).imagelinks())
     nbFiles = len(f)
     if(nbFiles > 0):
-      print ("%i/%i Process %s : %i images found" % 
+      print ("%i/%i Process %s : %i files found" % 
                (i+1,nbPage,p.encode('utf-8'),nbFiles))
       sys.stdout.flush()
       files.extend(mapTitle(f)) 
@@ -481,9 +477,6 @@ def main():
   sys.stdout.flush()
     
 if __name__ == "__main__":
-  flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL);
-  fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);
-  resource.setrlimit(resource.RLIMIT_DATA, (524288, 524288))
   main()
 
 ######################################
