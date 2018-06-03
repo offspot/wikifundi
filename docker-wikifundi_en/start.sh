@@ -43,14 +43,16 @@ then
   wikimedia_sync ${MIRRORING_OPTIONS} mirroring.json > /var/www/data/mirroring.log 
   service apache2 stop
   #maintenance
-  cd maintenance 
-  ./update.php --quick
-  cd ..
+  #cd maintenance 
+  #./update.php --quick
+  #cd ..
+else
+  #finnaly, start apache and wait
+  echo "Starting Apache 2 ..."
+  apache2ctl -D FOREGROUND
 fi
 
-#finnaly, start apache and wait
-echo "Starting Apache 2 ..."
-apache2ctl -D FOREGROUND
+
 
 # for debug
 #/bin/bash
