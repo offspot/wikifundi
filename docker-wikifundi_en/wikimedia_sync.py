@@ -99,6 +99,8 @@ from pywikibot import Site,Page,FilePage,Category,logging
 
 # For load JSON file config and check options
 import sys
+import os
+import fcntl
 import json
 import getopt
 
@@ -429,6 +431,8 @@ def main():
     processFromJSONFile(arg,options)
     
 if __name__ == "__main__":
+  flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL);
+  fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);
   main()
 
 ######################################

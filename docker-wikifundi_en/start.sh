@@ -39,7 +39,8 @@ if [ ${MIRRORING} ]
 then
   #mirroring
   service apache2 start
-  wikimedia_sync mirroring.json 
+  echo "Start Mirroring, log in data/mirroring.log"
+  wikimedia_sync mirroring.json > /var/www/data/mirroring.log
   service apache2 stop
   #maintenance
   cd maintenance 
