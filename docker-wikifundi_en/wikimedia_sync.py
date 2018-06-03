@@ -190,6 +190,7 @@ def uploadFiles(src, dst, files) :
       pageDst = FilePage(dst, f.title())
       if(not pageDst.exists()):
         print ("%i/%i Upload file %s" % (i+1, nbImages,  f.title().encode('utf-8')))
+        sys.stdout.flush()
         # start upload !
         dst.upload( pageDst, source_url=f.get_file_url(), 
                     comment=f.title(), text=f.text, 
@@ -211,6 +212,7 @@ def syncPages(src, dst, pages, force = False) -> int:
   
   for i,p in enumerate(pages):
     print ("%i/%i Sync %s " % (i+1,nbPage,p.title().encode('utf-8')))
+    sys.stdout.flush()
     if(syncPage(src,dst,p,force)):
       nbSyncPage = nbSyncPage + 1
       
@@ -225,6 +227,7 @@ def getTemplatesFromPages(pages) :
     nbTplt = len(tplt)
     if(nbTplt > 0):
       print ("%i/%i Process %s : %i templates found " % (i,nbPage,p.title().encode('utf-8'),nbTplt))
+      sys.stdout.flush()
       templates += tplt
       
   # apply set() to delete duplicate
@@ -239,6 +242,7 @@ def getFilesFromPages(pages) :
     nbFiles = len(f)
     if(nbFiles > 0):
       print ("%i/%i Process %s : %i images found" % (i,nbPage,p.title().encode('utf-8'),nbFiles))
+      sys.stdout.flush()
       files += f  
       
   # apply set() to delete duplicate
