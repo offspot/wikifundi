@@ -5,6 +5,8 @@ DATABASE_FILE=/var/www/data/${DATABASE_NAME}.sqlite
 chown www-data:www-data /var/www/html/images 
 chown www-data:www-data /var/www/data
 
+MIRRORING_OPTIONS=${MIRRORING_OPTIONS}
+
 #Fix latence problem
 rm -rf /var/www/data/locks
 
@@ -30,7 +32,7 @@ fi
 
 echo "Starting Persoid ..."
 cd parsoid
-node bin/server.js > /dev/null &
+node bin/server.js > /var/www/data/parsoid.log  &
 cd .. 
 
 service memcached start 
@@ -40,7 +42,7 @@ then
   #mirroring
   service apache2 start
   echo "Start Mirroring, log in data/mirroring.log"
-  wikimedia_sync ${MIRRORING_OPTIONS} mirroring.json > /var/www/data/mirroring.log 
+  wikimedia_sync ${MIRRORING_OPTIONS} -e "/var/www/data" mirroring.json > /var/www/data/mirroring.log 
   service apache2 stop
   #maintenance
   #cd maintenance 

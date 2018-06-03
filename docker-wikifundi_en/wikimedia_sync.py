@@ -101,6 +101,7 @@ from pywikibot import Site,Page,FilePage,Category,logging
 import sys
 import os
 import resource
+import gc
 import fcntl
 import json
 import getopt
@@ -114,45 +115,49 @@ DEFAULT_OPTIONS = dict(
     force = False, 
     templatesSync = True, 
     templatesDepSync = True, 
-    filesUpload = True)
+    filesUpload = True,
+    exportDir = "."    
+)
     
-def modifyPage(dst, p, subs)  :
+def modifyPage(dst, pageTitle, subs)  :
 
-  
   try:
-  
+    p = Page(dst, pageTitle)
+    
     for s in subs :
       pattern = s[0]
       repl = s[1]
       p.text = re.sub(pattern, repl, p.text)
-    print ("Save " + p.title().encode('utf-8'))
+      
+    print ("Save %s" % pageTitle.encode('utf-8'))
     return dst.editpage(p)
     
   except Exception as e:
       print ("Error to modify page %s (%s)" % 
-        (p.title().encode('utf-8'), e))
+        (pageTitle.encode('utf-8'), e))
       return False 
       
 def modifyPages(dst, pages, subs) :  
   nbModPage = 0
   nbPage = len(pages)
   
-  for i,p in enumerate(pages):
+  for i,pageTitle in enumerate(pages):
     print ("%i/%i Modification of %s " % 
-      (i+1,nbPage,p.title().encode('utf-8')))
-    if(modifyPage(dst,p,subs)):
+      (i+1,nbPage,pageTitle.encode('utf-8')))
+    if(modifyPage(dst,pageTitle,subs)):
       nbModPage = nbModPage + 1
       
   return nbModPage
 
-def syncPage(src, dst, p, force = False, checkRedirect = True):
+def syncPage(src, dst, pageTitle, force = False, checkRedirect = True):
   """Synchronize ONE wiki pages from src to dst
   
      return true if success
   """
-
-  # create a new page on dest wiki
-  newPage = Page(dst, p.title())
+  
+  # init page on src and dst
+  p = Page(src, pageTitle)
+  newPage = Page(dst, pageTitle)
   
   try:      
     # if page exist on dest and no force -> do not sync this page
@@ -175,7 +180,7 @@ def syncPage(src, dst, p, force = False, checkRedirect = True):
       
   except Exception as e:
     print ("Error on sync page %s (%s)" 
-              % (p.title().encode('utf-8'), e))
+              % (p.encode('utf-8'), e))
     return False
     
   return False
@@ -187,22 +192,23 @@ def uploadFiles(src, dst, files) :
   """
   
   nbImages = len(files)
-  for i,f in enumerate(files):
+  for i,fileTitle in enumerate(files):
     try:
       # create a new file on dest wiki
-      pageDst = FilePage(dst, f.title())
+      pageDst = FilePage(dst, fileTitle)
+      f = FilePage(dst, fileTitle)
       if(not pageDst.exists()):
         print ("%i/%i Upload file %s" % 
-          (i+1, nbImages,  f.title().encode('utf-8')))
+          (i+1, nbImages,  fileTitle.encode('utf-8')))
         sys.stdout.flush()
         # start upload !
         dst.upload( pageDst, source_url=f.get_file_url(), 
-                    comment=f.title(), text=f.text, 
+                    comment=f, text=f.text, 
                     ignore_warnings = False)
                     
     except Exception as e:
       print ("Error on upload file %s (%s)" % 
-              (f.title().encode('utf-8'),e))  
+              (f.encode('utf-8'),e))  
 
 def syncPages(src, dst, pages, force = False) -> int: 
   """Synchronize wiki pages from src to dst
@@ -217,44 +223,48 @@ def syncPages(src, dst, pages, force = False) -> int:
   
   for i,p in enumerate(pages):
     print ("%i/%i Sync %s " % 
-            (i+1,nbPage,p.title().encode('utf-8')))
+            (i+1,nbPage,p.encode('utf-8')))
     sys.stdout.flush()
     if(syncPage(src,dst,p,force)):
       nbSyncPage = nbSyncPage + 1
       
   return nbSyncPage
   
-def getTemplatesFromPages(pages) :
+def getTemplatesFromPages(siteSrc, pages) :
   templates = []
   nbPage = len(pages)
   for i,p in enumerate(pages) :
     # get templates used by p
-    tplt = p.templates()
+    tplt = Page(siteSrc, p).templates()
     nbTplt = len(tplt)
     if(nbTplt > 0):
       print ("%i/%i Process %s : %i templates found " % 
-              (i+1,nbPage,p.title().encode('utf-8'),nbTplt))
+              (i+1,nbPage,p.encode('utf-8'),nbTplt))
       sys.stdout.flush()
-      templates += tplt
+      templates += mapTitle(tplt)
       
   # apply set() to delete duplicate
   return list(set(templates))  
   
-def getFilesFromPages(pages) :
+def getFilesFromPages(siteSrc, pages) :
   files = []
   nbPage = len(pages)
   for i,p in enumerate(pages) :
     # get files used by p
-    f = list(p.imagelinks())
+    f = list(Page(siteSrc, p).imagelinks())
     nbFiles = len(f)
     if(nbFiles > 0):
       print ("%i/%i Process %s : %i images found" % 
-               (i+1,nbPage,p.title().encode('utf-8'),nbFiles))
+               (i+1,nbPage,p.encode('utf-8'),nbFiles))
       sys.stdout.flush()
-      files += f  
+      files += mapTitle(f)  
       
   # apply set() to delete duplicate
   return list(set(files))
+  
+def exportPagesTitle(pages, fileName, directory):
+  with open("%s/mirroring_export_%s.json" % (directory,fileName), 'w',encoding='utf-8') as f:
+      f.write(json.dumps(pages, sort_keys=True, indent=4,ensure_ascii=False))
   
 def syncPagesWithDependances( siteSrc, siteDst, 
                               pages, options) : 
@@ -265,41 +275,65 @@ def syncPagesWithDependances( siteSrc, siteDst,
     
     return the number of succes synchronized pages and files 
   """
+  
+  # export titles of collected pages to sync
+  exportPagesTitle(pages,"pages",options["exportDir"])
 
   #get templates and files used by pages
-  
   if(options['filesUpload']) :
-    images = getFilesFromPages(pages)
+    files = getFilesFromPages(siteSrc, pages)
+    exportPagesTitle(files,"files",options["exportDir"])
+ 
+  #force garbage collector
+  gc.collect() 
     
   if(options['templatesSync']):
-    templates = getTemplatesFromPages(pages)
+    templates = getTemplatesFromPages(siteSrc, pages)
+    exportPagesTitle(templates,"templates",options["exportDir"])
+    
+  #force garbage collector
+  gc.collect()
     
   if(options['templatesDepSync']):    
-    dependances = getTemplatesFromPages(templates)
+    dependances = getTemplatesFromPages(siteSrc, templates)
+    exportPagesTitle(dependances,"dependances",options["exportDir"])
     
-  #TODO export in JSON files pages/templates/dependances
-  
+  #force garbage collector
+  gc.collect()
+     
   #sync all pages, templates and associated files
   nbPageSync = 0
   
   if(options['templatesDepSync']):
     print ("====== Sync template dependances")
     nbPageSync += syncPages(siteSrc, siteDst, dependances, options['force'] )
+
+  #force garbage collector
+  gc.collect()
     
   if(options['templatesSync']):
     print ("====== Sync template")
     nbPageSync += syncPages(siteSrc, siteDst, templates, options['force'] )
+
+  #force garbage collector
+  gc.collect()
     
   print ("====== Sync pages")
   nbPageSync += syncPages(siteSrc, siteDst, pages, options['force'] )  
+
+  #force garbage collector
+  gc.collect()
   
   if(options['filesUpload']):
     print ("====== Upload files")
-    uploadFiles (siteSrc, siteDst, images)  
+    uploadFiles (siteSrc, siteDst, files)  
   
   return nbPageSync;  
   
 #############
+
+def mapTitle(pages) : 
+  return [ p.title() for p in pages ]
   
 def syncAndModifyPages(
   srcFam, srcCode, dstFam, dstCode, 
@@ -321,11 +355,7 @@ def syncAndModifyPages(
   #disable slow down wiki write mechanics 
   siteDst.throttle.maxdelay=0  
   
-  pages = []
-  
-  if( pagesName ):
-    # pages from their names
-    pages += [ Page(siteSrc, name) for name in pagesName ]
+  pages = pagesName
   
   if( categories ):
     cats = [(Category(
@@ -336,10 +366,10 @@ def syncAndModifyPages(
             ) for c in categories ]
     # retrieve all pages from categories
     for (cat,ns,r) in cats :
-      pages += [ Page(siteSrc, cat.title()) ]
+      pages += [ cat.title() ]
       print ("Retrieve pages from " + cat.title())
-      # add pages to sync of this categorie 
-      pages += list( cat.articles( namespaces=ns, recurse=r ) )
+      # add pages to sync of this categorie
+      pages += mapTitle(cat.articles( namespaces=ns, recurse=r ) )
     
   # copy all pages !
   nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)    
@@ -349,16 +379,10 @@ def syncAndModifyPages(
   if( modifications ):
     for mod in modifications :
       # get all pages to modify from regex mod['pages']
-      pageModsOnSrc = filter( 
-               lambda p : re.search(mod['pages'],p.title()), 
+      pageMods = filter( 
+               lambda p : re.search(mod['pages'],p ), 
                pages
              )
-      # We must modify on dest site, 
-      # then get pages to modify on this site
-      pageMods = map(
-               lambda p : Page(siteDst, p.title()),
-               pageModsOnSrc
-             )   
       
       # get all supstitution to apply on list of pages
       subs = map( 
@@ -414,12 +438,13 @@ def main():
   
   try:
     opts, args = getopt.getopt(sys.argv[1:], 
-      "hftdu", 
+      "hftdue:", 
       [ "help",
         "force",
         "no-sync-templates",
         "no-sync-dependances-templates",
-        "no-upload-files"
+        "no-upload-files",
+        "export-dir"
       ]
     )
   except (getopt.error, msg):
@@ -440,10 +465,14 @@ def main():
       options["templatesDepSync"] = False
     if opt in ("-u", "--no-upload-files"):  
       options["filesUpload"] = False
-      
+    if opt in ("-e", "--export-dir"):  
+      options["exportDir"] = arg
+            
   # check coherence, fix if needed
   if(options["templatesDepSync"] and not options["templatesSync"]):
       options["templatesSync"] = True
+
+  print (options)
 
   # process each config file
   for arg in args:
