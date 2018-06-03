@@ -241,7 +241,7 @@ def getTemplatesFromPages(siteSrc, pages) :
       print ("%i/%i Process %s : %i templates found " % 
               (i+1,nbPage,p.encode('utf-8'),nbTplt))
       sys.stdout.flush()
-      templates += mapTitle(tplt)
+      templates.extend(mapTitle(tplt))
       
   # apply set() to delete duplicate
   return list(set(templates))  
@@ -257,7 +257,7 @@ def getFilesFromPages(siteSrc, pages) :
       print ("%i/%i Process %s : %i images found" % 
                (i+1,nbPage,p.encode('utf-8'),nbFiles))
       sys.stdout.flush()
-      files += mapTitle(f)  
+      files.extend(mapTitle(f)) 
       
   # apply set() to delete duplicate
   return list(set(files))
@@ -366,10 +366,10 @@ def syncAndModifyPages(
             ) for c in categories ]
     # retrieve all pages from categories
     for (cat,ns,r) in cats :
-      pages += [ cat.title() ]
+      pages.append(cat.title())
       print ("Retrieve pages from " + cat.title())
       # add pages to sync of this categorie
-      pages += mapTitle(cat.articles( namespaces=ns, recurse=r ) )
+      pages.extend(mapTitle(cat.articles( namespaces=ns, recurse=r )))
     
   # copy all pages !
   nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)    
