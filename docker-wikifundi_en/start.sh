@@ -23,6 +23,9 @@ else
   cd maintenance 
   ./update.php --quick
   cd ..
+  
+  # if new databse, always mirroring
+  MIRRORING=1
 fi
 
 echo "Starting Persoid ..."
@@ -32,22 +35,24 @@ cd ..
 
 service memcached start 
 
-#mirroring
-service apache2 start
-wikimedia_sync -dut mirroring.json 
-service apache2 stop
+if [ ${MIRRORING} ]
+then
+  #mirroring
+  service apache2 start
+  wikimedia_sync mirroring.json 
+  service apache2 stop
+  #maintenance
+  cd maintenance 
+  ./update.php --quick
+  cd ..
+fi
 
-#maintenance
-cd maintenance 
-./update.php --quick
-cd ..
-
-#/bin/bash
-
+#finnaly, start apache and wait
 echo "Starting Apache 2 ..."
 apache2ctl -D FOREGROUND
 
 # for debug
+#/bin/bash
 #if [ -z "$1" ]
 #then
 #  echo "Starting Apache 2 ..."

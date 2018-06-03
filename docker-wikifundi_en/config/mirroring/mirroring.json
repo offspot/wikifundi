@@ -11,10 +11,33 @@
   },
 
   "pages":[
-    "MPEG-1_Audio_Layer_II"
+    "Sinenjongo_High_School",
+    "Saint_Fatima_School",
+    "Boa_Amponsem_Senior_High_School",
+    "Gayaza_High_School",
+    "Namwianga_Mission",
+    "American_Cooperative_School_of_Tunis",
+    "Kapsabet_High_School",
+    "Showcase",
+    "Eusèbe_Jaojoby",
+    "Cameroon",
+    "Pluto",
+    "List_World_Heritage",
+    "Ambohimanga",
+    
+    "MediaWiki:Common.js",
+    "MediaWiki:Common.css",
+    "MediaWiki:Vector.js",
+    "MediaWiki:Vector.css"
   ],
   
   "categories":[
+  { "title" : "WikiProject_Wikipack_Africa_Content",
+    "namespace" : 4,
+    "recurse" : 1},
+  { "title" : "Featured_articles",
+    "namespace" : 0,
+    "recurse" : 0}
   ],
   
   "modifications":[

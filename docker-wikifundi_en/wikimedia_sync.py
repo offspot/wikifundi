@@ -122,11 +122,11 @@ def modifyPage(dst, p, subs)  :
       pattern = s[0]
       repl = s[1]
       p.text = re.sub(pattern, repl, p.text)
-    print ("edit " + p.title())
+    print ("Save " + p.title().encode('utf-8'))
     return dst.editpage(p)
     
   except Exception as e:
-      print ("Error to modify page %s (%s)" % (p.title(), e))
+      print ("Error to modify page %s (%s)" % (p.title().encode('utf-8'), e))
       return False 
       
 def modifyPages(dst, pages, subs) :  
@@ -134,7 +134,7 @@ def modifyPages(dst, pages, subs) :
   nbPage = len(pages)
   
   for i,p in enumerate(pages):
-    print ("== %i/%i Modification of %s " % (i+1,nbPage,p.title()))
+    print ("== %i/%i Modification of %s " % (i+1,nbPage,p.title().encode('utf-8')))
     if(modifyPage(dst,p,subs)):
       nbModPage = nbModPage + 1
       
@@ -169,7 +169,7 @@ def syncPage(src, dst, p, force = False, checkRedirect = True):
       return dst.editpage(newPage)
       
   except Exception as e:
-    print ("Error on sync page %s (%s)" % (p.title(), e))
+    print ("Error on sync page %s (%s)" % (p.title().encode('utf-8'), e))
     return False
     
   return False
@@ -186,14 +186,14 @@ def uploadFiles(src, dst, files) :
       # create a new file on dest wiki
       pageDst = FilePage(dst, f.title())
       if(not pageDst.exists()):
-        print ("== %i/%i Upload file %s" % (i+1, nbImages,  f.title()))
+        print ("== %i/%i Upload file %s" % (i+1, nbImages,  f.title().encode('utf-8')))
         # start upload !
         dst.upload( pageDst, source_url=f.get_file_url(), 
                     comment=f.title(), text=f.text, 
                     ignore_warnings = False)
                     
     except Exception as e:
-      print ("Error on upload file %s (%s)" % (f.title(),e))  
+      print ("Error on upload file %s (%s)" % (f.title().encode('utf-8'),e))  
 
 def syncPages(src, dst, pages, force = False) -> int: 
   """Synchronize wiki pages from src to dst
@@ -207,7 +207,7 @@ def syncPages(src, dst, pages, force = False) -> int:
   nbPage = len(pages)
   
   for i,p in enumerate(pages):
-    print ("== %i/%i Sync %s " % (i+1,nbPage,p.title()))
+    print ("== %i/%i Sync %s " % (i+1,nbPage,p.title().encode('utf-8')))
     if(syncPage(src,dst,p,force)):
       nbSyncPage = nbSyncPage + 1
       
@@ -220,7 +220,7 @@ def getTemplatesFromPages(pages) :
     tplt = p.templates()
     nbTplt = len(tplt)
     if(nbTplt > 0):
-      print ("Process %i templates of %s" % (nbTplt, p.title()))
+      print ("Process %i templates of %s" % (nbTplt, p.title().encode('utf-8')))
       templates += tplt
       
   # apply set() to delete duplicate
@@ -233,7 +233,7 @@ def getFilesFromPages(pages) :
     f = list(p.imagelinks())
     nbFiles = len(f)
     if(nbFiles > 0):
-      print ("Process %i images of %s" % (nbFiles, p.title()))
+      print ("Process %i images of %s" % (nbFiles, p.title().encode('utf-8')))
       files += f  
       
   # apply set() to delete duplicate
@@ -361,24 +361,29 @@ def processFromJSONFile(fileconfig, options):
   """
   print ("Process %s" % fileconfig)
 
-  with open(fileconfig, 'r') as jsonfile:
-    cfg = json.load(jsonfile)
-    
-    # TODO add Exceptions
-    src = cfg['sites']['src']
-    dst = cfg['sites']['dst']
-    pages = cfg['pages']
-    cats = cfg['categories']
-    mods = cfg['modifications']
-    
-    (nbPages,nbMods) = syncAndModifyPages(
-      src['fam'], src['code'], 
-      dst['fam'], dst['code'], 
-      pages, cats, mods, options
-    )
-    #TODO end exception
+  with open(fileconfig, 'r', encoding='utf-8') as jsonfile:
+    try:
+      cfg = json.load(jsonfile)
+
+      src = cfg['sites']['src']
+      dst = cfg['sites']['dst']
+      pages = cfg['pages']
+      cats = cfg['categories']
+      mods = cfg['modifications']
       
-    print ("%i pages synchronized and %i pages modify" % (nbPages, nbMods))
+      (nbPages,nbMods) = syncAndModifyPages(
+        src['fam'], src['code'], 
+        dst['fam'], dst['code'], 
+        pages, cats, mods, options
+      )
+      
+      print ("%i pages synchronized and %i pages modify" % (nbPages, nbMods))
+      
+    except json.decoder.JSONDecodeError as e:
+      print ("Syntax error in mirroring file : %s" % e)
+    except KeyError as e:
+      print ("KeyError error in mirroring file : %s" % e)
+      
 
 ######################################
 # Main parts
