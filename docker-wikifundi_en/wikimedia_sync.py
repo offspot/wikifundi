@@ -101,9 +101,6 @@ import sys
 import json
 import getopt
 
-# To optimize memory usage
-import gc
-
 # To use regular expression
 import re
 
@@ -261,6 +258,11 @@ def getFilesFromPages(siteSrc, pages) :
 def exportPagesTitle(pages, fileName, directory):
   with open("%s/mirroring_export_%s.json" % (directory,fileName), 'w',encoding='utf-8') as f:
       f.write(json.dumps(pages, sort_keys=True, indent=4,ensure_ascii=False))
+      
+def importPagesTitle(fileName, directory):
+  with open("%s/mirroring_export_%s.json" % (directory,fileName), 'r', encoding='utf-8') as f:
+      return json.load(f)
+  return []
   
 def syncPagesWithDependances( siteSrc, siteDst, 
                               pages, options) : 
@@ -272,57 +274,55 @@ def syncPagesWithDependances( siteSrc, siteDst,
     return the number of succes synchronized pages and files 
   """
   
+  # get options
+  force = options['force']
+  exportDir = options["exportDir"]
+  
+  print ("%i pages to sync" % len(pages))
   # export titles of collected pages to sync
-  exportPagesTitle(pages,"pages",options["exportDir"])
-
-  #get templates and files used by pages
-  if(options['filesUpload']) :
-    files = getFilesFromPages(siteSrc, pages)
-    exportPagesTitle(files,"files",options["exportDir"])
- 
-  #force garbage collector
-  gc.collect() 
+  exportPagesTitle(pages,"pages",exportDir)
     
   if(options['templatesSync']):
-    templates = getTemplatesFromPages(siteSrc, pages)
-    exportPagesTitle(templates,"templates",options["exportDir"])
+    # try to restore precedent state
+    templates = importPagesTitle("templates",exportDir)
+    if(len(templates) > 0 and not force):
+      # the imported file contains all templates to sync
+      options['templatesDepSync'] = False
+    else:
+      # collect template used by pages
+      templates = getTemplatesFromPages(siteSrc, pages)
+      exportPagesTitle(templates,"templates",exportDir)
+    print ("%i templates to sync" % len(templates))
     
-  #force garbage collector
-  gc.collect()
+  #collect files used by pages
+  if(options['filesUpload']) :
+    # try to restore precedent state
+    files = importPagesTitle("files",exportDir)
+    if(len(files) == 0 or force):
+      files = getFilesFromPages(siteSrc, pages)
+      exportPagesTitle(files,"files",exportDir)
+    print ("%i files to sync" % len(files))
     
   if(options['templatesDepSync']):    
     dependances = getTemplatesFromPages(siteSrc, templates)
-    exportPagesTitle(dependances,"dependances",options["exportDir"])
+    #delete duplicate
+    templates = list(set(templates+dependances))
+    exportPagesTitle(templates,"templates",exportDir)
+    print ("%i templates to sync" % len(templates))
     
-  #force garbage collector
-  gc.collect()
-     
   #sync all pages, templates and associated files
   nbPageSync = 0
   
-  if(options['templatesDepSync']):
-    print ("====== Sync template dependances")
-    nbPageSync += syncPages(siteSrc, siteDst, dependances, options['force'] )
-
-  #force garbage collector
-  gc.collect()
+  print ("====== Sync pages")
+  nbPageSync += syncPages(siteSrc, siteDst, pages, force )  
     
   if(options['templatesSync']):
     print ("====== Sync template")
-    nbPageSync += syncPages(siteSrc, siteDst, templates, options['force'] )
-
-  #force garbage collector
-  gc.collect()
+    nbPageSync += syncPages(siteSrc, siteDst, templates, force )
     
-  print ("====== Sync pages")
-  nbPageSync += syncPages(siteSrc, siteDst, pages, options['force'] )  
-
-  #force garbage collector
-  gc.collect()
-  
   if(options['filesUpload']):
     print ("====== Upload files")
-    uploadFiles (siteSrc, siteDst, files)  
+    uploadFiles (siteSrc, siteDst, files)      
   
   return nbPageSync;  
   
