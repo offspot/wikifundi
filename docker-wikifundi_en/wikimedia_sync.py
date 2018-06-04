@@ -117,8 +117,11 @@ def exportPagesTitle(pages, fileName, directory):
       f.write(json.dumps(pages, sort_keys=True, indent=4,ensure_ascii=False))
       
 def importPagesTitle(fileName, directory):
-  with open("%s/mirroring_export_%s.json" % (directory,fileName), 'r', encoding='utf-8') as f:
-      return json.load(f)
+  try :
+    with open("%s/mirroring_export_%s.json" % (directory,fileName), 'r', encoding='utf-8') as f:
+        return json.load(f)
+  except FileNotFoundError:
+      print ("No precedent list of %s is found" % fileName)
   return []  
   
 def mapTitle(pages) : 
