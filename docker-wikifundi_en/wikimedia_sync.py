@@ -111,7 +111,51 @@ DEFAULT_OPTIONS = dict(
     filesUpload = True,
     exportDir = "."    
 )
+
+def exportPagesTitle(pages, fileName, directory):
+  with open("%s/mirroring_export_%s.json" % (directory,fileName), 'w',encoding='utf-8') as f:
+      f.write(json.dumps(pages, sort_keys=True, indent=4,ensure_ascii=False))
+      
+def importPagesTitle(fileName, directory):
+  with open("%s/mirroring_export_%s.json" % (directory,fileName), 'r', encoding='utf-8') as f:
+      return json.load(f)
+  return []  
+  
+def mapTitle(pages) : 
+  return [ p.title() for p in pages ]  
     
+def getTemplatesFromPages(siteSrc, pages) :
+  templates = []
+  nbPage = len(pages)
+  for i,p in enumerate(pages) :
+    # get templates used by p
+    tplt = Page(siteSrc, p).templates()
+    nbTplt = len(tplt)
+    if(nbTplt > 0):
+      print ("%i/%i Process %s : %i templates found " % 
+              (i+1,nbPage,p.encode('utf-8'),nbTplt))
+      sys.stdout.flush()
+      templates.extend(mapTitle(tplt))
+      
+  # apply set() to delete duplicate
+  return list(set(templates))  
+  
+def getFilesFromPages(siteSrc, pages) :
+  files = []
+  nbPage = len(pages)
+  for i,p in enumerate(pages) :
+    # get files used by p
+    f = list(Page(siteSrc, p).imagelinks())
+    nbFiles = len(f)
+    if(nbFiles > 0):
+      print ("%i/%i Process %s : %i files found" % 
+               (i+1,nbPage,p.encode('utf-8'),nbFiles))
+      sys.stdout.flush()
+      files.extend(mapTitle(f)) 
+      
+  # apply set() to delete duplicate
+  return list(set(files))
+  
 def modifyPage(dst, pageTitle, subs)  :
 
   try:
@@ -128,20 +172,9 @@ def modifyPage(dst, pageTitle, subs)  :
   except Exception as e:
       print ("Error to modify page %s (%s)" % 
         (pageTitle.encode('utf-8'), e))
-      return False 
-      
-def modifyPages(dst, pages, subs) :  
-  nbModPage = 0
-  nbPage = len(pages)
+      return False
   
-  for i,pageTitle in enumerate(pages):
-    print ("%i/%i Modification of %s " % 
-      (i+1,nbPage,pageTitle.encode('utf-8')))
-    if(modifyPage(dst,pageTitle,subs)):
-      nbModPage = nbModPage + 1
-      
-  return nbModPage
-
+  
 def syncPage(src, dst, pageTitle, force = False, checkRedirect = True):
   """Synchronize ONE wiki pages from src to dst
   
@@ -177,6 +210,18 @@ def syncPage(src, dst, pageTitle, force = False, checkRedirect = True):
     return False
     
   return False
+  
+def modifyPages(dst, pages, subs) :  
+  nbModPage = 0
+  nbPage = len(pages)
+  
+  for i,pageTitle in enumerate(pages):
+    print ("%i/%i Modification of %s " % 
+      (i+1,nbPage,pageTitle.encode('utf-8')))
+    if(modifyPage(dst,pageTitle,subs)):
+      nbModPage = nbModPage + 1
+      
+  return nbModPage  
   
 def uploadFiles(src, dst, files) :
   """Download files from src site and upload on dst site
@@ -223,46 +268,8 @@ def syncPages(src, dst, pages, force = False) -> int:
       
   return nbSyncPage
   
-def getTemplatesFromPages(siteSrc, pages) :
-  templates = []
-  nbPage = len(pages)
-  for i,p in enumerate(pages) :
-    # get templates used by p
-    tplt = Page(siteSrc, p).templates()
-    nbTplt = len(tplt)
-    if(nbTplt > 0):
-      print ("%i/%i Process %s : %i templates found " % 
-              (i+1,nbPage,p.encode('utf-8'),nbTplt))
-      sys.stdout.flush()
-      templates.extend(mapTitle(tplt))
-      
-  # apply set() to delete duplicate
-  return list(set(templates))  
-  
-def getFilesFromPages(siteSrc, pages) :
-  files = []
-  nbPage = len(pages)
-  for i,p in enumerate(pages) :
-    # get files used by p
-    f = list(Page(siteSrc, p).imagelinks())
-    nbFiles = len(f)
-    if(nbFiles > 0):
-      print ("%i/%i Process %s : %i files found" % 
-               (i+1,nbPage,p.encode('utf-8'),nbFiles))
-      sys.stdout.flush()
-      files.extend(mapTitle(f)) 
-      
-  # apply set() to delete duplicate
-  return list(set(files))
-  
-def exportPagesTitle(pages, fileName, directory):
-  with open("%s/mirroring_export_%s.json" % (directory,fileName), 'w',encoding='utf-8') as f:
-      f.write(json.dumps(pages, sort_keys=True, indent=4,ensure_ascii=False))
-      
-def importPagesTitle(fileName, directory):
-  with open("%s/mirroring_export_%s.json" % (directory,fileName), 'r', encoding='utf-8') as f:
-      return json.load(f)
-  return []
+######################################
+# Entry points  
   
 def syncPagesWithDependances( siteSrc, siteDst, 
                               pages, options) : 
@@ -325,11 +332,6 @@ def syncPagesWithDependances( siteSrc, siteDst,
     uploadFiles (siteSrc, siteDst, files)      
   
   return nbPageSync;  
-  
-#############
-
-def mapTitle(pages) : 
-  return [ p.title() for p in pages ]
   
 def syncAndModifyPages(
   srcFam, srcCode, dstFam, dstCode, 
