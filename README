@@ -14,6 +14,12 @@ sudo docker pull -a openzim/mediawiki
 mkdir -p data 
 sudo docker run -p 8080:80 \
   -v ${PWD}/data:/var/www/data -it openzim/mediawiki
+  
+Lauch in your brohter : http://localhost:8080/
+
+Default admin logging :
+User : Admin
+Password : wikiadmin
 
 ===================
 Customize MediaWiki
