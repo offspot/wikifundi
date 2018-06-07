@@ -35,25 +35,52 @@ else
   chmod 644 ${DATABASE_FILE} && chown www-data:www-data ${DATABASE_FILE}
   
   #change Admin password
-  php maintenance/createAndPromote.php --bureaucrat --sysop --bot --force Admin ${MEDIAWIKI_ADMIN_PASSWORD}
+  php maintenance/createAndPromote.php --bureaucrat --sysop --bot --force Admin ${MEDIAWIKI_ADMIN_PASSWORD}  
+  
+  #maintenance
+  echo "Start MediaWiki Maintenance"
+  cd maintenance 
+  ./update.php --quick > ${LOG_DIR}/mw_update.log 
+  cd ..
+  
+  # if new databse, always mirroring
+  MIRRORING=1
 fi
-
-#maintenance
-cd maintenance 
-./update.php --quick
-cd ..
 
 echo "Starting Persoid ..."
 cd parsoid
-node bin/server.js &
+node bin/server.js > ${LOG_DIR}/parsoid.log  &
 cd .. 
 
 service memcached start 
 
-#service apache2 start
-#/bin/bash
+if [ ${MIRRORING} ]
+then
+  #mirroring
+  service apache2 start
+  echo "Start Mirroring, log in data/mirroring.log"
+  wikimedia_sync ${MIRRORING_OPTIONS} -e "${LOG_DIR}/log" mirroring.json > ${LOG_DIR}/mirroring.log 
+  service apache2 stop
+fi
 
-echo "Starting Apache 2 and wait ..."
+#maintenance
+echo "Start MediaWiki Maintenance"
+cd maintenance 
+./update.php --quick > ${LOG_DIR}/mw_update.log 
+cd ..
+
+#finnaly, start apache and wait
+echo "Starting Apache 2 ..."
 apache2ctl -D FOREGROUND
 
+# for debug
+#/bin/bash
+#if [ -z "$1" ]
+#then
+#  echo "Starting Apache 2 ..."
+#  apache2ctl -D FOREGROUND
+#else
+#service apache2 start
+#exec "$@"
+#fi
 

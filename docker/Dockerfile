@@ -7,7 +7,6 @@ FROM php:7.1-apache
 LABEL maintainer="kiwix"
 
 # Volumes to store database and medias (images...) files
-VOLUME /var/www/html/images
 VOLUME /var/www/data
 
 # Wiki name
@@ -22,8 +21,8 @@ ENV MEDIAWIKI_CONFIG_FILE_BASE ./config/mediawiki/LocalSettings.php
 ENV MEDIAWIKI_CONFIG_FILE_COMPOSER ./config/mediawiki/composer.json
 ENV PARSOID_CONFIG_FILE ./config/parsoid/config.yaml
 
-# Custom image
-ENV MEDIAWIKI_LOGO_FILE ./assets/images/logo.png
+# Media Wiki default admin password
+ENV MEDIAWIKI_ADMIN_PASSWORD wikiadmin
 
 # Media Wiki Version
 ENV MEDIAWIKI_MAJOR_VERSION 1.31
@@ -91,12 +90,18 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
+	
+#set maximum file size upload
+RUN { \
+		echo 'upload_max_filesize = 100M'; \
+		echo 'post_max_size = 100M'; \
+	} > /usr/local/etc/php/conf.d/90-wikifundi.ini
 
 # MediaWiki setup
 RUN curl -fSL "https://releases.wikimedia.org/mediawiki/${MEDIAWIKI_MAJOR_VERSION}/mediawiki-${MEDIAWIKI_VERSION}-${MEDIAWIKI_RC}.tar.gz" -o mediawiki.tar.gz \
 	&& tar -xz --strip-components=1 -f mediawiki.tar.gz \
 	&& rm mediawiki.tar.gz \
-	&& chown -R www-data:www-data skins cache images
+	&& chown -R www-data:www-data skins cache
 
 # Parsoid setup
 RUN git clone --quiet https://gerrit.wikimedia.org/r/p/mediawiki/services/parsoid \
@@ -165,11 +170,11 @@ COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./LocalSettings.custom.php
 # Configure Parsoid
 COPY ${PARSOID_CONFIG_FILE} ./parsoid/
 
-# Copy assets
-COPY ${MEDIAWIKI_LOGO_FILE} ./
-
 # Needed to init database
 COPY ./data/my_wiki.sqlite /tmp/
+
+# The files uploaded are in the data volume
+RUN  mv ./images ./images.origin && ln -s /var/www/data/images ./images
 
 # Remove configuration by web
 #RUN rm -rf mw-config

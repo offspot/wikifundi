@@ -330,9 +330,6 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 # No visits count
 $wgDisableCounters = true;
 
-# Custom logo
-$wgLogo = "logo.png";
-
 # Enable subpages in all namespaces
 $wgNamespacesWithSubpages = array_fill(0, 200, true);
 
