@@ -1,9 +1,13 @@
-FROM florentk/wikifundi
+FROM openzim/mediawiki
 
 ENV PYWIKIBOT_CONFIG_FILE ./config/pywikibot/user-config.py
 ENV PYWIKIBOT_PASSWORD_FILE ./config/pywikibot/user-password.py
 ENV MIRRORING_CONFIG_FILE ./config/mirroring/mirroring.json
 ENV PYWIKIBOT2_DIR /usr/local/etc
+
+# Custom image
+ENV MEDIAWIKI_LOGO_FILE ./assets/images/logo.png
+
 
 ENV DATABASE_NAME mw_wikifundi_en
 

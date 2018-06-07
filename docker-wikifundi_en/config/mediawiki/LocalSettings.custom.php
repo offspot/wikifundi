@@ -16,4 +16,7 @@ $wgDBuser        = "";
 $wgDBpassword    = "";
 $wgSQLiteDataDir = "/var/www/data";
 
+# Custom logo
+$wgLogo = "logo.png";
+
 ?>

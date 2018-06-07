@@ -203,8 +203,8 @@ wfLoadExtension( 'VisualEditor' );
 $wgDefaultUserOptions['visualeditor-enable'] = 1;
 $wgVisualEditorNamespaces[] = NS_PROJECT;
 $wgVirtualRestConfig['modules']['parsoid'] = array(
-						   'url' => 'http://wikifundi-en.sloppy.zone:8000',
-						   'domain' => 'wikifundi-en.sloppy.zone',
+						   'url' => 'http://localhost:8000',
+						   'domain' => 'localhost',
 						   'prefix' => 'mediawiki_kiwix',
 						   'forwardCookies' => true
 						   );
@@ -329,9 +329,6 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 
 # No visits count
 $wgDisableCounters = true;
-
-# Custom logo
-$wgLogo = "logo.png";
 
 # Enable subpages in all namespaces
 $wgNamespacesWithSubpages = array_fill(0, 200, true);
