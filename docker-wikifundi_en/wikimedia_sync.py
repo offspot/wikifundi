@@ -96,7 +96,7 @@
 """
 
 # To use WikiMedia API
-from pywikibot import Site,Page,FilePage,Category,logging
+from pywikibot import Site,Page,FilePage,Category, textlib
 
 # To load JSON file config and check options
 import sys
@@ -206,7 +206,7 @@ def syncPage(src, dst, pageTitle, force = False, checkRedirect = True):
         syncPage(src, dst, p.getRedirectTarget().title(), force, False)
         
       # copy the content of the page
-      newPage.text = p.text
+      newPage.text = p.text      
       
       # commit the new page on dest wiki
       return dst.editpage(newPage)
@@ -340,6 +340,23 @@ def syncPagesWithDependances( siteSrc, siteDst,
   
   return nbPageSync;  
   
+def getPagesTitleFromCategorie(site, categories):
+  pages = []
+  cats = [(Category(
+              site,
+              c['title']),
+              c['namespace'],
+              c['recurse']
+          ) for c in categories ]
+  # retrieve all pages from categories
+  for (cat,ns,r) in cats :
+    pages.append(cat.title())
+    print ("Retrieve pages from " + cat.title())
+    # add pages to sync of this categorie
+    pages.extend(mapTitle(cat.articles( namespaces=ns, recurse=r )))
+    
+  return pages
+        
 def syncAndModifyPages(
   srcFam, srcCode, dstFam, dstCode, 
   pagesName, categories, 
@@ -363,18 +380,7 @@ def syncAndModifyPages(
   pages = pagesName
   
   if( categories ):
-    cats = [(Category(
-                siteSrc,
-                c['title']),
-                c['namespace'],
-                c['recurse']
-            ) for c in categories ]
-    # retrieve all pages from categories
-    for (cat,ns,r) in cats :
-      pages.append(cat.title())
-      print ("Retrieve pages from " + cat.title())
-      # add pages to sync of this categorie
-      pages.extend(mapTitle(cat.articles( namespaces=ns, recurse=r )))
+    pages.extend(getPagesTitleFromCategorie(siteSrc, categories))
     
   nbPages = 0
   if( options["pagesSync"] ):
@@ -383,14 +389,25 @@ def syncAndModifyPages(
   
   # apply modifications
   nbMods = 0
+  
   if( modifications and options["modifyPages"] ):
     for mod in modifications :
-      # get all pages to modify from regex mod['pages']
-      pageMods = filter( 
-               lambda p : re.search(mod['pages'],p ), 
-               pages
-             )
+    
+      pageMods = []
+      if('pages' in mod):
+        # get all pages to modify from regex mod['pages']
+        pageMods.extend (filter( 
+                 lambda p : re.search(mod['pages'],p ), 
+                 pages
+               ))
       
+      if('categorie' in mod):
+        pageMods.extend (getPagesTitleFromCategorie(siteSrc, categories))
+      
+      if('namespace' in mod):
+        pageMods.extend (mapTitle(
+                          siteDst.allpages(namespace=mod['namespace'])))                
+                 
       # get all supstitution to apply on list of pages
       subs = map( 
                lambda s : (re.compile(s['pattern']),s['repl']), 
@@ -486,8 +503,9 @@ def main():
   if(options["templatesDepSync"] and not options["templatesSync"]):
       options["templatesSync"] = True
   if(not options["pagesSync"]):
-      options["templatesSync"] = options["templatesDepSync"] 
-        = options["filesUpload"] = False
+      options["templatesSync"] = False
+      options["templatesDepSync"] = False
+      options["filesUpload"] = False
 
   print (options)
 
