@@ -202,7 +202,7 @@ def syncPage(src, dst, pageTitle, force = False, checkRedirect = True):
     elif(newPage.site == dst):
     
       #sync also the redirect target 
-      if(p.isRedirectPage()):
+      if(checkRedirect and p.isRedirectPage()):
         syncPage(src, dst, p.getRedirectTarget().title(), force, False)
         
       # copy the content of the page
