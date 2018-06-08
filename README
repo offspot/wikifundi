@@ -53,7 +53,6 @@ allow mirroring a existing wiki (by example Wikipedia) and
 use this wiki offline
 
 You can use `docker-wikifundi_en` subdirectory to build WikiFundi image
-
 The config files are located in docker-wikifundi_en/config directory.
 
 This directory contain the config of :
@@ -69,8 +68,26 @@ This directory contain the config of :
     To get file structure :    
       export PYWIKIBOT2_DIR=docker-wikifundi_en/config/pywikibot/
       ./docker-wikifundi_en/wikimedia_sync.py --help
-    
 You can also customize your logo in assets/images
+
+To build and run :
+mkdir -p data
+docker build -t wikifundi_en docker-wikifundi_en
+sudo docker run -p 8080:80 \
+  -v ${PWD}/data:/var/www/data -it wikifundi_en
+  
+On start, if the database not exist, then it is initialized and the
+mirroring script is lauched. If the databse exist, you can force 
+mirroring by changing environments variables :
+ sudo docker run -p 8080:80 -e MIRRORING=1 \
+  -v ${PWD}/data:/var/www/data -it wikifundi_en
+ 
+You can also change options script with MIRRORING_OPTIONS : 
+  -f, --force : always copy  the content (even if page exist on site dest). Default : False
+  -t, --no-sync-templates : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates. Default : False
+  -d, --no-sync-dependances-templates : do not copy templates used by templates.  Default : False
+  -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync. Default : False
+  -e, --export-dir <directory> : write json export files in this directory
 
 ========================
 Install on a RaspberryPi
