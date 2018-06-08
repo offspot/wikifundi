@@ -402,7 +402,7 @@ def syncAndModifyPages(
                ))
       
       if('categorie' in mod):
-        pageMods.extend (getPagesTitleFromCategorie(siteSrc, categories))
+        pageMods.extend (getPagesTitleFromCategorie(siteSrc, mod['categorie']))
       
       if('namespace' in mod):
         pageMods.extend (mapTitle(
