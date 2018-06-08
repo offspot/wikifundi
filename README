@@ -87,6 +87,8 @@ You can also change options script with MIRRORING_OPTIONS :
   -t, --no-sync-templates : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates. Default : False
   -d, --no-sync-dependances-templates : do not copy templates used by templates.  Default : False
   -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync. Default : False
+  -p, --no-sync : do not copy anything. If not -m, just modify. Default : False
+  -m, --no-modify : do not modify pages. Default : False 
   -e, --export-dir <directory> : write json export files in this directory
 
 ========================

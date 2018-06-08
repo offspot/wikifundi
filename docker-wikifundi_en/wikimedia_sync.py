@@ -20,6 +20,8 @@
   -t, --no-sync-templates : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates. Default : False
   -d, --no-sync-dependances-templates : do not copy templates used by templates.  Default : False
   -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync. Default : False
+  -p, --no-sync : do not copy anything. If not -m, just modify. Default : False
+  -m, --no-modify : do not modify pages. Default : False 
   -e, --export-dir <directory> : write json export files in this directory
   
  json file config :
@@ -106,9 +108,11 @@ import re
 
 DEFAULT_OPTIONS = dict(
     force = False, 
+    pagesSync = True,    
     templatesSync = True, 
     templatesDepSync = True, 
     filesUpload = True,
+    modifyPages = True,
     exportDir = "."    
 )
 
@@ -372,12 +376,14 @@ def syncAndModifyPages(
       # add pages to sync of this categorie
       pages.extend(mapTitle(cat.articles( namespaces=ns, recurse=r )))
     
-  # copy all pages !
-  nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)    
+  nbPages = 0
+  if( options["pagesSync"] ):
+    # copy all pages !
+    nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)  
   
   # apply modifications
   nbMods = 0
-  if( modifications ):
+  if( modifications and options["modifyPages"] ):
     for mod in modifications :
       # get all pages to modify from regex mod['pages']
       pageMods = filter( 
@@ -439,15 +445,18 @@ def main():
   
   try:
     opts, args = getopt.getopt(sys.argv[1:], 
-      "hftdue:", 
+      "hftdupme:", 
       [ "help",
         "force",
         "no-sync-templates",
         "no-sync-dependances-templates",
         "no-upload-files",
+        "no-sync",
+        "no-modify",
         "export-dir"
       ]
     )
+      
   except (getopt.error, msg):
     print (("args error : %s" % str(msg)))
     print ("Use --help to show help instructions")
@@ -466,12 +475,19 @@ def main():
       options["templatesDepSync"] = False
     if opt in ("-u", "--no-upload-files"):  
       options["filesUpload"] = False
+    if opt in ("-p", "--no-sync"):  
+      options["pagesSync"] = False
+    if opt in ("-m", "--no-modify"):  
+      options["modifyPages"] = False      
     if opt in ("-e", "--export-dir"):  
       options["exportDir"] = arg
             
   # check coherence, fix if needed
   if(options["templatesDepSync"] and not options["templatesSync"]):
       options["templatesSync"] = True
+  if(not options["pagesSync"]):
+      options["templatesSync"] = options["templatesDepSync"] 
+        = options["filesUpload"] = False
 
   print (options)
 
