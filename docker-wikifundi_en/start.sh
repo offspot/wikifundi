@@ -67,6 +67,7 @@ fi
 echo "Start MediaWiki Maintenance"
 cd maintenance 
 ./update.php --quick > ${LOG_DIR}/mw_update.log 
+php refreshLinks.php > ${LOG_DIR}/mw_update.log 
 cd ..
 
 #finnaly, start apache and wait
