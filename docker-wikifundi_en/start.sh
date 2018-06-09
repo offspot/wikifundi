@@ -69,16 +69,17 @@ then
   php refreshLinks.php > ${LOG_DIR}/mw_update.log 
   cd ..  
   
-  #build tarbal
+  #build tarbals
+  echo "Build tarbal"
   cd ${DATA_DIR}
-  #compress database 
-  gzip -c ${DATABASE_NAME}.sqlite > ${DATABASE_NAME}.sqlite.gz
-  #create tarbal
-  tar -cvvf data-${DATABASE_NAME}.tar ${DATABASE_NAME}.sqlite.gz log config images >> ${LOG_DIR}/mirroring.log 
-  rm -f ${DATABASE_NAME}.sqlite.gz
+  tar -czvvf data-${DATABASE_NAME}.tgz ${DATABASE_NAME}.sqlite log config >> ${LOG_DIR}/mirroring.log 
+  tar -cvvf images-${DATABASE_NAME}.tar images >> ${LOG_DIR}/mirroring.log 
   cd ../html
-  ln -s ${DATA_DIR}/data-${DATABASE_NAME}.tar
 fi
+
+# create links to allow download tarbals
+ln -s ${DATA_DIR}/data-${DATABASE_NAME}.tgz
+ln -s ${DATA_DIR}/images-${DATABASE_NAME}.tar
 
 #finnaly, start apache and wait
 echo "Starting Apache 2 ..."
