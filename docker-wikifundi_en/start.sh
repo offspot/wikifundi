@@ -59,16 +59,26 @@ then
   #mirroring
   service apache2 start
   echo "Start Mirroring, log in data/mirroring.log"
-  wikimedia_sync ${MIRRORING_OPTIONS} -e "${LOG_DIR}/log" mirroring.json > ${LOG_DIR}/mirroring.log 
+  wikimedia_sync ${MIRRORING_OPTIONS} -e "${LOG_DIR}" mirroring.json > ${LOG_DIR}/mirroring.log 
   service apache2 stop
+  
+  #maintenance
+  echo "Start MediaWiki Maintenance"
+  cd maintenance 
+  ./update.php --quick > ${LOG_DIR}/mw_update.log 
+  php refreshLinks.php > ${LOG_DIR}/mw_update.log 
+  cd ..  
+  
+  #build tarbal
+  cd ${DATA_DIR}
+  #compress database 
+  gzip -c ${DATABASE_NAME}.sqlite > ${DATABASE_NAME}.sqlite.gz
+  #create tarbal
+  tar -cvvf data-${DATABASE_NAME}.tar ${DATABASE_NAME}.sqlite.gz log config images >> ${LOG_DIR}/mirroring.log 
+  rm -f ${DATABASE_NAME}.sqlite.gz
+  cd ../html
+  ln -s ${DATA_DIR}/data-${DATABASE_NAME}.tar
 fi
-
-#maintenance
-echo "Start MediaWiki Maintenance"
-cd maintenance 
-./update.php --quick > ${LOG_DIR}/mw_update.log 
-php refreshLinks.php > ${LOG_DIR}/mw_update.log 
-cd ..
 
 #finnaly, start apache and wait
 echo "Starting Apache 2 ..."
