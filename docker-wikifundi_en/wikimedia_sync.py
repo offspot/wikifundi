@@ -209,7 +209,7 @@ def emptyPage(dst, pageTitle)  :
         (pageTitle.encode('utf-8'), e))
       return False  
   
-def modifyPage(dst, pageTitle, subs)  :
+def subsOnPage(dst, pageTitle, subs)  :
 
   try:
     p = Page(dst, pageTitle)
@@ -264,14 +264,14 @@ def syncPage(src, dst, pageTitle, force = False, checkRedirect = True):
     
   return False
   
-def modifyPages(dst, pages, subs) :  
+def subsOnPages(dst, pages, subs) :  
   nbModPage = 0
   nbPage = len(pages)
   
   for i,pageTitle in enumerate(pages):
     print ("%i/%i Modification of %s " % 
       (i+1,nbPage,pageTitle.encode('utf-8')))
-    if(modifyPage(dst,pageTitle,subs)):
+    if(subsOnPage(dst,pageTitle,subs)):
       nbModPage += 1
       
   return nbModPage  
@@ -332,9 +332,65 @@ def syncPages(src, dst, pages, force = False) -> int:
       nbSyncPage += 1
       
   return nbSyncPage
+
+  
+def getPagesTitleFromCategorie(site, categories):
+  pages = []
+  cats = [(Category(
+              site,
+              c['title']),
+              c['namespace'],
+              c['recurse']
+          ) for c in categories ]
+  # retrieve all pages from categories
+  for (cat,ns,r) in cats :
+    pages.append(cat.title())
+    print ("Retrieve pages from " + cat.title())
+    # add pages to sync of this categorie
+    pages.extend(mapTitle(cat.articles( namespaces=ns, recurse=r )))
+    
+  return pages
   
 ######################################
 # Entry points  
+def modifyPages(siteSrc, siteDst, 
+               pages, modifications):
+  # apply modifications
+  nbMods = 0   
+  #print (json.dumps(modifications, sort_keys=True, indent=4,ensure_ascii=False))
+  for mod in modifications :
+    pageMods = []
+    if('pages' in mod):
+      for regex in mod['pages']:
+        # get all pages to modify from regex
+        pageMods.extend (filter( 
+                 lambda p : re.search(regex,p), 
+                 pages
+               ))
+    
+    if('categories' in mod):
+        pageMods.extend (getPagesTitleFromCategorie(siteSrc, mod['categories']))
+    
+    if('namespaces' in mod):
+      for ns in mod['namespaces']:
+        pageMods.extend (mapTitle(
+                          siteDst.allpages(namespace=ns)))                
+         
+    # apply set() on pageMods to delete duplicate        
+    pageModsUniq = list(set(pageMods))        
+            
+    if('substitutions' in mod):
+      # get all supstitution to apply on list of pages
+      subs = map( 
+               lambda s : (re.compile(s['pattern']),s['repl']), 
+               mod['substitutions']
+             )
+      nbMods += subsOnPages(siteDst, pageModsUniq, list(subs))
+        
+    if('empty' in mod):
+      nbMods += emptyPages(siteDst, pageModsUniq) 
+  
+  return nbMods;
   
 def syncPagesWithDependances( siteSrc, siteDst, 
                               pages, options) : 
@@ -397,23 +453,6 @@ def syncPagesWithDependances( siteSrc, siteDst,
     uploadFiles (siteSrc, siteDst, files)      
   
   return nbPageSync;  
-  
-def getPagesTitleFromCategorie(site, categories):
-  pages = []
-  cats = [(Category(
-              site,
-              c['title']),
-              c['namespace'],
-              c['recurse']
-          ) for c in categories ]
-  # retrieve all pages from categories
-  for (cat,ns,r) in cats :
-    pages.append(cat.title())
-    print ("Retrieve pages from " + cat.title())
-    # add pages to sync of this categorie
-    pages.extend(mapTitle(cat.articles( namespaces=ns, recurse=r )))
-    
-  return pages
         
 def syncAndModifyPages(
   srcFam, srcCode, dstFam, dstCode, 
@@ -430,68 +469,27 @@ def syncAndModifyPages(
   siteSrc = Site(fam=srcFam,code=srcCode)
   siteDst = Site(fam=dstFam,code=dstCode)
   
+  # logging now to modify pages on dest
   siteDst.login()
   
-  #disable slow down wiki write mechanics 
+  # disable slow down wiki write mechanics 
   siteDst.throttle.maxdelay=0  
   
+  # init pages to copy
   pages = pagesName
   
+  # get pages in categories
   if( categories ):
     pages.extend(getPagesTitleFromCategorie(siteSrc, categories))
     
-  nbPages = 0
   if( options["pagesSync"] ):
     # copy all pages !
-    nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)  
-  
-  # apply modifications
-  nbMods = 0
-  
-  
-  
-  if( modifications ):
-  
-    #print (json.dumps(modifications, sort_keys=True, indent=4,ensure_ascii=False))
-    
-    for mod in modifications :
-    
-      pageMods = []
-      if('pages' in mod):
-        for regex in mod['pages']:
-          # get all pages to modify from regex
-          pageMods.extend (filter( 
-                   lambda p : re.search(regex,p), 
-                   pages
-                 ))
-      
-      if('categories' in mod):
-          pageMods.extend (getPagesTitleFromCategorie(siteSrc, mod['categories']))
-      
-      if('namespaces' in mod):
-        for ns in mod['namespaces']:
-          pageMods.extend (mapTitle(
-                            siteDst.allpages(namespace=ns)))                
-           
-      # apply set() on pageMods to delete duplicate        
-      pageModsUniq = list(set(pageMods))        
-              
-      if('substitutions' in mod):
-        # get all supstitution to apply on list of pages
-        subs = map( 
-                 lambda s : (re.compile(s['pattern']),s['repl']), 
-                 mod['substitutions']
-               )
-        if( options["modifyPages"] ):
-          nbMods += modifyPages(siteDst, pageModsUniq, list(subs))
-          
-      if('empty' in mod):
-        if( options["modifyPages"] ):
-          nbMods += emptyPages(siteDst, pageModsUniq)          
-      
-  
-  return (nbPages,nbMods)
+    nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)    
 
+  if( modifications and options["modifyPages"] ):
+    nbMods =  modifyPages(siteSrc, siteDst, pages, modifications)        
+      
+  return (nbPages,nbMods)
 
 def processFromJSONFile(fileconfig, options):
   """Synchronize wiki pages from JSON file
