@@ -61,12 +61,15 @@
         "recurse":0
       }
       ...
-    ]
+    ],
     
     // list of modification on dest after copy
     "modifications":[
       {
+        // modifications on pages mathing with RegEx1
         "pages":"RegEx1",
+        // apply a list of substitutions on this pages
+        // see https://docs.python.org/2/library/re.html#re.sub
         "substitutions":[
           {
             "pattern":"Pattern 1",
@@ -75,18 +78,33 @@
           {
             "pattern":"Pattern 2",
             "repl":"Remplacement 2"
-          }        
+          }
+          ...        
         ]
       },
       {
-        "pages":"RegEx2",
+        // modifications on pages in Category 1
+        "categorie":"Category 1",
         "substitutions":[
           {
             "pattern":"Pattern 3",
             "repl":"Remplacement 3"
-          }     
+          }  
+          ...   
         ]
-      }      
+      },
+      {
+        // modifications on pages in namespace=4
+        "namespace":4,
+        "substitutions":[
+          {
+            "pattern":"Pattern 4",
+            "repl":"Remplacement 4"
+          }  
+          ...   
+        ]     
+      } 
+      ...        
     ]
   }
 
@@ -226,7 +244,7 @@ def modifyPages(dst, pages, subs) :
     print ("%i/%i Modification of %s " % 
       (i+1,nbPage,pageTitle.encode('utf-8')))
     if(modifyPage(dst,pageTitle,subs)):
-      nbModPage = nbModPage + 1
+      nbModPage += 1
       
   return nbModPage  
   
@@ -271,7 +289,7 @@ def syncPages(src, dst, pages, force = False) -> int:
             (i+1,nbPage,p.encode('utf-8')))
     sys.stdout.flush()
     if(syncPage(src,dst,p,force)):
-      nbSyncPage = nbSyncPage + 1
+      nbSyncPage += 1
       
   return nbSyncPage
   
@@ -415,7 +433,7 @@ def syncAndModifyPages(
              )
       
       # apply set() on pageMods to delete duplicate
-      nbMods = modifyPages(siteDst, list(set(pageMods)), list(subs))
+      nbMods += modifyPages(siteDst, list(set(pageMods)), list(subs))
       
   
   return (nbPages,nbMods)
