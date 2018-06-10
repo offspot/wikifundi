@@ -1,12 +1,14 @@
-Wikifundi is a solution which propose a Mediawiki pre-configured in a
+WikiFundi
+=========
+
+WikiFundi is a solution which provide a pre-configured Mediawiki in a
 similar way like Wikipedia. Probably the easiest way to train users if
 you do not have access to Internet!
 
 Here steps to install it with Docker or on a RaspberryPi.
 
-=============
 Run MediaWiki
-=============
+-------------
 
 Install Docker on your system and lauch :
 
@@ -21,9 +23,8 @@ Default admin logging :
 User : Admin
 Password : wikiadmin
 
-===================
 Customize MediaWiki
-===================
+-------------------
 
 The `data` directory contain the database, images, file config and images. 
 
@@ -32,21 +33,18 @@ this, edit `data/config/LocalSetting.mw_kiwix.php` file. You can change
 lang, wiki name, logo, and more ... 
 See : https://www.mediawiki.org/wiki/Manual:LocalSettings.php
 
-=================
-Bakcup your datas
-=================
+Backup your datas
+-----------------
 
 Copy the content of `data` directories  
 
-===============================
 Build yourself the Docker image
-===============================
+-------------------------------
 
 docker build -t mymediawiki docker 
 
-========================
 Mirroring with WikiFundi
-========================
+------------------------
 
 The WikiFundi image extends the openzim/mediawiki Docker image to
 allow mirroring a existing wiki (by example Wikipedia) and
@@ -91,9 +89,8 @@ You can also change options script with MIRRORING_OPTIONS :
   -m, --no-modify : do not modify pages. Default : False 
   -e, --export-dir <directory> : write json export files in this directory
 
-========================
 Install on a RaspberryPi
-========================
+------------------------
 
 == Install Raspbian-lite on your RaspberryPi ==
 
