@@ -66,8 +66,8 @@
     // list of modification on dest after copy
     "modifications":[
       {
-        // modifications on pages mathing with RegEx1
-        "pages":"RegEx1",
+        // modifications on pages mathing with RegEx1 and RegEx2
+        "pages":["RegEx1","RegEx2"],
         // apply a list of substitutions on this pages
         // see https://docs.python.org/2/library/re.html#re.sub
         "substitutions":[
@@ -83,8 +83,20 @@
         ]
       },
       {
-        // modifications on pages in Category 1
-        "categorie":"Category 1",
+        // modifications on pages in Category 1 and 2
+         "categories":[
+            {
+              "title":"Category 1",
+              "namespace":0,
+              "recurse":1
+            },
+            {
+              "title":"Category 2",
+              "namespace":4,
+              "recurse":0
+            }
+            ...
+          ],
         "substitutions":[
           {
             "pattern":"Pattern 3",
@@ -94,8 +106,8 @@
         ]
       },
       {
-        // modifications on pages in namespace=4
-        "namespace":4,
+        // modifications on pages in namespaces 0 and 4
+        "namespaces":[0,4],
         "substitutions":[
           {
             "pattern":"Pattern 4",
@@ -103,6 +115,10 @@
           }  
           ...   
         ]     
+      },
+      {
+        "pages":["Page1"],
+        "empty":true
       } 
       ...        
     ]
@@ -181,6 +197,18 @@ def getFilesFromPages(siteSrc, pages) :
   # apply set() to delete duplicate
   return list(set(files))
   
+def emptyPage(dst, pageTitle)  :
+  try:
+    p = Page(dst, pageTitle)
+    p.text = ""
+    print ("Save %s" % pageTitle.encode('utf-8'))
+    return dst.editpage(p)
+    
+  except Exception as e:
+      print ("Error to empty page %s (%s)" % 
+        (pageTitle.encode('utf-8'), e))
+      return False  
+  
 def modifyPage(dst, pageTitle, subs)  :
 
   try:
@@ -247,6 +275,18 @@ def modifyPages(dst, pages, subs) :
       nbModPage += 1
       
   return nbModPage  
+  
+def emptyPages(dst, pages) :  
+  nbModPage = 0
+  nbPage = len(pages)
+  
+  for i,pageTitle in enumerate(pages):
+    print ("%i/%i Empty of %s " % 
+      (i+1,nbPage,pageTitle.encode('utf-8')))
+    if(emptyPage(dst,pageTitle)):
+      nbModPage += 1
+      
+  return nbModPage    
   
 def uploadFiles(src, dst, files) :
   """Download files from src site and upload on dst site
@@ -408,32 +448,46 @@ def syncAndModifyPages(
   # apply modifications
   nbMods = 0
   
-  if( modifications and options["modifyPages"] ):
+  
+  
+  if( modifications ):
+  
+    #print (json.dumps(modifications, sort_keys=True, indent=4,ensure_ascii=False))
+    
     for mod in modifications :
     
       pageMods = []
       if('pages' in mod):
-        # get all pages to modify from regex mod['pages']
-        pageMods.extend (filter( 
-                 lambda p : re.search(mod['pages'],p ), 
-                 pages
-               ))
+        for regex in mod['pages']:
+          # get all pages to modify from regex
+          pageMods.extend (filter( 
+                   lambda p : re.search(regex,p), 
+                   pages
+                 ))
       
-      if('categorie' in mod):
-        pageMods.extend (getPagesTitleFromCategorie(siteSrc, mod['categorie']))
+      if('categories' in mod):
+          pageMods.extend (getPagesTitleFromCategorie(siteSrc, mod['categories']))
       
-      if('namespace' in mod):
-        pageMods.extend (mapTitle(
-                          siteDst.allpages(namespace=mod['namespace'])))                
-                 
-      # get all supstitution to apply on list of pages
-      subs = map( 
-               lambda s : (re.compile(s['pattern']),s['repl']), 
-               mod['substitutions']
-             )
-      
-      # apply set() on pageMods to delete duplicate
-      nbMods += modifyPages(siteDst, list(set(pageMods)), list(subs))
+      if('namespaces' in mod):
+        for ns in mod['namespaces']:
+          pageMods.extend (mapTitle(
+                            siteDst.allpages(namespace=ns)))                
+           
+      # apply set() on pageMods to delete duplicate        
+      pageModsUniq = list(set(pageMods))        
+              
+      if('substitutions' in mod):
+        # get all supstitution to apply on list of pages
+        subs = map( 
+                 lambda s : (re.compile(s['pattern']),s['repl']), 
+                 mod['substitutions']
+               )
+        if( options["modifyPages"] ):
+          nbMods += modifyPages(siteDst, pageModsUniq, list(subs))
+          
+      if('empty' in mod):
+        if( options["modifyPages"] ):
+          nbMods += emptyPages(siteDst, pageModsUniq)          
       
   
   return (nbPages,nbMods)
