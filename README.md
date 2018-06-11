@@ -62,6 +62,17 @@ You can also change options script with MIRRORING_OPTIONS :
 To Mirroring without templates dependences  :
 
  `sudo docker run -p 8080:80 -e MIRRORING=1 -e MIRRORING_OPTIONS="-d" -v ${PWD}/data:/var/www/data -it wikifundi_en`
+ 
+Go to  [http://localhost:8080/](http://localhost:8080/)
+
+Default admin logging :
+
+* User : Admin
+* Password : wikiadmin
+ 
+After mirroring, two tarballs are generated : one for data, log and config files and one for images (uploaded files). 
+To get this tarballs, go to [http://localhost:8080/data-mw_wikifundi_en.tgz](http://localhost:8080/data-mw_wikifundi_en.tgz)
+and [http://localhost:8080/images-mw_wikifundi_en.tar](http://localhost:8080/images-mw_wikifundi_en.tar)
 
 Install on a RaspberryPi
 ------------------------
