@@ -478,6 +478,9 @@ def syncAndModifyPages(
   # init pages to copy
   pages = pagesName
   
+  nbMods = 0
+  nbPages = 0
+  
   # get pages in categories
   if( categories ):
     pages.extend(getPagesTitleFromCategorie(siteSrc, categories))
