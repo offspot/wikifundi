@@ -27,7 +27,7 @@ This directory contain the configuration of :
       ```
 * `mediawiki/LocalSettings.custom.php` : 
     You can customise the Mediawiki by editing your this file. 
-    If you want to know more, have a look to [https://www.mediawiki.org/wiki/Manual:LocalSettings.php](documentation)
+    If you want to know more, have a look to [documentation](https://www.mediawiki.org/wiki/Manual:LocalSettings.php)
 * `parsoid/config.yaml` :
     Parsoid config file (allow to use VisualEdit)
 * `pywikibot/user-config.py` :
