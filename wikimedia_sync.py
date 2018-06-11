@@ -288,7 +288,7 @@ def emptyPages(dst, pages) :
       
   return nbModPage    
   
-def uploadFiles(src, dst, files) :
+def uploadFiles(src, srcFileRepo, dst, files) :
   """Download files from src site and upload on dst site
     
     return the number of succes uploaded files
@@ -299,7 +299,11 @@ def uploadFiles(src, dst, files) :
     try:
       # create a new file on dest wiki
       pageDst = FilePage(dst, fileTitle)
-      f = FilePage(src, fileTitle)
+      f = FilePage(srcFileRepo, fileTitle)
+      # if page not exist in image repo
+      # get from site src
+      if(not f.exists()):
+        f = FilePage(src, fileTitle)
       if(not pageDst.exists()):
         print ("%i/%i Upload file %s" % 
           (i+1, nbFiles,  fileTitle.encode('utf-8')))
@@ -450,7 +454,7 @@ def syncPagesWithDependances( siteSrc, siteDst,
     
   if(options['filesUpload']):
     print ("====== Upload files")
-    uploadFiles (siteSrc.image_repository(), siteDst, files)
+    uploadFiles (siteSrc, siteSrc.image_repository(), siteDst, files)
   
   return nbPageSync;  
         
