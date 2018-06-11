@@ -306,8 +306,8 @@ def uploadFiles(src, dst, files) :
         sys.stdout.flush()
         # start upload !
         dst.upload( pageDst, source_url=f.get_file_url(), 
-                    comment=fileTitle, text=f.text, 
-                    ignore_warnings = False)
+                    comment="mirroring", text=f.text, 
+                    ignore_warnings = False, report_success = False)
                     
     except Exception as e:
       print ("Error on upload file %s (%s)" % 
@@ -369,15 +369,15 @@ def modifyPages(siteSrc, siteDst,
                ))
     
     if('categories' in mod):
-        pageMods.extend (getPagesTitleFromCategorie(siteSrc, mod['categories']))
+        pageMods.extend (getPagesTitleFromCategorie(siteSrc, 
+                          mod['categories']))
     
     if('namespaces' in mod):
       for ns in mod['namespaces']:
-        pageMods.extend (mapTitle(
-                          siteDst.allpages(namespace=ns)))                
+        pageMods.extend (mapTitle(siteDst.allpages(namespace=ns)))               
          
-    # apply set() on pageMods to delete duplicate        
-    pageModsUniq = list(set(pageMods))        
+    # apply set() on pageMods to delete duplicate
+    pageModsUniq = list(set(pageMods))
             
     if('substitutions' in mod):
       # get all supstitution to apply on list of pages
@@ -450,7 +450,7 @@ def syncPagesWithDependances( siteSrc, siteDst,
     
   if(options['filesUpload']):
     print ("====== Upload files")
-    uploadFiles (siteSrc, siteDst, files)      
+    uploadFiles (siteSrc.image_repository(), siteDst, files)
   
   return nbPageSync;  
         
