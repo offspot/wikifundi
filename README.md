@@ -13,7 +13,7 @@ Run MediaWiki
 Install Docker on your system and lauch :
 
 ```
-sudo docker pull -a openzim/mediawiki`
+sudo docker pull -a openzim/mediawiki
 mkdir -p data
 sudo docker run -p 8080:80 \
   -v ${PWD}/data:/var/www/data -it openzim/mediawiki
