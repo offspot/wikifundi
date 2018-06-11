@@ -7,50 +7,10 @@ you do not have access to Internet!
 
 Here steps to install it with Docker or on a RaspberryPi.
 
-Run MediaWiki
--------------
-
-Install Docker on your system and lauch :
-
-```
-sudo docker pull -a openzim/mediawiki
-mkdir -p data
-sudo docker run -p 8080:80 \
-  -v ${PWD}/data:/var/www/data -it openzim/mediawiki
-```
-  
-Lauch in your brohter : [http://localhost:8080/](http://localhost:8080/)
-
-Default admin logging :
-
-* User : Admin
-* Password : wikiadmin
-
-Customize MediaWiki
--------------------
-
-The `data` directory contain the database, images, file config and images. 
-
-You can cusomize the LocalSetting file to configure MediaWiki. To make
-this, edit `data/config/LocalSetting.mw_kiwix.php` file. You can change
-lang, wiki name, logo, and more ... 
-
-See [LocalSettings.php help page](https://www.mediawiki.org/wiki/Manual:LocalSettings.php)
-
-Backup your datas
------------------
-
-Copy the content of `data` directories
-
-Build yourself the Docker image
--------------------------------
-
-docker build -t mymediawiki docker 
-
 Mirroring with WikiFundi
 ------------------------
 
-The WikiFundi image extends the openzim/mediawiki Docker image to
+The WikiFundi image extends the `openzim/mediawiki` Docker image to
 allow mirroring a existing wiki (by example Wikipedia) and
 use this wiki offline
 
@@ -73,7 +33,7 @@ This directory contain the config of :
         docker-wikifundi_en/wikimedia_sync.py --help
       ```
 
-You can also customize your logo in assets/images
+You can also customize your logo in `assets/images`
 
 To build and run :
 
@@ -99,6 +59,9 @@ You can also change options script with MIRRORING_OPTIONS :
 * `-m, --no-modify` : do not modify pages. Default : False 
 * `-e, --export-dir <directory>` : write json export files in this directory
 
+To Mirroring without templates dependences  :
+
+ `sudo docker run -p 8080:80 -e MIRRORING=1 -e MIRRORING_OPTIONS="-d" -v ${PWD}/data:/var/www/data -it wikifundi_en`
 
 Install on a RaspberryPi
 ------------------------
