@@ -125,7 +125,7 @@
           "repl":" "
         },     
         {
-          "pattern":"<tvar\\|[^>]+>(Special:MyLanguage\/|)([^>]+)</>",
+          "pattern":"<tvar\\|[^>]+>(Special:MyLanguage\\/|)([^>]+)</>",
           "repl":"\\2"
         },     
         {
