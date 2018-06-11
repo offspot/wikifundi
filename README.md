@@ -14,8 +14,7 @@ The WikiFundi image extends the `openzim/mediawiki` Docker image to
 allow mirroring a existing wiki (by example Wikipedia) and
 use this wiki offline
 
-You can use `docker-wikifundi_en` subdirectory to build WikiFundi image
-The config files are located in `docker-wikifundi_en/config directory`.
+The config files are located in `config` directory.
 
 This directory contain the config of :
 
@@ -29,8 +28,8 @@ This directory contain the config of :
     Pages to copy from an other wiki and modifications after copy. 
     To get file structure :
       ```
-        export PYWIKIBOT2_DIR=docker-wikifundi_en/config/pywikibot/`
-        docker-wikifundi_en/wikimedia_sync.py --help
+        export PYWIKIBOT2_DIR=config/pywikibot/`
+        ./wikimedia_sync.py --help
       ```
 
 You can also customize your logo in `assets/images`
@@ -39,7 +38,7 @@ To build and run :
 
 ```
 mkdir -p data
-docker build -t wikifundi_en docker-wikifundi_en
+docker build -t wikifundi_en .
 sudo docker run -p 8080:80 -v ${PWD}/data:/var/www/data -it wikifundi_en
 ```
   
