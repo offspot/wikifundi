@@ -16,14 +16,8 @@ use this wiki offline
 
 The config files are located in `config` directory.
 
-This directory contain the config of :
+This directory contain the configuration of :
 
-* `mediawiki/LocalSettings.php` : 
-    Add statements to MediaWiki config file 
-* `parsoid/config.yaml` :
-    Parsoid config file (allow to use VisualEdit)
-* `pywikibot/user-config.py` :
-    [Configure pywikibot library](https://www.mediawiki.org/wiki/Manual:Pywikibot/user-config.py) to use MediaWiki API (needed for mirroring)
 * `mirroring/mirroring.json` : 
     Pages to copy from an other wiki and modifications after copy. 
     To get file structure :
@@ -31,6 +25,13 @@ This directory contain the config of :
         export PYWIKIBOT2_DIR=config/pywikibot/`
         ./wikimedia_sync.py --help
       ```
+* `mediawiki/LocalSettings.custom.php` : 
+    Your custom LocalSetting.php to configure MediaWiki
+* `parsoid/config.yaml` :
+    Parsoid config file (allow to use VisualEdit)
+* `pywikibot/user-config.py` :
+    [Configure pywikibot library](https://www.mediawiki.org/wiki/Manual:Pywikibot/user-config.py) to use MediaWiki API (needed for mirroring)
+
 
 You can also customize your logo in `assets/images`
 
