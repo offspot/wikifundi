@@ -26,7 +26,8 @@ This directory contain the configuration of :
         ./wikimedia_sync.py --help
       ```
 * `mediawiki/LocalSettings.custom.php` : 
-    Your custom LocalSetting.php to configure MediaWiki
+    You can customise the Mediawiki by editing your this file. 
+    If you want to know more, have a look to [https://www.mediawiki.org/wiki/Manual:LocalSettings.php](documentation)
 * `parsoid/config.yaml` :
     Parsoid config file (allow to use VisualEdit)
 * `pywikibot/user-config.py` :
