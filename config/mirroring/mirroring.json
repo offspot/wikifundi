@@ -88,7 +88,10 @@
     "Help:Recent_changes",
     "Help:Undelete",
     "Help:Copying_a_page",
-    "Template:MW_version"    
+    "Template:MW_version",
+    "Template:Information",
+    "Template:Self",
+    "Template:Own"
   ],
   
   "categories":[
