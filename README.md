@@ -12,16 +12,19 @@ Run MediaWiki
 
 Install Docker on your system and lauch :
 
-sudo docker pull -a openzim/mediawiki
-mkdir -p data 
+```
+sudo docker pull -a openzim/mediawiki`
+mkdir -p data
 sudo docker run -p 8080:80 \
   -v ${PWD}/data:/var/www/data -it openzim/mediawiki
+```
   
-Lauch in your brohter : http://localhost:8080/
+Lauch in your brohter : [http://localhost:8080/](http://localhost:8080/)
 
 Default admin logging :
-User : Admin
-Password : wikiadmin
+
+* User : Admin
+* Password : wikiadmin
 
 Customize MediaWiki
 -------------------
@@ -31,12 +34,13 @@ The `data` directory contain the database, images, file config and images.
 You can cusomize the LocalSetting file to configure MediaWiki. To make
 this, edit `data/config/LocalSetting.mw_kiwix.php` file. You can change
 lang, wiki name, logo, and more ... 
-See : https://www.mediawiki.org/wiki/Manual:LocalSettings.php
+
+See [LocalSettings.php help page](https://www.mediawiki.org/wiki/Manual:LocalSettings.php)
 
 Backup your datas
 -----------------
 
-Copy the content of `data` directories  
+Copy the content of `data` directories
 
 Build yourself the Docker image
 -------------------------------
@@ -51,79 +55,93 @@ allow mirroring a existing wiki (by example Wikipedia) and
 use this wiki offline
 
 You can use `docker-wikifundi_en` subdirectory to build WikiFundi image
-The config files are located in docker-wikifundi_en/config directory.
+The config files are located in `docker-wikifundi_en/config directory`.
 
 This directory contain the config of :
-- mediawiki/LocalSettings.php : 
+
+* `mediawiki/LocalSettings.php` : 
     Add statements to MediaWiki config file 
-- parsoid/config.yaml :
+* `parsoid/config.yaml` :
     Parsoid config file (allow to use VisualEdit)
-- pywikibot/user-config.py and /user-password.py
-    Configure pywikibot library to use MediaWiki API (needed for mirroring)
-    See : https://www.mediawiki.org/wiki/Manual:Pywikibot/user-config.py
-- mirroring/mirroring.json : 
-    Pages to copy from an other wiki and modifications after copy 
-    To get file structure :    
-      export PYWIKIBOT2_DIR=docker-wikifundi_en/config/pywikibot/
-      ./docker-wikifundi_en/wikimedia_sync.py --help
+* `pywikibot/user-config.py` :
+    [Configure pywikibot library](https://www.mediawiki.org/wiki/Manual:Pywikibot/user-config.py) to use MediaWiki API (needed for mirroring)
+* `mirroring/mirroring.json` : 
+    Pages to copy from an other wiki and modifications after copy. 
+    To get file structure :
+      ```
+        export PYWIKIBOT2_DIR=docker-wikifundi_en/config/pywikibot/`
+        docker-wikifundi_en/wikimedia_sync.py --help
+      ```
+
 You can also customize your logo in assets/images
 
 To build and run :
+
+```
 mkdir -p data
 docker build -t wikifundi_en docker-wikifundi_en
-sudo docker run -p 8080:80 \
-  -v ${PWD}/data:/var/www/data -it wikifundi_en
+sudo docker run -p 8080:80 -v ${PWD}/data:/var/www/data -it wikifundi_en
+```
   
 On start, if the database not exist, then it is initialized and the
 mirroring script is lauched. If the databse exist, you can force 
 mirroring by changing environments variables :
- sudo docker run -p 8080:80 -e MIRRORING=1 \
-  -v ${PWD}/data:/var/www/data -it wikifundi_en
+
+ `sudo docker run -p 8080:80 -e MIRRORING=1 -v ${PWD}/data:/var/www/data -it wikifundi_en`
  
 You can also change options script with MIRRORING_OPTIONS : 
-  -f, --force : always copy  the content (even if page exist on site dest). Default : False
-  -t, --no-sync-templates : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates. Default : False
-  -d, --no-sync-dependances-templates : do not copy templates used by templates.  Default : False
-  -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync. Default : False
-  -p, --no-sync : do not copy anything. If not -m, just modify. Default : False
-  -m, --no-modify : do not modify pages. Default : False 
-  -e, --export-dir <directory> : write json export files in this directory
+
+* `-f, --force` : always copy  the content (even if page exist on site dest). Default : False
+* `-t, --no-sync-templates` : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates. Default : False
+* `-d, --no-sync-dependances-templates` : do not copy templates used by templates.  Default : False
+* `-u, --no-upload-files` : do not copy files (images, css, js, sounds, ...) used by the pages to sync. Default : False
+* `-p, --no-sync` : do not copy anything. If not -m, just modify. Default : False
+* `-m, --no-modify` : do not modify pages. Default : False 
+* `-e, --export-dir <directory>` : write json export files in this directory
+
 
 Install on a RaspberryPi
 ------------------------
 
-== Install Raspbian-lite on your RaspberryPi ==
+## Install Raspbian-lite on your RaspberryPi
 
 Download a Raspbian-lite image and install it following these online
 instructions: https://www.raspberrypi.org/downloads/raspbian/
 
 and upgrade it:
+
+```
 sudo apt-get update
 sudo apt-get dist-ugprade
+```
 
-== Get the Wikifundi dump ==
+## Get the Wikifundi dump
 
+```
 sudo mkdir /var/www
 wget http://download.kiwix.org/other/wikifundi/
 tar -xvf fr.africapack.kiwix.org_2016-08.tar.bz2
 sudo mv fr.africapack.kiwix.org /var/www/
 sudo chown -R www-data:www-data /var/www/
+```
 
-== Install a few packages necessary ==
+## Install a few packages necessary
 
-sudo apt-get install nginx php5-fpm memcached nodejs imagemagick
+`sudo apt-get install nginx php5-fpm memcached nodejs imagemagick
 texlive texlive-latex-extra php-pear php5-curl php5-sqlite libav-tools
-librsvg2-bin poppler-utils redis-server npm dvipng
+librsvg2-bin poppler-utils redis-server npm dvipng`
 
-== Configure Nginx ==
+## Configure Nginx
 
 Remark: please everywhere replace "fr.africapack.kiwix.org" by the
 name fo your web-site and do not forget to check that you (local) DNS
 can resolve it.
 
-Create your virtual host file at /etc/nginx/sites-available/fr.africapack.kiwix.org
+Create your virtual host file at `/etc/nginx/sites-available/fr.africapack.kiwix.org`
 
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+---
+
+```
 upstream php {
         server unix:/var/run/php5-fpm.sock;
 }
@@ -168,63 +186,68 @@ server {
         expires 10d;
     }
 }
+```
 
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+---
 
+```
 cd /etc/nginx/sites-enabled
 ln -s ../site-available/fr.africapack.kiwix.org 
 sudo service php5-fpm restart
 sudo service nginx restart
-
-== Configure Lua ==
+```
+## Configure Lua
 
 If you have lua problems (which is the case on RaspberryPi), you need
 to use the lua of the system.
 
-sudo apt-get install lua5.1
+`sudo apt-get install lua5.1`
 
 and then put in the
-/var/www/fr.africapack.kiwix.org/w/Localsettings.custom.php the
+`/var/www/fr.africapack.kiwix.org/w/Localsettings.custom.php` the
 following line:
-$wgScribuntoEngineConf['luastandalone']['luaPath'] = "/usr/bin/lua5.1";
+`$wgScribuntoEngineConf['luastandalone']['luaPath'] = "/usr/bin/lua5.1";`
 
-== Configure Parsoid ==
+## Configure Parsoid
 
 Parsoid is the serveur mandatory for the visual editor.
+
+```
 wget http://download.kiwix.org/other/wikifundi/parsoid_2016-08.tar.bz2
 tar -xvf parsoid_2016-08.tar.bz2
 sudo mv parsoid /var/www
+```
 
 Create a link for new nodejs name:
-cd /usr/bin
+
+```
+cd /usr/bin`
 sudo ln -s nodejs node
+```
 
 Do not forget to customize your parsoid configuration in
-/var/www/parsoid/localsettings.js
+`/var/www/parsoid/localsettings.js`
 
-sudo chown -R www-data:www-data /var/www
+`sudo chown -R www-data:www-data /var/www`
 
-To start the Parsoid daemon, run /var/www/parsoid/bin/server.js
+To start the Parsoid daemon, run `/var/www/parsoid/bin/server.js`
 
-== Get the Math renderer correctly ==
+## Get the Math renderer correctly
 
-sudo apt-get install build-essential dvipng ocaml cjk-latex
-texlive-fonts-recommended texlive-lang-greek texlive-latex-recommended
+`sudo apt-get install build-essential dvipng ocaml cjk-latex
+texlive-fonts-recommended texlive-lang-greek texlive-latex-recommended`
 
+```
 cd /var/www/fr.africapack.kiwix.org/w/extensions/Math/math
 sudo make clean all
 cd /var/www/fr.africapack.kiwix.org/w/extensions/Math/texvccheck
 sudo make clean all
 cd ..
 sudo chown -R www-data:www-data .
+```
 
-== Clean cache ==
+## Clean cache
 
-got to /var/www/fr.africapack.kiwix.org/w/maintenance/ and run:
-./update.php --skip-external-dependencies
-
-== Login to the Mediawiki ==
-
-user: Admin
-pass: adminadmin
+got to `/var/www/fr.africapack.kiwix.org/w/maintenance/` and run:
+`./update.php --skip-external-dependencies`
 
