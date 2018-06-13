@@ -10,7 +10,7 @@ CFG_DIR=${DATA_DIR}/config
 
 function maintenance {
   #maintenance
-  echo "Start MediaWiki Maintenance"
+  echo "Starting Mediawiki maintenance ..."
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
 
   #cd extensions/Wikibase/
@@ -65,8 +65,8 @@ if [ ${MIRRORING} ]
 then
   #mirroring
   service apache2 start
-  echo "Start Mirroring, log in data/mirroring.log"
-  wikimedia_sync ${MIRRORING_OPTIONS} -e "${LOG_DIR}" mirroring.json > ${LOG_DIR}/mirroring.log 
+  echo "Starting mirroring ..."
+  wikimedia_sync ${MIRRORING_OPTIONS} -e "${LOG_DIR}" mirroring.json | tee -a ${LOG_DIR}/mirroring.log 
   service apache2 stop
   
   maintenance
@@ -84,6 +84,7 @@ fi
 # create links to allow download tarbals
 #ln -s ${DATA_DIR}/data-${DATABASE_NAME}.tgz
 #ln -s ${DATA_DIR}/images-${DATABASE_NAME}.tar
+ln -s ${DATA_DIR} data
 
 maintenance
 
