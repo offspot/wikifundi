@@ -71,29 +71,29 @@ then
   
   maintenance
   
-  #php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
+  php maintenance/refreshLinks.php -e 100 >> ${LOG_DIR}/mw_update.log 
   
   #build tarbals
-  echo "Build tarbal"
-  cd ${DATA_DIR}
-  tar -czvvf data-${DATABASE_NAME}.tgz ${DATABASE_NAME}.sqlite log config >> ${LOG_DIR}/mirroring.log 
-  tar -cvvf images-${DATABASE_NAME}.tar images >> ${LOG_DIR}/mirroring.log 
-  cd ../html
+  #echo "Build tarbal"
+  #cd ${DATA_DIR}
+  #tar -czvvf data-${DATABASE_NAME}.tgz ${DATABASE_NAME}.sqlite log config >> ${LOG_DIR}/mirroring.log 
+  #tar -cvvf images-${DATABASE_NAME}.tar images >> ${LOG_DIR}/mirroring.log 
+  #cd ../html
 fi
 
 # create links to allow download tarbals
-ln -s ${DATA_DIR}/data-${DATABASE_NAME}.tgz
-ln -s ${DATA_DIR}/images-${DATABASE_NAME}.tar
+#ln -s ${DATA_DIR}/data-${DATABASE_NAME}.tgz
+#ln -s ${DATA_DIR}/images-${DATABASE_NAME}.tar
 
 maintenance
 
 #finnaly, start apache and wait
-#echo "Starting Apache 2 ..."
-#apache2ctl -D FOREGROUND
+echo "Starting Apache 2 ..."
+apache2ctl -D FOREGROUND
 
 # for debug
-service apache2 start
-/bin/bash
+#service apache2 start
+#/bin/bash
 
 #if [ -z "$1" ]
 #then
