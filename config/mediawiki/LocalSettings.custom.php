@@ -17,7 +17,7 @@ $wgDBpassword    = "";
 $wgSQLiteDataDir = "/var/www/data";
 
 # Custom logo
-$wgLogo = "logo.png";
+$wgLogo = "/logo.png";
 
 # Uploads
 ini_set('memory_limit', '512M');

@@ -7,7 +7,6 @@ ENV PYWIKIBOT2_DIR /usr/local/etc
 # Custom image
 ENV MEDIAWIKI_LOGO_FILE ./assets/images/logo.png
 
-
 ENV DATABASE_NAME mw_wikifundi_en
 
 # Install PyWikiBot library
@@ -16,18 +15,12 @@ RUN apt-get update \
    && pip3 install -U setuptools \
    && pip3 install pywikibot
    
-# set a specific max file size for Raspberry Pi 
-RUN { \
-		echo 'upload_max_filesize = 5M'; \
-		echo 'post_max_size = 5M'; \
-	} > /usr/local/etc/php/conf.d/90-wikifundi.ini
-
 # Configure Pywikibot (must be in same directory of wikimedia_sync.py)
 COPY ${PYWIKIBOT_CONFIG_FILE} ${PYWIKIBOT2_DIR}/ 
 
 # Configure MediaWiki
 COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./LocalSettings.custom.php
-COPY ${MEDIAWIKI_LOGO_FILE} ./
+COPY ${MEDIAWIKI_LOGO_FILE} ../
 
 # Configure Parsoid with specific domain
 COPY ${PARSOID_CONFIG_FILE} ./parsoid/
