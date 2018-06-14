@@ -2,6 +2,7 @@ FROM openzim/mediawiki
 
 ENV PYWIKIBOT_CONFIG_FILE ./config/pywikibot/user-config.py
 ENV MIRRORING_CONFIG_FILE ./config/mirroring/mirroring.json
+ENV README_FILE ./assets/docs/README.md
 ENV PYWIKIBOT2_DIR /usr/local/etc
 
 # Custom image
@@ -21,6 +22,7 @@ COPY ${PYWIKIBOT_CONFIG_FILE} ${PYWIKIBOT2_DIR}/
 # Configure MediaWiki
 COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./LocalSettings.custom.php
 COPY ${MEDIAWIKI_LOGO_FILE} ../
+COPY ${README_FILE} ./ 
 
 # Configure Parsoid with specific domain
 COPY ${PARSOID_CONFIG_FILE} ./parsoid/
