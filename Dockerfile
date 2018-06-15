@@ -2,7 +2,7 @@ FROM openzim/mediawiki
 
 ENV PYWIKIBOT_CONFIG_FILE ./config/pywikibot/user-config.py
 ENV MIRRORING_CONFIG_FILE ./config/mirroring/mirroring.json
-ENV README_FILE ./assets/docs/README.md
+ENV README_FILE ./assets/docs/README
 ENV PYWIKIBOT2_DIR /usr/local/etc
 
 # Custom image

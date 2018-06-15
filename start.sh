@@ -2,11 +2,9 @@
 
 LOG_DIR=${DATA_DIR}/log
 DATABASE_FILE=${DATA_DIR}/${DATABASE_NAME}.sqlite
-README_FILE=${DATA_DIR}/README.md
-if [ ! -e ${README_FILE}  ]
-then
-  cp README.md ${README_FILE} 
-fi 
+README_FILE=${DATA_DIR}/README
+
+cp README ${README_FILE} 
 
 if [ ! -e ${DATABASE_FILE} ]
 then 
