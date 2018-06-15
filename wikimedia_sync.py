@@ -16,13 +16,15 @@
  usage : ./wikimedia_sync.py [options] config_file1.json, config_file2.json, ...
  
  options :
-  -f, --force : always copy  the content (even if page exist on site dest). Default : False
-  -t, --no-sync-templates : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates. Default : False
-  -d, --no-sync-dependances-templates : do not copy templates used by templates.  Default : False
-  -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync. Default : False
-  -p, --no-sync : do not copy anything. If not -m, just modify. Default : False
-  -m, --no-modify : do not modify pages. Default : False 
+  -f, --force : always copy  the content (even if page exist on site dest) (default : false).
+  -t, --no-sync-templates : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates (default : false).
+  -d, --no-sync-dependances-templates : do not copy templates used by templates (default : false).
+  -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync (default : false).
+  -p, --no-sync : do not copy anything. If not -m, just modify (default : false).
+  -m, --no-modify : do not modify pages (default : false).
   -e, --export-dir <directory> : write json export files in this directory
+  -w, --thumbwidth :try to download thumbnail image with this width instead original image (default : 2000)
+  -s, --maxsize : do not files download greater to this limit (default : 100MB)
   
  json file config :
    
@@ -147,8 +149,14 @@ DEFAULT_OPTIONS = dict(
     templatesDepSync = True, 
     filesUpload = True,
     modifyPages = True,
-    exportDir = "."    
+    exportDir = "." ,
+    thumbWidth = 2000  ,
+    maxSize = 100*1024^6 
 )
+
+# try to download thumb only for this mime type 
+# (is needed fot not try with no thumbnaible files )
+thumbmime = ['image/jpeg','image/png']
 
 def exportPagesTitle(pages, fileName, directory):
   with open("%s/mirroring_export_%s.json" % (directory,fileName), 'w',encoding='utf-8') as f:
@@ -288,7 +296,7 @@ def emptyPages(dst, pages) :
       
   return nbModPage    
   
-def uploadFiles(src, srcFileRepo, dst, files) :
+def uploadFiles(src, srcFileRepo, dst, files, maxwith, maxsize) :
   """Download files from src site and upload on dst site
     
     return the number of succes uploaded files
@@ -300,16 +308,25 @@ def uploadFiles(src, srcFileRepo, dst, files) :
       # create a new file on dest wiki
       pageDst = FilePage(dst, fileTitle)
       f = FilePage(srcFileRepo, fileTitle)
+
       # if page not exist in image repo
       # get from site src
       if(not f.exists()):
         f = FilePage(src, fileTitle)
-      if(not pageDst.exists()):
-        print ("%i/%i Upload file %s" % 
-          (i+1, nbFiles,  fileTitle.encode('utf-8')))
+
+      if( f.latest_file_info['mime'] in thumbmime ):
+        url = f.get_file_url(maxwith) 
+        maxsize = 0 # do not check thumbnail file size
+      else:      
+        url = f.get_file_url() 
+
+      if( not pageDst.exists() 
+          and (maxsize == 0 or f.latest_file_info['size'] < maxsize )): 
+        print ("%i/%i Upload file %s [%s]" % 
+          (i+1, nbFiles,  fileTitle.encode('utf-8'), url))
         sys.stdout.flush()
         # start upload !
-        dst.upload( pageDst, source_url=f.get_file_url(), 
+        dst.upload( pageDst, source_url=url, 
                     comment="mirroring", text=f.text, 
                     ignore_warnings = False, report_success = False)
                     
@@ -436,7 +453,7 @@ def syncPagesWithDependances( siteSrc, siteDst,
     print ("%i files to sync" % len(files))
     
   if(options['templatesDepSync']):    
-    dependances = getTemplatesFromPages(siteSrc, templates)
+    dependances = getTemplatesFromPages(siteSrc, templates+files)
     #delete duplicate
     templates = list(set(templates+dependances))
     exportPagesTitle(templates,"templates",exportDir)
@@ -454,8 +471,9 @@ def syncPagesWithDependances( siteSrc, siteDst,
     
   if(options['filesUpload']):
     print ("====== Upload files")
-    uploadFiles (siteSrc, siteSrc.image_repository(), siteDst, files)
-  
+    uploadFiles (siteSrc, siteSrc.image_repository(), siteDst, 
+              files, options["thumbwidth"], options["maxsize"])
+              
   return nbPageSync;  
         
 def syncAndModifyPages(
@@ -539,7 +557,7 @@ def main():
   
   try:
     opts, args = getopt.getopt(sys.argv[1:], 
-      "hftdupme:", 
+      "hftdupme:w:s:", 
       [ "help",
         "force",
         "no-sync-templates",
@@ -547,7 +565,9 @@ def main():
         "no-upload-files",
         "no-sync",
         "no-modify",
-        "export-dir"
+        "export-dir",
+        "thumbwidth",
+        "maxsize"
       ]
     )
       
@@ -575,6 +595,10 @@ def main():
       options["modifyPages"] = False      
     if opt in ("-e", "--export-dir"):  
       options["exportDir"] = arg
+    if opt in ("-w", "--thumbwidth"):  
+      options["thumbwidth"] = int(arg)
+    if opt in ("-s", "--maxsize"):  
+      options["maxsize"] = int(arg)               
             
   # check coherence, fix if needed
   if(options["templatesDepSync"] and not options["templatesSync"]):
