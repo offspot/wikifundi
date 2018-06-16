@@ -191,10 +191,23 @@ def mapTitle(pages) :
   return [ p.title() for p in pages ]   
   
 def getTemplateTitlesFromPage(siteSrc, nbPages, iTitles) :
-  # get templates used by p
-  #TODO if FilePage, check repository and recreate Page
   (i,title) = iTitles
-  tplt = Page(siteSrc, title).templates()
+  
+  p = Page(siteSrc, title)
+  
+  if ( p.is_filepage()  ):
+    # check if the file is in a specific file repository
+    f = FilePage(siteSrc.image_repository(), title)
+    if(f.exists()):
+      # get template on page in specific file repository
+      tplt = f.templates()
+    else:
+      # get templates from original site
+      tplt = p.templates()
+  else:
+  # get templates
+    tplt = p.templates()
+    
   nbTplt = len(tplt)
   if(nbTplt > 0):
     print ("%i/%i Process %s : %i templates found " % 
@@ -203,9 +216,10 @@ def getTemplateTitlesFromPage(siteSrc, nbPages, iTitles) :
   return mapTitle(tplt)
   
 def getFilesFromPage(siteSrc, nbPages, iTitles) : 
-  # get files used by p
   (i,title) = iTitles
+  
   pages = Page(siteSrc, title).imagelinks()
+  
   nbFiles = len(list(pages))
   if(nbFiles > 0):
     print ("%i/%i Process %s : %i files found" % 
@@ -330,27 +344,33 @@ def uploadFile(src, srcFileRepo, dst, maxwith, maxsize, nbFiles, iTitles ):
     if(not f.exists()):
       f = FilePage(src, fileTitle)
 
+    # get thumbnail instead original file
+    #  only avaible if file is in thumbmime list
     if( f.latest_file_info['mime'] in thumbmime ):
       url = f.get_file_url(maxwith) 
       maxsize = 0 # do not check thumbnail file size
     else:      
       url = f.get_file_url() 
     
-    #TODO fix (work only for bitmap images)
     size = f.latest_file_info['size']
 
+    # if already exist, no upload
+    # and check size limit
     if( not pageDst.exists() 
         and (maxsize == 0 or size < maxsize )): 
+        
+      # show informations
       print ("%i/%i Upload file %s [%s] (%1.2f MB)" % 
         (i+1, nbFiles,  fileTitle.encode('utf-8'), 
             url, size / 1024.0 / 1024.0))
       sys.stdout.flush()
+      
       # start upload !
       if(dst.upload( pageDst, source_url=url, 
                   comment="mirroring", text=f.text, 
-                  ignore_warnings = False, report_success = False)):
+                  ignore_warnings = True, report_success = False)):
         return 1
-                  
+                    
   except Exception as e:
     print ("Error on upload file %s (%s)" % 
             (fileTitle.encode('utf-8'),e))  
@@ -465,6 +485,7 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
   # export titles of collected pages to sync
   exportPagesTitle(pages,"pages",exportDir)
     
+  templates = []
   if(options['templatesSync']):
     # try to restore precedent state
     templates = importPagesTitle("templates",exportDir)
@@ -478,6 +499,7 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
     print ("%i templates to sync" % len(templates))
     
   #collect files used by pages
+  files = []
   if(options['filesUpload']) :
     # try to restore precedent state
     files = importPagesTitle("files",exportDir)
@@ -487,7 +509,7 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
     print ("%i files to sync" % len(files))
     
   if(options['templatesDepSync']):    
-    dependances = getTemplatesFromPages(siteSrc, templates+files)
+    dependances = getTemplatesFromPages(siteSrc, files+templates)
     #delete duplicate
     templates = list(set(templates+dependances))
     exportPagesTitle(templates,"templates",exportDir)
@@ -499,17 +521,17 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
   
   if(options["async"]):
     print ("====== Sync pages with %i thread pool" % MAX_WORKERS)
-    nbPageSync += syncPagesWithThreadPool
-                    (siteSrc, siteDst, pages, force )  
+    nbPageSync += syncPagesWithThreadPool(siteSrc, siteDst, 
+                                            pages, force )  
       
     if(options['templatesSync']):
       print ("====== Sync template with %i thread pool" % MAX_WORKERS)
-      nbPageSync += syncPagesWithThreadPool
-                    (siteSrc, siteDst, templates, force )
+      nbPageSync += syncPagesWithThreadPool(siteSrc, siteDst, 
+                                              templates, force )
       
     if(options['filesUpload']):
       print ("====== Upload files with %i thread pool" % MAX_WORKERS)
-      uploadFilesWithThreadPool (siteSrc, siteSrc.image_repository(), siteDst, 
+      nbPageUpload += uploadFilesWithThreadPool (siteSrc, siteSrc.image_repository(), siteDst, 
                 files, options["thumbWidth"], options["maxSize"])
   else:
     print ("====== Sync pages")
@@ -521,7 +543,7 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
       
     if(options['filesUpload']):
       print ("====== Upload files")
-      uploadFiles (siteSrc, siteSrc.image_repository(), siteDst, 
+      nbPageUpload += uploadFiles (siteSrc, siteSrc.image_repository(), siteDst, 
                 files, options["thumbWidth"], options["maxSize"])  
               
   return (nbPageSync,nbPageUpload)
@@ -560,8 +582,8 @@ def mirroringAndModifyPages(
     
   if( options["pagesSync"] ):
     # copy all pages !
-    (nbPagesSync,nbPagesUpload) 
-        = mirroringPagesWithDependances(siteSrc, siteDst, pages, options)    
+    (nbPagesSync,nbPagesUpload) = mirroringPagesWithDependances(
+                                    siteSrc, siteDst, pages, options)    
 
   if( modifications and options["modifyPages"] ):
     nbMods =  modifyPages(siteSrc, siteDst, pages, modifications)        
