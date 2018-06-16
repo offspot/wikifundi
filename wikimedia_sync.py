@@ -25,6 +25,7 @@
   -e, --export-dir <directory> : write json export files in this directory
   -w, --thumbwidth :try to download thumbnail image with this width instead original image (default : 2000)
   -s, --maxsize : do not files download greater to this limit (default : 100MB)
+  -a, --async : execute mirroring in async mode (5 threads / cpu). No works with sqlite database
   
  json file config :
    
@@ -142,6 +143,12 @@ import getopt
 # To use regular expression
 import re
 
+# To use multi-threading
+from functools import partial
+from concurrent.futures import ThreadPoolExecutor
+from multiprocessing import cpu_count
+MAX_WORKERS = cpu_count() * 5
+
 DEFAULT_OPTIONS = dict(
     force = False, 
     pagesSync = True,    
@@ -151,13 +158,17 @@ DEFAULT_OPTIONS = dict(
     modifyPages = True,
     exportDir = "." ,
     thumbWidth = 2000  ,
-    maxSize = 100*1024^6 
+    maxSize = 100*1024*1024*1024, 
+    async = False
 )
 
 # try to download thumb only for this mime type 
 # (is needed fot not try with no thumbnaible files )
 thumbmime = ['image/jpeg','image/png']
 
+#####################################
+# Export/Import
+  
 def exportPagesTitle(pages, fileName, directory):
   with open("%s/mirroring_export_%s.json" % (directory,fileName), 'w',encoding='utf-8') as f:
       f.write(json.dumps(pages, sort_keys=True, indent=4,ensure_ascii=False))
@@ -168,192 +179,37 @@ def importPagesTitle(fileName, directory):
         return json.load(f)
   except FileNotFoundError:
       print ("No precedent list of %s is found" % fileName)
-  return []  
+  return []   
+  
+
+###############################################
+# Get dependencies of WikiPages
   
 def mapTitle(pages) : 
-  return [ p.title() for p in pages ]  
-    
-def getTemplatesFromPages(siteSrc, pages) :
-  templates = []
-  nbPage = len(pages)
-  for i,p in enumerate(pages) :
-    # get templates used by p
-    tplt = Page(siteSrc, p).templates()
-    nbTplt = len(tplt)
-    if(nbTplt > 0):
-      print ("%i/%i Process %s : %i templates found " % 
-              (i+1,nbPage,p.encode('utf-8'),nbTplt))
-      sys.stdout.flush()
-      templates.extend(mapTitle(tplt))
-      
-  # apply set() to delete duplicate
-  return list(set(templates))  
+  return [ p.title() for p in pages ]   
   
-def getFilesFromPages(siteSrc, pages) :
-  files = []
-  nbPage = len(pages)
-  for i,p in enumerate(pages) :
-    # get files used by p
-    f = list(Page(siteSrc, p).imagelinks())
-    nbFiles = len(f)
-    if(nbFiles > 0):
-      print ("%i/%i Process %s : %i files found" % 
-               (i+1,nbPage,p.encode('utf-8'),nbFiles))
-      sys.stdout.flush()
-      files.extend(mapTitle(f)) 
-      
-  # apply set() to delete duplicate
-  return list(set(files))
+def getTemplateTitlesFromPage(siteSrc, nbPages, iTitles) :
+  # get templates used by p
+  #TODO if FilePage, check repository and recreate Page
+  (i,title) = iTitles
+  tplt = Page(siteSrc, title).templates()
+  nbTplt = len(tplt)
+  if(nbTplt > 0):
+    print ("%i/%i Process %s : %i templates found " % 
+            (i+1,nbPages,title.encode('utf-8'),nbTplt))
+    sys.stdout.flush()    
+  return mapTitle(tplt)
   
-def emptyPage(dst, pageTitle)  :
-  try:
-    p = Page(dst, pageTitle)
-    p.text = ""
-    print ("Save %s" % pageTitle.encode('utf-8'))
-    return dst.editpage(p)
-    
-  except Exception as e:
-      print ("Error to empty page %s (%s)" % 
-        (pageTitle.encode('utf-8'), e))
-      return False  
-  
-def subsOnPage(dst, pageTitle, subs)  :
-
-  try:
-    p = Page(dst, pageTitle)
-    
-    for s in subs :
-      pattern = s[0]
-      repl = s[1]
-      p.text = re.sub(pattern, repl, p.text)
-      
-    print ("Save %s" % pageTitle.encode('utf-8'))
-    return dst.editpage(p)
-    
-  except Exception as e:
-      print ("Error to modify page %s (%s)" % 
-        (pageTitle.encode('utf-8'), e))
-      return False
-  
-  
-def syncPage(src, dst, pageTitle, force = False, checkRedirect = True):
-  """Synchronize ONE wiki pages from src to dst
-  
-     return true if success
-  """
-  
-  # init page on src and dst
-  p = Page(src, pageTitle)
-  newPage = Page(dst, pageTitle)
-  
-  try:      
-    # if page exist on dest and no force -> do not sync this page
-    if((not force) and newPage.exists()):  
-      return False
-      
-    # sometime, pywikibot return a page in a different site, 
-    # here check this
-    elif(newPage.site == dst):
-    
-      #sync also the redirect target 
-      if(checkRedirect and p.isRedirectPage()):
-        syncPage(src, dst, p.getRedirectTarget().title(), force, False)
-        
-      # copy the content of the page
-      newPage.text = p.text      
-      
-      # commit the new page on dest wiki
-      return dst.editpage(newPage)
-      
-  except Exception as e:
-    print ("Error on sync page %s (%s)" 
-              % (pageTitle.encode('utf-8'), e))
-    return False
-    
-  return False
-  
-def subsOnPages(dst, pages, subs) :  
-  nbModPage = 0
-  nbPage = len(pages)
-  
-  for i,pageTitle in enumerate(pages):
-    print ("%i/%i Modification of %s " % 
-      (i+1,nbPage,pageTitle.encode('utf-8')))
-    if(subsOnPage(dst,pageTitle,subs)):
-      nbModPage += 1
-      
-  return nbModPage  
-  
-def emptyPages(dst, pages) :  
-  nbModPage = 0
-  nbPage = len(pages)
-  
-  for i,pageTitle in enumerate(pages):
-    print ("%i/%i Empty of %s " % 
-      (i+1,nbPage,pageTitle.encode('utf-8')))
-    if(emptyPage(dst,pageTitle)):
-      nbModPage += 1
-      
-  return nbModPage    
-  
-def uploadFiles(src, srcFileRepo, dst, files, maxwith, maxsize) :
-  """Download files from src site and upload on dst site
-    
-    return the number of succes uploaded files
-  """
-  
-  nbFiles = len(files)
-  for i,fileTitle in enumerate(files):
-    try:
-      # create a new file on dest wiki
-      pageDst = FilePage(dst, fileTitle)
-      f = FilePage(srcFileRepo, fileTitle)
-
-      # if page not exist in image repo
-      # get from site src
-      if(not f.exists()):
-        f = FilePage(src, fileTitle)
-
-      if( f.latest_file_info['mime'] in thumbmime ):
-        url = f.get_file_url(maxwith) 
-        maxsize = 0 # do not check thumbnail file size
-      else:      
-        url = f.get_file_url() 
-
-      if( not pageDst.exists() 
-          and (maxsize == 0 or f.latest_file_info['size'] < maxsize )): 
-        print ("%i/%i Upload file %s [%s]" % 
-          (i+1, nbFiles,  fileTitle.encode('utf-8'), url))
-        sys.stdout.flush()
-        # start upload !
-        dst.upload( pageDst, source_url=url, 
-                    comment="mirroring", text=f.text, 
-                    ignore_warnings = False, report_success = False)
-                    
-    except Exception as e:
-      print ("Error on upload file %s (%s)" % 
-              (fileTitle.encode('utf-8'),e))  
-
-def syncPages(src, dst, pages, force = False) -> int: 
-  """Synchronize wiki pages from src to dst
-  
-    force : if true, always copy  the content (even if page exist on site dest) 
-    
-    return the number of succes synchronized pages 
-  """
-  
-  nbSyncPage = 0
-  nbPage = len(pages)
-  
-  for i,p in enumerate(pages):
-    print ("%i/%i Sync %s " % 
-            (i+1,nbPage,p.encode('utf-8')))
+def getFilesFromPage(siteSrc, nbPages, iTitles) : 
+  # get files used by p
+  (i,title) = iTitles
+  pages = Page(siteSrc, title).imagelinks()
+  nbFiles = len(list(pages))
+  if(nbFiles > 0):
+    print ("%i/%i Process %s : %i files found" % 
+             (i+1,nbPages,title.encode('utf-8'),nbFiles))
     sys.stdout.flush()
-    if(syncPage(src,dst,p,force)):
-      nbSyncPage += 1
-      
-  return nbSyncPage
-
+  return mapTitle(pages)  
   
 def getPagesTitleFromCategorie(site, categories):
   pages = []
@@ -370,10 +226,185 @@ def getPagesTitleFromCategorie(site, categories):
     # add pages to sync of this categorie
     pages.extend(mapTitle(cat.articles( namespaces=ns, recurse=r )))
     
-  return pages
+  return pages  
+  
+###########################################
+# Modify pages WikiPages
+
+def emptyPage(dst, nbPages, iTitles)  :
+  (i,title) = iTitles
+  try:
+    p = Page(dst, title)
+    p.text = ""
+    
+    print ("%i/%i Empty of %s " % 
+          (i+1,nbPages,title.encode('utf-8')))
+    sys.stdout.flush()      
+      
+    if(dst.editpage(p)):
+      return 1
+    
+  except Exception as e:
+      print ("Error to empty page %s (%s)" % 
+        (title.encode('utf-8'), e))
+  return 0  
+  
+def subsOnPage(dst, subs, nbPages, iTitles)  :
+  (i,title) = iTitles
+  try:
+    p = Page(dst, title)
+    
+    for s in subs :
+      pattern = s[0]
+      repl = s[1]
+      p.text = re.sub(pattern, repl, p.text)
+      
+    print ("%i/%i Modification of %s " % 
+      (i+1,nbPages,title.encode('utf-8')))
+    sys.stdout.flush()  
+      
+    if(dst.editpage(p)):
+      return 1
+    
+  except Exception as e:
+      print ("Error to modify page %s (%s)" % 
+        (title.encode('utf-8'), e))
+  return 0  
+  
+#####################################  
+# Mirroring WikiPages 
+  
+def syncPage(src, dst, force, checkRedirect, nbPages, iTitles):
+  """Synchronize ONE wiki pages from src to dst
+  
+     return true if success
+  """
+
+  (i,pageTitle) = iTitles
+  
+  # init page on src and dst
+  p = Page(src, pageTitle)
+  newPage = Page(dst, pageTitle)
+  
+  try:      
+    # if page exist on dest and no force -> do not sync this page
+    if((not force) and newPage.exists()):  
+      return 0
+      
+    # sometime, pywikibot return a page in a different site, 
+    # here check this
+    elif(newPage.site == dst):
+    
+      #sync also the redirect target 
+      if(checkRedirect and p.isRedirectPage()):
+        syncPage(src, dst, force, False, nbPages, (i,p.getRedirectTarget().title()))
+        
+      # copy the content of the page
+      newPage.text = p.text 
+         
+      print ("%i/%i Copy %s" % (i+1,nbPages,pageTitle.encode('utf-8')))
+      sys.stdout.flush()
+      # commit the new page on dest wiki
+      if ( dst.editpage(newPage) ):
+        return 1
+      
+  except Exception as e:
+    print ("Error on copy page %s (%s)" 
+              % (pageTitle.encode('utf-8'), e))
+    
+  return 0
+  
+def uploadFile(src, srcFileRepo, dst, maxwith, maxsize, nbFiles, iTitles ):
+  (i,fileTitle) = iTitles
+
+  # create a new file on dest wiki
+  pageDst = FilePage(dst, fileTitle)
+  f = FilePage(srcFileRepo, fileTitle)
+  
+  try:
+    # if page not exist in image repo
+    # get from site src
+    if(not f.exists()):
+      f = FilePage(src, fileTitle)
+
+    if( f.latest_file_info['mime'] in thumbmime ):
+      url = f.get_file_url(maxwith) 
+      maxsize = 0 # do not check thumbnail file size
+    else:      
+      url = f.get_file_url() 
+    
+    #TODO fix (work only for bitmap images)
+    size = f.latest_file_info['size']
+
+    if( not pageDst.exists() 
+        and (maxsize == 0 or size < maxsize )): 
+      print ("%i/%i Upload file %s [%s] (%1.2f MB)" % 
+        (i+1, nbFiles,  fileTitle.encode('utf-8'), 
+            url, size / 1024.0 / 1024.0))
+      sys.stdout.flush()
+      # start upload !
+      if(dst.upload( pageDst, source_url=url, 
+                  comment="mirroring", text=f.text, 
+                  ignore_warnings = False, report_success = False)):
+        return 1
+                  
+  except Exception as e:
+    print ("Error on upload file %s (%s)" % 
+            (fileTitle.encode('utf-8'),e))  
+  return 0
+
+########################################################
+# Mapping
+
+def subsOnPages(dst, pages, subs) :  
+  subs = partial(subsOnPage,dst,subs,len(pages))
+  return sum(map(subs,enumerate(pages)))
+
+def emptyPages(dst, pages) : 
+  empty =  partial(emptyPage,dst,len(pages))
+  return sum(map(empty,enumerate(pages)))
+  
+def uploadFilesWithThreadPool(src, srcFileRepo, dst, files, maxwith, maxsize) :
+  upload = partial(uploadFile,src, srcFileRepo, 
+                    dst, maxwith, maxsize,len(files))
+  with ThreadPoolExecutor(max_workers=MAX_WORKERS) as ex:                  
+    return sum(ex.map(upload,enumerate(files)))
+  return 0  
+  
+def uploadFiles(src, srcFileRepo, dst, files, maxwith, maxsize) :
+  upload = partial(uploadFile,src, srcFileRepo, 
+                    dst, maxwith, maxsize,len(files))
+  return sum(map(upload,enumerate(files)))  
+  
+def syncPagesWithThreadPool(src, dst, pages, force = False): 
+  sync = partial(syncPage, src,dst,force,True, len(pages))
+  with ThreadPoolExecutor(max_workers=MAX_WORKERS) as ex:
+    return sum(ex.map(sync,enumerate(pages)))
+  return 0
+
+def syncPages(src, dst, pages, force = False): 
+  sync = partial(syncPage, src,dst,force,True, len(pages))
+  return sum(map(sync,enumerate(pages)))
+    
+def getTemplatesFromPages(siteSrc, pages) :
+  getTplt = partial(getTemplateTitlesFromPage, siteSrc, len(pages))
+  templates = []
+  for tList in map(getTplt,enumerate(pages)):
+    templates.extend(tList)
+  # apply set() to delete duplicate
+  return list(set(templates))  
+   
+def getFilesFromPages(siteSrc, pages) :
+  getFiles = partial(getFilesFromPage, siteSrc, len(pages))
+  files = []
+  for fList in map(getFiles,enumerate(pages)):
+    files.extend(fList)
+  # apply set() to delete duplicate
+  return list(set(files))
   
 ######################################
 # Entry points  
+
 def modifyPages(siteSrc, siteDst, 
                pages, modifications):
   # apply modifications
@@ -413,7 +444,7 @@ def modifyPages(siteSrc, siteDst,
   
   return nbMods;
   
-def syncPagesWithDependances( siteSrc, siteDst, 
+def mirroringPagesWithDependances( siteSrc, siteDst, 
                               pages, options) : 
   """ Get the dependances of pages (templates and files),
       sync all pages and upload files contained in the pages
@@ -461,22 +492,36 @@ def syncPagesWithDependances( siteSrc, siteDst,
     
   #sync all pages, templates and associated files
   nbPageSync = 0
+  nbPageUpload = 0
   
-  print ("====== Sync pages")
-  nbPageSync += syncPages(siteSrc, siteDst, pages, force )  
-    
-  if(options['templatesSync']):
-    print ("====== Sync template")
-    nbPageSync += syncPages(siteSrc, siteDst, templates, force )
-    
-  if(options['filesUpload']):
-    print ("====== Upload files")
-    uploadFiles (siteSrc, siteSrc.image_repository(), siteDst, 
-              files, options["thumbwidth"], options["maxsize"])
+  if(options["async"]):
+    print ("====== Sync pages with %i thread pool" % MAX_WORKERS)
+    nbPageSync += syncPagesWithThreadPool(siteSrc, siteDst, pages, force )  
+      
+    if(options['templatesSync']):
+      print ("====== Sync template with %i thread pool" % MAX_WORKERS)
+      nbPageSync += syncPagesWithThreadPool(siteSrc, siteDst, templates, force )
+      
+    if(options['filesUpload']):
+      print ("====== Upload files with %i thread pool" % MAX_WORKERS)
+      uploadFilesWithThreadPool (siteSrc, siteSrc.image_repository(), siteDst, 
+                files, options["thumbWidth"], options["maxSize"])
+  else:
+    print ("====== Sync pages")
+    nbPageSync += syncPages(siteSrc, siteDst, pages, force )  
+      
+    if(options['templatesSync']):
+      print ("====== Sync template")
+      nbPageSync += syncPages(siteSrc, siteDst, templates, force )
+      
+    if(options['filesUpload']):
+      print ("====== Upload files")
+      uploadFiles (siteSrc, siteSrc.image_repository(), siteDst, 
+                files, options["thumbWidth"], options["maxSize"])  
               
-  return nbPageSync;  
+  return (nbPageSync,nbPageUpload)
         
-def syncAndModifyPages(
+def mirroringAndModifyPages(
   srcFam, srcCode, dstFam, dstCode, 
   pagesName, categories, 
   modifications, options) :
@@ -501,7 +546,8 @@ def syncAndModifyPages(
   pages = pagesName
   
   nbMods = 0
-  nbPages = 0
+  nbPagesSync = 0
+  nbPagesUpload = 0
   
   # get pages in categories
   if( categories ):
@@ -509,12 +555,12 @@ def syncAndModifyPages(
     
   if( options["pagesSync"] ):
     # copy all pages !
-    nbPages = syncPagesWithDependances(siteSrc, siteDst, pages, options)    
+    (nbPagesSync,nbPagesUpload) = mirroringPagesWithDependances(siteSrc, siteDst, pages, options)    
 
   if( modifications and options["modifyPages"] ):
     nbMods =  modifyPages(siteSrc, siteDst, pages, modifications)        
       
-  return (nbPages,nbMods)
+  return (nbPagesSync,nbPagesUpload,nbMods)
 
 def processFromJSONFile(fileconfig, options):
   """Synchronize wiki pages from JSON file
@@ -533,20 +579,18 @@ def processFromJSONFile(fileconfig, options):
       cats = cfg['categories']
       mods = cfg['modifications']
       
-      (nbPages,nbMods) = syncAndModifyPages(
+      (nbPagesSync,nbPagesUpload,nbMods) = mirroringAndModifyPages(
         src['fam'], src['code'], 
         dst['fam'], dst['code'], 
         pages, cats, mods, options
       )
       
-      print ("%i pages synchronized and %i pages modify" % (nbPages, nbMods))
+      print ("%i pages copied, %i files copied, %i pages modify" % (nbPagesSync,nbPagesUpload,nbMods))
       
     except json.decoder.JSONDecodeError as e:
       print ("Syntax error in mirroring file : %s" % e)
     except KeyError as e:
       print ("KeyError error in mirroring file : %s" % e)
-    except Exception as e:
-      print ("Program exit with error : %s" % e)
       
 
 ######################################
@@ -557,7 +601,7 @@ def main():
   
   try:
     opts, args = getopt.getopt(sys.argv[1:], 
-      "hftdupme:w:s:", 
+      "hftdupme:w:s:a", 
       [ "help",
         "force",
         "no-sync-templates",
@@ -567,7 +611,8 @@ def main():
         "no-modify",
         "export-dir",
         "thumbwidth",
-        "maxsize"
+        "maxsize",
+        "async"
       ]
     )
       
@@ -596,9 +641,11 @@ def main():
     if opt in ("-e", "--export-dir"):  
       options["exportDir"] = arg
     if opt in ("-w", "--thumbwidth"):  
-      options["thumbwidth"] = int(arg)
+      options["thumbWidth"] = int(arg)
     if opt in ("-s", "--maxsize"):  
-      options["maxsize"] = int(arg)               
+      options["maxSize"] = int(arg)   
+    if opt in ("-a", "--async"):  
+      options["async"] = True                
             
   # check coherence, fix if needed
   if(options["templatesDepSync"] and not options["templatesSync"]):
