@@ -590,36 +590,31 @@ def mirroringAndModifyPages(
       
   return (nbPagesSync,nbPagesUpload,nbMods)
 
-def processFromJSONFile(fileconfig, options):
-  """Synchronize wiki pages from JSON file
+def processConfig(cfg, options):
+  """Synchronize wiki pages from loaded config
     
-    return the number of succes synchronized pages and files
+    return the number of succes synchronized pages, files and 
+          modifications
   """
-  print ("Process %s" % fileconfig)
+  try:
 
-  with open(fileconfig, 'r', encoding='utf-8') as jsonfile:
-    try:
-      cfg = json.load(jsonfile)
+    src = cfg['sites']['src']
+    dst = cfg['sites']['dst']
+    pages = cfg['pages']
+    cats = cfg['categories']
+    mods = cfg['modifications']
+    
+    (nbPagesSync,nbPagesUpload,nbMods) = mirroringAndModifyPages(
+      src['fam'], src['code'], 
+      dst['fam'], dst['code'], 
+      pages, cats, mods, options
+    )
+    
+    print ("%i pages copied, %i files copied, %i pages modified" 
+              % (nbPagesSync,nbPagesUpload,nbMods))
 
-      src = cfg['sites']['src']
-      dst = cfg['sites']['dst']
-      pages = cfg['pages']
-      cats = cfg['categories']
-      mods = cfg['modifications']
-      
-      (nbPagesSync,nbPagesUpload,nbMods) = mirroringAndModifyPages(
-        src['fam'], src['code'], 
-        dst['fam'], dst['code'], 
-        pages, cats, mods, options
-      )
-      
-      print ("%i pages copied, %i files copied, %i pages modified" 
-                % (nbPagesSync,nbPagesUpload,nbMods))
-      
-    except json.decoder.JSONDecodeError as e:
-      print ("Syntax error in mirroring file : %s" % e)
-    except KeyError as e:
-      print ("KeyError error in mirroring file : %s" % e)
+  except KeyError as e:
+    print ("KeyError error in mirroring file : %s" % e)
       
 
 ######################################
@@ -687,9 +682,15 @@ def main():
   print (options)
 
   # process each config file
-  for arg in args:
-    processFromJSONFile(arg,options)
-    
+  for filename in args:
+    print ("Process %s" % filename)
+
+    with open(filename, 'r', encoding='utf-8') as cfgfile:
+      try:
+        processConfig(json.load(cfgfile),options)
+      except json.decoder.JSONDecodeError as e:
+        print ("Syntax error in mirroring file : %s" % e)  
+     
   sys.stdout.flush()
     
 if __name__ == "__main__":
