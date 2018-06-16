@@ -360,7 +360,7 @@ def uploadFile(src, srcFileRepo, dst, maxwith, maxsize, nbFiles, iTitles ):
         and (maxsize == 0 or size < maxsize )): 
         
       # show informations
-      print ("%i/%i Upload file %s [%s] (%1.2f MB)" % 
+      print ("%i/%i Uploading file %s [%s] (%1.2f MB)" % 
         (i+1, nbFiles,  fileTitle.encode('utf-8'), 
             url, size / 1024.0 / 1024.0))
       sys.stdout.flush()
@@ -613,7 +613,7 @@ def processFromJSONFile(fileconfig, options):
         pages, cats, mods, options
       )
       
-      print ("%i pages copied, %i files copied, %i pages modify" 
+      print ("%i pages copied, %i files copied, %i pages modified" 
                 % (nbPagesSync,nbPagesUpload,nbMods))
       
     except json.decoder.JSONDecodeError as e:
