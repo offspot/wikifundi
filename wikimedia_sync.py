@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# author : Florent Kaisser
-# maintainer : kiwix
+# author : Florent Kaisser <florent@kaisser.name>
+# maintainer : Kiwix
 
 """
  wikimedia_sync.py
@@ -25,7 +25,7 @@
   -e, --export-dir <directory> : write json export files in this directory
   -w, --thumbwidth :try to download thumbnail image with this width instead original image (default : 2000)
   -s, --maxsize : do not files download greater to this limit (default : 100MB)
-  -a, --async : execute mirroring in async mode (5 threads / cpu). No works with sqlite database
+  -a, --async : execute mirroring in async mode (5 threads / cpu). No works with SQLITE database. (default : false)
   
  json file config :
    
@@ -170,12 +170,14 @@ thumbmime = ['image/jpeg','image/png']
 # Export/Import
   
 def exportPagesTitle(pages, fileName, directory):
-  with open("%s/mirroring_export_%s.json" % (directory,fileName), 'w',encoding='utf-8') as f:
+  with open("%s/mirroring_export_%s.json" % (directory,fileName), 
+    'w',encoding='utf-8') as f:
       f.write(json.dumps(pages, sort_keys=True, indent=4,ensure_ascii=False))
       
 def importPagesTitle(fileName, directory):
   try :
-    with open("%s/mirroring_export_%s.json" % (directory,fileName), 'r', encoding='utf-8') as f:
+    with open("%s/mirroring_export_%s.json" % (directory,fileName), 
+      'r', encoding='utf-8') as f:
         return json.load(f)
   except FileNotFoundError:
       print ("No precedent list of %s is found" % fileName)
@@ -297,7 +299,8 @@ def syncPage(src, dst, force, checkRedirect, nbPages, iTitles):
     
       #sync also the redirect target 
       if(checkRedirect and p.isRedirectPage()):
-        syncPage(src, dst, force, False, nbPages, (i,p.getRedirectTarget().title()))
+        syncPage(src, dst, force, False, nbPages, 
+          (i,p.getRedirectTarget().title()))
         
       # copy the content of the page
       newPage.text = p.text 
@@ -361,7 +364,7 @@ def subsOnPages(dst, pages, subs) :
   return sum(map(subs,enumerate(pages)))
 
 def emptyPages(dst, pages) : 
-  empty =  partial(emptyPage,dst,len(pages))
+  empty = partial(emptyPage,dst,len(pages))
   return sum(map(empty,enumerate(pages)))
   
 def uploadFilesWithThreadPool(src, srcFileRepo, dst, files, maxwith, maxsize) :
@@ -409,7 +412,7 @@ def modifyPages(siteSrc, siteDst,
                pages, modifications):
   # apply modifications
   nbMods = 0   
-  #print (json.dumps(modifications, sort_keys=True, indent=4,ensure_ascii=False))
+
   for mod in modifications :
     pageMods = []
     if('pages' in mod):
@@ -496,11 +499,13 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
   
   if(options["async"]):
     print ("====== Sync pages with %i thread pool" % MAX_WORKERS)
-    nbPageSync += syncPagesWithThreadPool(siteSrc, siteDst, pages, force )  
+    nbPageSync += syncPagesWithThreadPool
+                    (siteSrc, siteDst, pages, force )  
       
     if(options['templatesSync']):
       print ("====== Sync template with %i thread pool" % MAX_WORKERS)
-      nbPageSync += syncPagesWithThreadPool(siteSrc, siteDst, templates, force )
+      nbPageSync += syncPagesWithThreadPool
+                    (siteSrc, siteDst, templates, force )
       
     if(options['filesUpload']):
       print ("====== Upload files with %i thread pool" % MAX_WORKERS)
@@ -555,7 +560,8 @@ def mirroringAndModifyPages(
     
   if( options["pagesSync"] ):
     # copy all pages !
-    (nbPagesSync,nbPagesUpload) = mirroringPagesWithDependances(siteSrc, siteDst, pages, options)    
+    (nbPagesSync,nbPagesUpload) 
+        = mirroringPagesWithDependances(siteSrc, siteDst, pages, options)    
 
   if( modifications and options["modifyPages"] ):
     nbMods =  modifyPages(siteSrc, siteDst, pages, modifications)        
@@ -585,7 +591,8 @@ def processFromJSONFile(fileconfig, options):
         pages, cats, mods, options
       )
       
-      print ("%i pages copied, %i files copied, %i pages modify" % (nbPagesSync,nbPagesUpload,nbMods))
+      print ("%i pages copied, %i files copied, %i pages modify" 
+                % (nbPagesSync,nbPagesUpload,nbMods))
       
     except json.decoder.JSONDecodeError as e:
       print ("Syntax error in mirroring file : %s" % e)
@@ -665,11 +672,5 @@ def main():
     
 if __name__ == "__main__":
   main()
-
-######################################
-# Test parts
-
-def test():
-  #syncPagesAndCategories("wikipedia","en","kiwix","kiwix",["Redirect_Message"],[],DEFAULT_OPTIONS)
-  processFromJSONFile("test.json", DEFAULT_OPTIONS)
+  
 
