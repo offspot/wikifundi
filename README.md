@@ -52,13 +52,16 @@ mirroring by changing environments variables :
  
 You can also change options script with MIRRORING_OPTIONS : 
 
-* `-f, --force` : always copy  the content (even if page exist on site dest). Default : False
-* `-t, --no-sync-templates` : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates. Default : False
-* `-d, --no-sync-dependances-templates` : do not copy templates used by templates.  Default : False
-* `-u, --no-upload-files` : do not copy files (images, css, js, sounds, ...) used by the pages to sync. Default : False
-* `-p, --no-sync` : do not copy anything. If not -m, just modify. Default : False
-* `-m, --no-modify` : do not modify pages. Default : False 
-* `-e, --export-dir <directory>` : write json export files in this directory
+* -f, --force : always copy  the content (even if page exist on site dest) (default : false).
+* -t, --no-sync-templates : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates (default : false).
+* -d, --no-sync-dependances-templates : do not copy templates used by templates (default : false).
+* -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync (default : false).
+* -p, --no-sync : do not copy anything. If not -m, just modify (default : false).
+* -m, --no-modify : do not modify pages (default : false).
+* -e, --export-dir <directory> : write json export files in this directory
+* -w, --thumbwidth :try to download thumbnail image with this width instead original image (default : 2000)
+* -s, --maxsize : do not files download greater to this limit (default : 100MB)
+* -a, --async : execute mirroring in async mode (5 threads / cpu). No works with SQLITE database. (default : false)
 
 To Mirroring without templates dependences  :
 
