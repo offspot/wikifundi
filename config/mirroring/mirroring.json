@@ -88,10 +88,7 @@
     "Help:Recent_changes",
     "Help:Undelete",
     "Help:Copying_a_page",
-    "Template:MW_version",
-    "Template:Information",
-    "Template:Self",
-    "Template:Own"
+    "Template:MW_version"
   ],
   
   "categories":[
@@ -146,34 +143,28 @@
       ]
     },
     {
+      "pages":["Template:Coord"],
+      "empty":true
+    },
+    {
       "categories":[  
         { 
           "title" : "WikiProject_Wikipack_Africa_Content",
           "namespace" : 4,
-          "recurse" : 1
+          "recurse" : 0
         }
       ],
       "substitutions":[
         {
           "pattern":"\\[\\[Category:WikiProject( |_)Wikipack( |_)Africa( |_)Content\\]\\]",
           "repl":" "
-        }       
-      ]
-    },
-    {
-      "namespaces":[0,4,12,3000],
-      "substitutions":[
+        },
         {
           "pattern":"^<!--2BREINSERTED(.*)-->$",
           "repl":"\\1"
-        }       
+        }         
       ]
-    },
-    {
-      "pages":["Template:Coord"],
-      "empty":true
-    }     
-    
+    }
   ]  
 
 }

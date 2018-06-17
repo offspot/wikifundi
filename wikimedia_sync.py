@@ -245,7 +245,7 @@ def getPagesTitleFromCategorie(site, categories):
   return pages  
   
 ###########################################
-# Modify pages WikiPages
+# Modify wiki pages
 
 def emptyPage(dst, nbPages, iTitles)  :
   (i,title) = iTitles
@@ -288,7 +288,7 @@ def subsOnPage(dst, subs, nbPages, iTitles)  :
   return 0  
   
 #####################################  
-# Mirroring WikiPages 
+# Mirroring wiki pages 
   
 def syncPage(src, dst, force, checkRedirect, nbPages, iTitles):
   """Synchronize ONE wiki pages from src to dst
@@ -302,28 +302,27 @@ def syncPage(src, dst, force, checkRedirect, nbPages, iTitles):
   p = Page(src, pageTitle)
   newPage = Page(dst, pageTitle)
   
+  if(newPage.site != dst):
+    newPage = Page(dst, p.titleWithoutNamespace())
+  
   try:      
     # if page exist on dest and no force -> do not sync this page
     if((not force) and newPage.exists()):  
       return 0
-      
-    # sometime, pywikibot return a page in a different site, 
-    # here check this
-    elif(newPage.site == dst):
     
-      #sync also the redirect target 
-      if(checkRedirect and p.isRedirectPage()):
-        syncPage(src, dst, force, False, nbPages, 
-          (i,p.getRedirectTarget().title()))
-        
-      # copy the content of the page
-      newPage.text = p.text 
-         
-      print ("%i/%i Copy %s" % (i+1,nbPages,pageTitle.encode('utf-8')))
-      sys.stdout.flush()
-      # commit the new page on dest wiki
-      if ( dst.editpage(newPage) ):
-        return 1
+    #sync also the redirect target 
+    if(checkRedirect and p.isRedirectPage()):
+      syncPage(src, dst, force, False, nbPages, 
+        (i,p.getRedirectTarget().title()))
+
+    # copy the content of the page
+    newPage.text = p.text 
+       
+    print ("%i/%i Copy %s" % (i+1,nbPages,pageTitle.encode('utf-8')))
+    sys.stdout.flush()
+    # commit the new page on dest wiki
+    if ( dst.editpage(newPage) ):
+      return 1
       
   except Exception as e:
     print ("Error on copy page %s (%s)" 
