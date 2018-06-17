@@ -485,10 +485,9 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
   # export titles of collected pages to sync
   exportPagesTitle(pages,"pages",exportDir)
     
-  templates = []
+  # try to restore precedent state
+  templates = importPagesTitle("templates",exportDir)
   if(options['templatesSync']):
-    # try to restore precedent state
-    templates = importPagesTitle("templates",exportDir)
     if(len(templates) > 0 and not force):
       # the imported file contains all templates to sync
       options['templatesDepSync'] = False
@@ -498,12 +497,11 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
       exportPagesTitle(templates,"templates",exportDir)
     print ("%i templates to sync" % len(templates))
     
-  #collect files used by pages
-  files = []
+  # try to restore precedent state
+  files = importPagesTitle("files",exportDir)
   if(options['filesUpload']) :
-    # try to restore precedent state
-    files = importPagesTitle("files",exportDir)
     if(len(files) == 0 or force):
+      #collect files used by pages
       files = getFilesFromPages(siteSrc, pages)
       exportPagesTitle(files,"files",exportDir)
     print ("%i files to sync" % len(files))
