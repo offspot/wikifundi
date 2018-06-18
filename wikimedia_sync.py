@@ -255,8 +255,10 @@ def getPageSrcDstFromTitle(src, dst, pageTitle):
   if(ns.id == 4):
     if(ns.subpages):
       subPage = pageTitle.split("/",1)
-      if(len(subPage)>0):
+      if(len(subPage) > 1):
         title = subPage[1]
+      else:
+        title = pageTitle
   else:
     title = pageTitle
   
