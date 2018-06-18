@@ -166,6 +166,15 @@ DEFAULT_OPTIONS = dict(
 # (is needed fot not try with no thumbnaible files )
 thumbmime = ['image/jpeg','image/png']
 
+##############################
+# Logs
+
+def log(o) :
+  sys.stdout.buffer.write((str(o)+"\n").encode("utf-8"))
+  
+def log_err(o) :
+  sys.stderr.buffer.write((str(o)+"\n").encode("utf-8"))  
+
 #####################################
 # Export/Import
   
@@ -180,7 +189,7 @@ def importPagesTitle(fileName, directory):
       'r', encoding='utf-8') as f:
         return json.load(f)
   except FileNotFoundError:
-      print ("No precedent list of %s is found" % fileName)
+      log_err ("No precedent list of %s is found" % fileName)
   return []   
   
 
@@ -210,8 +219,8 @@ def getTemplateTitlesFromPage(siteSrc, nbPages, iTitles) :
     
   nbTplt = len(tplt)
   if(nbTplt > 0):
-    print ("%i/%i Process %s : %i templates found " % 
-            (i+1,nbPages,title.encode('utf-8'),nbTplt))
+    log ("%i/%i Process %s : %i templates found " % 
+            (i+1,nbPages,title,nbTplt))
     sys.stdout.flush()    
   return mapTitle(tplt)
   
@@ -222,8 +231,8 @@ def getFilesFromPage(siteSrc, nbPages, iTitles) :
   
   nbFiles = len(list(pages))
   if(nbFiles > 0):
-    print ("%i/%i Process %s : %i files found" % 
-             (i+1,nbPages,title.encode('utf-8'),nbFiles))
+    log ("%i/%i Process %s : %i files found" % 
+             (i+1,nbPages,title,nbFiles))
     sys.stdout.flush()
   return mapTitle(pages)  
   
@@ -232,13 +241,13 @@ def getPagesTitleFromCategorie(site, categories):
   cats = [(Category(
               site,
               c['title']),
-              c['namespace'],
-              c['recurse']
+              c['namespace'] if ("namespace" in c) else None,
+              c['recurse'] if ("recurse" in c) else 0,
           ) for c in categories ]
   # retrieve all pages from categories
   for (cat,ns,r) in cats :
     pages.append(cat.title())
-    print ("Retrieve pages from %s" % cat.title().encode('utf-8'))
+    log ("Retrieve pages from %s" % cat.title())
     # add pages to sync of this categorie
     pages.extend(mapTitle(cat.articles( namespaces=ns, recurse=r )))
     
@@ -275,16 +284,16 @@ def emptyPage(src, dst, nbPages, iTitles)  :
   try:
     p.text = ""
     
-    print ("%i/%i Empty of %s " % 
-          (i+1,nbPages,title.encode('utf-8')))
+    log ("%i/%i Empty of %s " % 
+          (i+1,nbPages,title))
     sys.stdout.flush()      
       
     if(dst.editpage(p)):
       return 1
     
   except Exception as e:
-      print ("Error to empty page %s (%s)" % 
-        (title.encode('utf-8'), e))
+      log_err ("Error to empty page %s (%s)" % 
+        (title, e))
   return 0  
   
 def subsOnPage(src, dst, subs, nbPages, iTitles)  :
@@ -297,16 +306,16 @@ def subsOnPage(src, dst, subs, nbPages, iTitles)  :
       repl = s[1]
       p.text = re.sub(pattern, repl, p.text)
       
-    print ("%i/%i Modification of %s " % 
-      (i+1,nbPages,title.encode('utf-8')))
+    log ("%i/%i Modification of %s " % 
+      (i+1,nbPages,title))
     sys.stdout.flush()  
       
     if(dst.editpage(p)):
       return 1
     
   except Exception as e:
-      print ("Error to modify page %s (%s)" % 
-        (title.encode('utf-8'), e))
+      log_err ("Error to modify page %s (%s)" % 
+        (title, e))
   return 0  
   
 #####################################  
@@ -320,7 +329,7 @@ def syncPage(src, dst, force, checkRedirect, nbPages, iTitles):
 
   (i,pageTitle) = iTitles
   (p,newPage,ns) = getPageSrcDstFromTitle(src,dst,pageTitle)
-      
+     
   try:      
     # if page exist on dest and no force -> do not sync this page
     # always copy page for "Project pages"
@@ -334,16 +343,16 @@ def syncPage(src, dst, force, checkRedirect, nbPages, iTitles):
 
     # copy the content of the page
     newPage.text = p.text 
-       
-    print ("%i/%i Copy %s" % (i+1,nbPages,pageTitle.encode('utf-8')))
+    
+    log ("%i/%i Copy %s" % (i+1,nbPages,pageTitle))
     sys.stdout.flush()
     # commit the new page on dest wiki
     if ( dst.editpage(newPage) ):
       return 1
       
   except Exception as e:
-    print ("Error on copy page %s (%s)" 
-              % (pageTitle.encode('utf-8'), e))
+    log_err ("Error on copy page %s (%s)" 
+              % (pageTitle, e))
     
   return 0
   
@@ -376,8 +385,8 @@ def uploadFile(src, srcFileRepo, dst, maxwith, maxsize, nbFiles, iTitles ):
         and (maxsize == 0 or size < maxsize )): 
         
       # show informations
-      print ("%i/%i Uploading file %s [%s] (%1.2f MB)" % 
-        (i+1, nbFiles,  fileTitle.encode('utf-8'), 
+      log ("%i/%i Uploading file %s [%s] (%1.2f MB)" % 
+        (i+1, nbFiles,  fileTitle, 
             url, size / 1024.0 / 1024.0))
       sys.stdout.flush()
       
@@ -388,8 +397,8 @@ def uploadFile(src, srcFileRepo, dst, maxwith, maxsize, nbFiles, iTitles ):
         return 1
                     
   except Exception as e:
-    print ("Error on upload file %s (%s)" % 
-            (fileTitle.encode('utf-8'),e))  
+    log_err ("Error on upload file %s (%s)" % 
+            (fileTitle,e))  
   return 0
 
 ########################################################
@@ -497,7 +506,7 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
   force = options['force']
   exportDir = options["exportDir"]
   
-  print ("%i pages to sync" % len(pages))
+  log ("%i pages to sync" % len(pages))
   # export titles of collected pages to sync
   exportPagesTitle(pages,"pages",exportDir)
     
@@ -511,7 +520,7 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
       # collect template used by pages
       templates = getTemplatesFromPages(siteSrc, pages)
       exportPagesTitle(templates,"templates",exportDir)
-    print ("%i templates to sync" % len(templates))
+    log ("%i templates to sync" % len(templates))
     
   # try to restore precedent state
   files = importPagesTitle("files",exportDir)
@@ -520,43 +529,43 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
       #collect files used by pages
       files = getFilesFromPages(siteSrc, pages)
       exportPagesTitle(files,"files",exportDir)
-    print ("%i files to sync" % len(files))
+    log ("%i files to sync" % len(files))
     
   if(options['templatesDepSync']):    
     dependances = getTemplatesFromPages(siteSrc, files+templates)
     #delete duplicate
     templates = list(set(templates+dependances))
     exportPagesTitle(templates,"templates",exportDir)
-    print ("%i templates to sync" % len(templates))
+    log ("%i templates to sync" % len(templates))
     
   #sync all pages, templates and associated files
   nbPageSync = 0
   nbPageUpload = 0
   
   if(options["async"]):
-    print ("====== Sync pages with %i thread pool" % MAX_WORKERS)
+    log ("====== Sync pages with %i thread pool" % MAX_WORKERS)
     nbPageSync += syncPagesWithThreadPool(siteSrc, siteDst, 
                                             pages, force )  
       
     if(options['templatesSync']):
-      print ("====== Sync template with %i thread pool" % MAX_WORKERS)
+      log ("====== Sync template with %i thread pool" % MAX_WORKERS)
       nbPageSync += syncPagesWithThreadPool(siteSrc, siteDst, 
                                               templates, force )
       
     if(options['filesUpload']):
-      print ("====== Upload files with %i thread pool" % MAX_WORKERS)
+      log ("====== Upload files with %i thread pool" % MAX_WORKERS)
       nbPageUpload += uploadFilesWithThreadPool (siteSrc, siteSrc.image_repository(), siteDst, 
                 files, options["thumbWidth"], options["maxSize"])
   else:
-    print ("====== Sync pages")
+    log ("====== Sync pages")
     nbPageSync += syncPages(siteSrc, siteDst, pages, force )  
       
     if(options['templatesSync']):
-      print ("====== Sync template")
+      log ("====== Sync template")
       nbPageSync += syncPages(siteSrc, siteDst, templates, force )
       
     if(options['filesUpload']):
-      print ("====== Upload files")
+      log ("====== Upload files")
       nbPageUpload += uploadFiles (siteSrc, siteSrc.image_repository(), siteDst, 
                 files, options["thumbWidth"], options["maxSize"])  
               
@@ -593,6 +602,7 @@ def mirroringAndModifyPages(
   # get pages in categories
   if( categories ):
     pages.extend(getPagesTitleFromCategorie(siteSrc, categories))
+
     
   if( options["pagesSync"] ):
     # copy all pages !
@@ -624,11 +634,11 @@ def processConfig(cfg, options):
       pages, cats, mods, options
     )
     
-    print ("%i pages copied, %i files copied, %i pages modified" 
+    log ("%i pages copied, %i files copied, %i pages modified" 
               % (nbPagesSync,nbPagesUpload,nbMods))
 
   except KeyError as e:
-    print ("KeyError error in mirroring file : %s" % e)
+    log_err ("KeyError error in mirroring file : %s" % e)
       
 
 ######################################
@@ -655,14 +665,14 @@ def main():
     )
       
   except (getopt.error, msg):
-    print (("args error : %s" % str(msg)))
-    print ("Use --help to show help instructions")
+    log_err (("args error : %s" % str(msg)))
+    log_err ("Use --help to show help instructions")
     sys.exit(2)
 
   # parse args
   for (opt, arg) in opts:
     if opt in ("-h", "--help"):
-      print(__doc__)
+      log(__doc__)
       sys.exit(0)
     if opt in ("-f", "--force"):
       options["force"] = True
@@ -693,17 +703,17 @@ def main():
       options["templatesDepSync"] = False
       options["filesUpload"] = False
 
-  print (options)
+  log (options)
 
   # process each config file
   for filename in args:
-    print ("Process %s" % filename)
+    log ("Process %s" % filename)
 
     with open(filename, 'r', encoding='utf-8') as cfgfile:
       try:
         processConfig(json.load(cfgfile),options)
       except json.decoder.JSONDecodeError as e:
-        print ("Syntax error in mirroring file : %s" % e)  
+        log_err ("Syntax error in mirroring file : %s" % e)  
      
   sys.stdout.flush()
     

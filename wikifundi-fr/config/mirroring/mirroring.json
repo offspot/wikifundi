@@ -75,9 +75,8 @@
   ],
   
   "categories":[
-  { "title" : "Projet_Wikipack_Africa_Contenu",
-    "namespace" : 4,
-    "recurse" : 0}
+    { "title" : "Projet_Wikipack_Africa_Contenu"},
+    { "title" : "Article_de_qualité"}
   ],
   
   "modifications":[
@@ -135,13 +134,7 @@
       "empty":true
     },       
     {
-      "categories":[  
-        { 
-          "title" : "Projet_Wikipack_Africa_Contenu",
-          "namespace" : 4,
-          "recurse" : 0
-        }
-      ],
+      "categories":[{ "title" : "Projet_Wikipack_Africa_Contenu"}],
       "substitutions":[
         {
           "pattern":"\\[\\[(Category|Catégorie):Projet( |_)Wikipack( |_)Africa( |_|)(Contenu|)\\]\\]",
