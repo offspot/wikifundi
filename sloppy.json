@@ -1,0 +1,34 @@
+{
+  "project": "mediawiki",
+  "services":[
+    {
+        "id": "mediawiki",
+        "apps": [
+            {
+                "id": "mediawiki",
+                "domain": {
+                    "uri": "mediawiki.openzim.org"
+                },
+                "mem": 1720,
+                "instances": 1,
+                "image": "florentk/wikifundi_en",
+                "port_mappings": [
+                    {
+                        "container_port": 80
+                    }
+                ],
+                "env": {
+                    "MIRRORING_OPTIONS": "-fpm -s 5000000 -w 1024"
+                },
+                "volumes": [
+                    {
+                        "container_path": "/var/www/data",
+                        "size": "24GB"
+                    }
+                ]
+            }
+        ]
+    }
+  ]
+}
+
