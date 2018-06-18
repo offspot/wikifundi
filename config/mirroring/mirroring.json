@@ -94,7 +94,7 @@
   "categories":[
   { "title" : "WikiProject_Wikipack_Africa_Content",
     "namespace" : 4,
-    "recurse" : 1},
+    "recurse" : 0},
   { "title" : "Featured_articles",
     "namespace" : 0,
     "recurse" : 0}

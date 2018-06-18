@@ -247,10 +247,30 @@ def getPagesTitleFromCategorie(site, categories):
 ###########################################
 # Modify wiki pages
 
-def emptyPage(dst, nbPages, iTitles)  :
+def getPageSrcDstFromTitle(src, dst, pageTitle):
+  p = Page(src, pageTitle)
+  ns = p.namespace()
+  
+  # specific case for "Project pages"
+  if(ns.id == 4):
+    if(ns.subpages):
+      subPage = pageTitle.split("/",1)
+      if(len(subPage)>0):
+        title = subPage[1]
+  else:
+    title = pageTitle
+  
+  newPage = Page(dst, title)
+  
+  if(newPage.site != dst):
+    newPage = Page(dst, newPage.titleWithoutNamespace(), ns.id)
+  
+  return (p,newPage,ns)
+
+def emptyPage(src, dst, nbPages, iTitles)  :
   (i,title) = iTitles
+  (pSrc,p,ns) = getPageSrcDstFromTitle(src,dst,title)
   try:
-    p = Page(dst, title)
     p.text = ""
     
     print ("%i/%i Empty of %s " % 
@@ -265,10 +285,10 @@ def emptyPage(dst, nbPages, iTitles)  :
         (title.encode('utf-8'), e))
   return 0  
   
-def subsOnPage(dst, subs, nbPages, iTitles)  :
+def subsOnPage(src, dst, subs, nbPages, iTitles)  :
   (i,title) = iTitles
+  (pSrc,p,ns) = getPageSrcDstFromTitle(src,dst,title)
   try:
-    p = Page(dst, title)
     
     for s in subs :
       pattern = s[0]
@@ -289,7 +309,7 @@ def subsOnPage(dst, subs, nbPages, iTitles)  :
   
 #####################################  
 # Mirroring wiki pages 
-  
+    
 def syncPage(src, dst, force, checkRedirect, nbPages, iTitles):
   """Synchronize ONE wiki pages from src to dst
   
@@ -297,17 +317,12 @@ def syncPage(src, dst, force, checkRedirect, nbPages, iTitles):
   """
 
   (i,pageTitle) = iTitles
-  
-  # init page on src and dst
-  p = Page(src, pageTitle)
-  newPage = Page(dst, pageTitle)
-  
-  if(newPage.site != dst):
-    newPage = Page(dst, p.titleWithoutNamespace())
-  
+  (p,newPage,ns) = getPageSrcDstFromTitle(src,dst,pageTitle)
+      
   try:      
     # if page exist on dest and no force -> do not sync this page
-    if((not force) and newPage.exists()):  
+    # always copy page for "Project pages"
+    if((not force) and newPage.exists() and ns.id != 4):  
       return 0
     
     #sync also the redirect target 
@@ -378,12 +393,12 @@ def uploadFile(src, srcFileRepo, dst, maxwith, maxsize, nbFiles, iTitles ):
 ########################################################
 # Mapping
 
-def subsOnPages(dst, pages, subs) :  
-  subs = partial(subsOnPage,dst,subs,len(pages))
+def subsOnPages(src, dst, pages, subs) :  
+  subs = partial(subsOnPage,src,dst,subs,len(pages))
   return sum(map(subs,enumerate(pages)))
 
-def emptyPages(dst, pages) : 
-  empty = partial(emptyPage,dst,len(pages))
+def emptyPages(src, dst, pages) : 
+  empty = partial(emptyPage,src,dst,len(pages))
   return sum(map(empty,enumerate(pages)))
   
 def uploadFilesWithThreadPool(src, srcFileRepo, dst, files, maxwith, maxsize) :
@@ -459,10 +474,10 @@ def modifyPages(siteSrc, siteDst,
                lambda s : (re.compile(s['pattern']),s['repl']), 
                mod['substitutions']
              )
-      nbMods += subsOnPages(siteDst, pageModsUniq, list(subs))
+      nbMods += subsOnPages(siteSrc, siteDst, pageModsUniq, list(subs))
         
     if('empty' in mod):
-      nbMods += emptyPages(siteDst, pageModsUniq) 
+      nbMods += emptyPages(siteSrc, siteDst, pageModsUniq) 
   
   return nbMods;
   
