@@ -1,0 +1,160 @@
+{
+  "sites":{
+    "src":{
+      "fam": "wikipedia",
+      "code": "fr"
+    },
+    "dst":{
+      "fam": "kiwix",
+      "code": "fr"    
+    }
+  },
+
+  "pages":[
+    "MediaWiki:Common.js",
+    "MediaWiki:Common.css",
+    "MediaWiki:Vector.js",
+    "MediaWiki:Vector.css",
+    
+    "Wikipédia:Neutralité_de_point_de_vue",
+    "Wikipédia:Principes_fondateurs",
+    "Wikipédia:Travaux_inédits",
+    "Wikipédia:Vérifiabilité",
+    "Wikipédia:Ce_que_Wikipédia_n'est_pas",
+    "Wikipédia:Style_encyclopédique",
+    
+    "Help:Contents/fr",
+    "Help:Navigation/fr",
+    "Help:Searching/fr",
+    "Help:Tracking_changes/fr",
+    "Help:Watchlist/fr",
+    "Help:Editing_pages/fr",
+    "Help:Starting_a_new_page/fr",
+    "Help:Formatting/fr",
+    "Help:Links/fr",
+    "Help:User_page/fr",
+    "Help:Talk_pages/fr",
+    "Help:Signatures/fr",
+    "Help:VisualEditor/User_guide/fr",
+    "Help:Images/fr",
+    "Help:Lists/fr",
+    "Help:Tables/fr",
+    "Help:Categories/fr",
+    "Help:Subpages/fr",
+    "Help:Managing_files/fr",
+    "Help:Moving_a_page/fr",
+    "Help:Redirects/fr",
+    "Help:Protected_pages/fr",
+    "Help:Templates/fr",
+    "Help:Magic_words/fr",
+    "Help:Namespaces/fr",
+    "Help:Cite/fr",
+    "Help:Special_pages/fr",
+    "Help:External_searches/fr",
+    "Help:Bots/fr",
+    "Help:Notifications/fr",
+    "Help:Flow/fr",
+    "Help:Preferences/fr",
+    "Help:Skins/fr",
+    "Help:Sysops_and_permissions/fr",
+    "Help:Protecting_and_unprotecting_pages/fr",
+    "Help:Sysop_deleting_and_undeleting/fr",
+    "Help:Patrolled_edits/fr",
+    "Help:Blocking_users/fr",
+    "Help:Range_blocks/fr",
+    "Help:Assigning_permissions/fr",
+    "Help:Diff/fr",
+    "Help:Merge_history/fr",
+    "Help:New_images/fr",
+    "Help:New_pages/fr",
+    "Help:Random_page/fr",
+    "Help:Recent_changes/fr",
+    "Help:Undelete/fr",
+    "Help:Copying_a_page/fr",
+    "Template:MW_version"
+  ],
+  
+  "categories":[
+  { "title" : "Projet_Wikipack_Africa_Contenu",
+    "namespace" : 4,
+    "recurse" : 0}
+  ],
+  
+  "modifications":[
+    {
+      "pages":["^Help:"],
+      "substitutions":[
+        {
+          "pattern":"<[/]*translate>",
+          "repl":" "
+        },     
+        {
+          "pattern":"<languages[ ]*/>",
+          "repl":" "
+        },     
+        {
+          "pattern":"<!--T:[\\d]+-->",
+          "repl":" "
+        },     
+        {
+          "pattern":"{{ll\\|([^}|]+)(|[^}]*)}}",
+          "repl":"\"[[\".\\1.\"]]\""
+        },     
+        {
+          "pattern":"{{TNT\\|[^}]+}}",
+          "repl":" "
+        },     
+        {
+          "pattern":"<tvar\\|[^>]+>(Special:MyLanguage\\/|)([^>]+)</>",
+          "repl":"\\2"
+        },     
+        {
+          "pattern":"\\[\\[(C|c)ategory:[^]]+\\]\\]",
+          "repl":" "
+        },     
+        {
+          "pattern":"\n[ ]+",
+          "repl":"\n"
+        },     
+        {
+          "pattern":"\n+",
+          "repl":"\n"
+        }     
+      ]
+    },
+    {
+      "pages":["Template:Coord"],
+      "empty":true
+    },
+    {
+      "pages":["Template:Portail"],
+      "empty":true
+    },   
+    {
+      "pages":["Infobox_Logiciel"],
+      "empty":true
+    },       
+    {
+      "categories":[  
+        { 
+          "title" : "Projet_Wikipack_Africa_Contenu",
+          "namespace" : 4,
+          "recurse" : 0
+        }
+      ],
+      "substitutions":[
+        {
+          "pattern":"\\[\\[(Category|Catégorie):Projet( |_)Wikipack( |_)Africa( |_|)(Contenu|)\\]\\]",
+          "repl":" "
+        },
+        {
+          "pattern":"^<!--2BREINSERTED(.*)-->$",
+          "repl":"\\1"
+        }         
+      ]
+    }
+  ]  
+
+}
+
+

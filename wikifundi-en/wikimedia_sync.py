@@ -238,7 +238,7 @@ def getPagesTitleFromCategorie(site, categories):
   # retrieve all pages from categories
   for (cat,ns,r) in cats :
     pages.append(cat.title())
-    print ("Retrieve pages from " + cat.title())
+    print ("Retrieve pages from %s" % cat.title().encode('utf-8'))
     # add pages to sync of this categorie
     pages.extend(mapTitle(cat.articles( namespaces=ns, recurse=r )))
     
