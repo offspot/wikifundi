@@ -2,7 +2,7 @@
 
 # General
 $wgLanguageCode     = "fr";
-$wgSitename         = "Kiwix";
+$wgSitename         = "WikiFundi";
 
 # Site language 
 $wgLanguageCode = "fr";
