@@ -171,9 +171,11 @@ thumbmime = ['image/jpeg','image/png']
 
 def log(o) :
   sys.stdout.buffer.write((str(o)+"\n").encode("utf-8"))
+  sys.stdout.flush()
   
 def log_err(o) :
   sys.stderr.buffer.write((str(o)+"\n").encode("utf-8"))  
+  sys.stderr.flush()
 
 #####################################
 # Export/Import
@@ -221,7 +223,9 @@ def getTemplateTitlesFromPage(siteSrc, nbPages, iTitles) :
   if(nbTplt > 0):
     log ("%i/%i Process %s : %i templates found " % 
             (i+1,nbPages,title,nbTplt))
-    sys.stdout.flush()    
+  else:
+    log ("%i/%i Process %s :no templates found " % 
+            (i+1,nbPages,title))            
   return mapTitle(tplt)
   
 def getFilesFromPage(siteSrc, nbPages, iTitles) : 
@@ -233,7 +237,9 @@ def getFilesFromPage(siteSrc, nbPages, iTitles) :
   if(nbFiles > 0):
     log ("%i/%i Process %s : %i files found" % 
              (i+1,nbPages,title,nbFiles))
-    sys.stdout.flush()
+  else:
+    log ("%i/%i Process %s : no files found" % 
+             (i+1,nbPages,title))  
   return mapTitle(pages)  
   
 def getPagesTitleFromCategorie(site, categories):
@@ -261,7 +267,8 @@ def getPageSrcDstFromTitle(src, dst, pageTitle):
   ns = p.namespace()
   
   # specific case for "Project pages"
-  if(ns.id == 4):
+  # TODO : use an option ! 
+  if(ns.id == 4 or ns.id == 102):
     if(ns.subpages):
       subPage = pageTitle.split("/",1)
       if(len(subPage) > 1):
@@ -286,8 +293,7 @@ def emptyPage(src, dst, nbPages, iTitles)  :
     
     log ("%i/%i Empty of %s " % 
           (i+1,nbPages,title))
-    sys.stdout.flush()      
-      
+
     if(dst.editpage(p)):
       return 1
     
@@ -308,7 +314,6 @@ def subsOnPage(src, dst, subs, nbPages, iTitles)  :
       
     log ("%i/%i Modification of %s " % 
       (i+1,nbPages,title))
-    sys.stdout.flush()  
       
     if(dst.editpage(p)):
       return 1
@@ -333,7 +338,9 @@ def syncPage(src, dst, force, checkRedirect, nbPages, iTitles):
   try:      
     # if page exist on dest and no force -> do not sync this page
     # always copy page for "Project pages"
-    if((not force) and newPage.exists() and ns.id != 4):  
+    # TODO : use an option ! 
+    if((not force) and newPage.exists() and ns.id != 4 and ns.id != 102):  
+      log ("%i/%i %s already exist. Use -f to force)" % (i+1,nbPages,pageTitle))
       return 0
     
     #sync also the redirect target 
@@ -345,7 +352,7 @@ def syncPage(src, dst, force, checkRedirect, nbPages, iTitles):
     newPage.text = p.text 
     
     log ("%i/%i Copy %s" % (i+1,nbPages,pageTitle))
-    sys.stdout.flush()
+    
     # commit the new page on dest wiki
     if ( dst.editpage(newPage) ):
       return 1
@@ -388,13 +395,16 @@ def uploadFile(src, srcFileRepo, dst, maxwith, maxsize, nbFiles, iTitles ):
       log ("%i/%i Uploading file %s [%s] (%1.2f MB)" % 
         (i+1, nbFiles,  fileTitle, 
             url, size / 1024.0 / 1024.0))
-      sys.stdout.flush()
       
       # start upload !
       if(dst.upload( pageDst, source_url=url, 
                   comment="mirroring", text=f.text, 
                   ignore_warnings = True, report_success = False)):
         return 1
+    else:
+      log ("%i/%i file already uploaded or to large %s [%s] (%1.2f MB)" % 
+        (i+1, nbFiles,  fileTitle, 
+            url, size / 1024.0 / 1024.0))
                     
   except Exception as e:
     log_err ("Error on upload file %s (%s)" % 
@@ -715,7 +725,6 @@ def main():
       except json.decoder.JSONDecodeError as e:
         log_err ("Syntax error in mirroring file : %s" % e)  
      
-  sys.stdout.flush()
     
 if __name__ == "__main__":
   main()
