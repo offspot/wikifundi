@@ -18,12 +18,13 @@
                     }
                 ],
                 "env": {
-                    "MIRRORING_OPTIONS": "-fm -s 5000000 -w 1024"
+                    "MIRRORING" : "1",
+                    "MIRRORING_OPTIONS": "-s 5000000 -w 1024"
                 },                
                 "volumes": [
                     {
                         "container_path": "/var/www/data",
-                        "size": "8GB"
+                        "size": "16GB"
                     }
                 ]
             },
@@ -42,7 +43,8 @@
                     }
                 ],
                 "env": {
-                    "MIRRORING_OPTIONS": "-fm -s 5000000 -w 1024"
+                    "MIRRORING" : "1",
+                    "MIRRORING_OPTIONS": "-s 5000000 -w 1024"
                 },                
                 "volumes": [
                     {

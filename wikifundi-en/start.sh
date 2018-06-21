@@ -6,12 +6,6 @@ README_FILE=${DATA_DIR}/README
 
 cp README ${README_FILE} 
 
-if [ ! -e ${DATABASE_FILE} ]
-then 
-  # if new databse, always mirroring
-  export MIRRORING=1  
-fi
-
 mediawiki-init.sh
 
 ln -s ${DATA_DIR} data
@@ -29,7 +23,7 @@ then
   
   echo "Starting Mediawiki maintenance ..."
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
-  php maintenance/refreshLinks.php -e 1000 >> ${LOG_DIR}/mw_update.log 
+  php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
  
   #build tarbals
   #echo "Build tarbal"
