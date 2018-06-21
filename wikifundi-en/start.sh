@@ -23,7 +23,7 @@ then
   
   echo "Starting Mediawiki maintenance ..."
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
-  php deleteOldRevisions.php --delete
+  php maintenance/deleteOldRevisions.php --delete
   php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
 
   service memcached stop
