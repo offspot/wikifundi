@@ -22,9 +22,9 @@ then
   chown -R www-data:www-data ${DATA_DIR}
   
   echo "Starting Mediawiki maintenance ..."
-  maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
-  php maintenance/deleteOldRevisions.php --delete
-  php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
+  {maintenance/update.php --quick
+  php maintenance/deleteOldRevisions.php --delete 
+  php maintenance/refreshLinks.php } >> ${LOG_DIR}/mw_update.log 
 
   service memcached stop
   service php7.0-fpm stop
