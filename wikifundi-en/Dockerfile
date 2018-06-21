@@ -41,6 +41,8 @@ RUN { \
 COPY ./wikimedia_sync.py /usr/local/bin/wikimedia_sync
 RUN chmod a+x /usr/local/bin/wikimedia_sync
 
+COPY ./export_data.php ../
+
 #ENTRYPOINT /bin/bash
 
 # Run start script

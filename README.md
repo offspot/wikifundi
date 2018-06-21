@@ -44,11 +44,10 @@ docker build -t wikifundi_en .
 sudo docker run -p 8080:80 -v ${PWD}/data:/var/www/data -it wikifundi_en
 ```
   
-On start, if the database not exist, then it is initialized and the
-mirroring script is lauched. If the databse exist, you can force 
-mirroring by changing environments variables :
+On start, if the database not exist, then it is initialized. You can 
+lauch mirroring by changing environments variables :
 
- `sudo docker run -p 8080:80 -e MIRRORING=1 -v ${PWD}/data:/var/www/data -it wikifundi_en`
+`sudo docker run -p 8080:80 -e MIRRORING=1 -v ${PWD}/data:/var/www/data -it wikifundi_en`
  
 You can also change options script with MIRRORING_OPTIONS : 
 
@@ -74,9 +73,7 @@ Default admin logging :
 * User : Admin
 * Password : wikiadmin
  
-After mirroring, two tarballs are generated : one for data, log and config files and one for images (uploaded files). 
-To get this tarballs, go to [http://localhost:8080/data-mw_wikifundi_en.tgz](http://localhost:8080/data-mw_wikifundi_en.tgz)
-and [http://localhost:8080/images-mw_wikifundi_en.tar](http://localhost:8080/images-mw_wikifundi_en.tar)
+After mirroring, you can generate tarball by going [http://localhost:8080/export_data.php](http://localhost:8080/export_data.php)
 
 
 

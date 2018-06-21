@@ -23,14 +23,8 @@ then
   
   echo "Starting Mediawiki maintenance ..."
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
+  php deleteOldRevisions.php --delete
   php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
- 
-  #build tarbals
-  #echo "Build tarbal"
-  #cd ${DATA_DIR}
-  #tar -czvvf data-${DATABASE_NAME}.tgz ${DATABASE_NAME}.sqlite log config >> ${LOG_DIR}/mirroring.log 
-  #tar -cvvf images-${DATABASE_NAME}.tar images >> ${LOG_DIR}/mirroring.log 
-  #cd ../html
 
   service memcached stop
   service php7.0-fpm stop
