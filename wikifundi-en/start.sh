@@ -32,8 +32,8 @@ then
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
   echo "Delete old revisions ..."
   php maintenance/deleteOldRevisions.php --delete >> ${LOG_DIR}/mw_update.log 
-  echo "Refresh links ..."
-  php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
+  #echo "Refresh links ..."
+  #php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
 
   echo "Stop services"
   service memcached stop
