@@ -49,11 +49,14 @@ You can also change options script with MIRRORING_OPTIONS :
 * -a, --async : execute mirroring in async mode (5 threads / cpu). No works with SQLITE database. (default : false)
   
 Case usaging :
- ./wikimedia_sync.py -m 5MB -w 2000 config.json : sync page, templates, files and modify pages. Do not copy file > 5MB and Copy images (jpeg and png) in 2000px (if available).
- ./wikimedia_sync.py -tu config.json : sync and modify pages. Do not copy dependances (templates and files).
- ./wikimedia_sync.py -p config.json : just modify pages.
- ./wikimedia_sync.py -pm config.json : do anything.
- ./wikimedia_sync.py -af config.json : copy all pages and their dependencies in async mode.
+
+
+* ./wikimedia_sync.py -m 5MB -w 2000 config.json : sync page, templates, files and modify pages. Do not copy file > 5MB and Copy images (jpeg and png) in 2000px (if available).
+* ./wikimedia_sync.py -tu config.json : sync and modify pages. Do not copy dependances (templates and files).
+* ./wikimedia_sync.py -p config.json : just modify pages.
+* ./wikimedia_sync.py -pm config.json : do anything.
+* ./wikimedia_sync.py -af config.json : copy all pages and their dependencies in async mode.
+ 
  
 After mirroring, you can generate tarball by going [http://localhost:8080/export_data.php](http://localhost:8080/export_data.php)
 
