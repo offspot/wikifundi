@@ -17,12 +17,13 @@ then
   cp ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM} ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}.backup
   cp LocalSettings.mirroring.php ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}
   
-  chmod 666 ${DATABASE_FILE} && chown www-data:www-data ${DATABASE_FILE}  
-  
   echo "Start services"
   service nginx start
   service php7.0-fpm start
   service memcached start 
+  
+  echo "Start Mediawiki maintenance ..."
+  maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
 
   echo "Start mirroring ..."
   wikimedia_sync ${MIRRORING_OPTIONS} -e "${LOG_DIR}" mirroring.json | tee -a ${LOG_DIR}/mirroring.log 

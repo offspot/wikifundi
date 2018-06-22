@@ -710,7 +710,7 @@ def main():
     if opt in ("-m", "--no-modify"):  
       options["modifyPages"] = False 
     if opt in ("-r", "--resume"):  
-      options["resume"] = False            
+      options["resume"] = True            
     if opt in ("-e", "--export-dir"):  
       options["exportDir"] = arg
     if opt in ("-w", "--thumbwidth"):  
