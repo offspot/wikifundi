@@ -9,13 +9,16 @@ Here steps to install it with Docker or on a RaspberryPi.
 
 Using MediaWiki
 ---------------
-
-To build and run :
+Run for english version :
 
 ```
-mkdir -p data
-docker build -t wikifundi_en .
-docker run -p 8080:80 -v ${PWD}/data:/var/www/data -it wikifundi_en
+docker run -p 8080:80 -v ${PWD}/data-init:/var/www/data -it openzim/wikifundi-en
+```
+
+For french version :
+
+```
+docker run -p 8080:80 -v ${PWD}/data-init:/var/www/data -it openzim/wikifundi-fr
 ```
 
 Go to  [http://localhost:8080/](http://localhost:8080/)
@@ -28,36 +31,9 @@ Default admin logging :
 Mirroring with WikiFundi
 ------------------------
 
-The WikiFundi image extends the `openzim/mediawiki` Docker image to
-allow mirroring a existing wiki (by example Wikipedia) and
-use this wiki offline
+You can lauch mirroring by changing environments variables MIRRORING :
 
-The config files are located in `config` directory.
-
-This directory contain the configuration of :
-
-* `mirroring/mirroring.json` : 
-    Pages to copy from an other wiki and modifications after copy. 
-    To get file structure :
-      ```
-        export PYWIKIBOT2_DIR=config/pywikibot/`
-        ./wikimedia_sync.py --help
-      ```
-* `mediawiki/LocalSettings.custom.php` : 
-    You can customise the Mediawiki by editing your this file. 
-    If you want to know more, have a look to [documentation](https://www.mediawiki.org/wiki/Manual:LocalSettings.php)
-* `parsoid/config.yaml` :
-    Parsoid config file (allow to use VisualEdit)
-* `pywikibot/user-config.py` :
-    [Configure pywikibot library](https://www.mediawiki.org/wiki/Manual:Pywikibot/user-config.py) to use MediaWiki API (needed for mirroring)
-
-
-You can also customize your logo in `assets/images` as customize the `assets/docs/README` embeded with data 
-  
-On start, if the database not exist, then it is initialized. You can 
-lauch mirroring by changing environments variables MIRRORING :
-
-`docker run -p 8080:80 -e MIRRORING=1 -v ${PWD}/data:/var/www/data -it wikifundi_en`
+`docker run -p 8080:80 -e MIRRORING=1 -v ${PWD}/data:/var/www/data -it openzim/wikifundi-en`
  
 You can also change options script with MIRRORING_OPTIONS : 
 
@@ -81,5 +57,38 @@ Case usaging :
  
 After mirroring, you can generate tarball by going [http://localhost:8080/export_data.php](http://localhost:8080/export_data.php)
 
+Build your Docker image
+-----------------------
+The WikiFundi image extends the `openzim/mediawiki` Docker image to
+allow mirroring a existing wiki (by example Wikipedia) and
+use this wiki offline.
 
+The config files are located in `config` directory.
 
+This directory contain the configuration of :
+
+* `mirroring/mirroring.json` : 
+    Pages to copy from an other wiki and modifications after copy. 
+    To get file structure :
+      ```
+        export PYWIKIBOT2_DIR=config/pywikibot/`
+        ./wikimedia_sync.py --help
+      ```
+* `mediawiki/LocalSettings.custom.php` : 
+    You can customise the Mediawiki by editing your this file. 
+    If you want to know more, have a look to [documentation](https://www.mediawiki.org/wiki/Manual:LocalSettings.php)
+* `parsoid/config.yaml` :
+    Parsoid config file (allow to use VisualEdit)
+* `pywikibot/user-config.py` :
+    [Configure pywikibot library](https://www.mediawiki.org/wiki/Manual:Pywikibot/user-config.py) to use MediaWiki API (needed for mirroring)
+
+You can also customize your logo in `assets/images` as customize the `assets/docs/README` embeded with data 
+
+To build and run :
+
+```
+mkdir -p data
+docker build -t wikifundi_en .
+docker run -p 8080:80 -v ${PWD}/data:/var/www/data -it wikifundi_en
+```
+As french version, yon can extend openzim/wikifundi-en to create an image for other Wikipedia language or other wiki.
