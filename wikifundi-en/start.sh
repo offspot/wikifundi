@@ -32,6 +32,8 @@ then
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
   echo "Delete old revisions ..."
   php maintenance/deleteOldRevisions.php --delete >> ${LOG_DIR}/mw_update.log 
+  echo "Delete archive file" 
+  php maintenance/deleteArchivedFiles.php --delete >> ${LOG_DIR}/mw_update.log 
   #echo "Refresh links ..."
   #php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
 
@@ -40,7 +42,7 @@ then
   service php7.0-fpm stop
   service nginx stop
   
-  cp ${MEDIAWIKI_CONFIG_FILE_CUSTOM}.backup ${MEDIAWIKI_CONFIG_FILE_CUSTOM}
+  cp ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}.backup ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}
 fi
 
 if [ ${DEBUG}  ]
