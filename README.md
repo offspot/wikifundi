@@ -37,26 +37,24 @@ You can lauch mirroring by changing environments variables MIRRORING :
  
 You can also change options script with MIRRORING_OPTIONS : 
 
-* -f, --force : always copy  the content (even if page exist on site dest) (default : false)
-* -t, --no-sync-templates : do not copy templates used by the pages to sync. (default : false)
-* -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync (default : false)
-* -p, --no-sync : do not copy anything (default : false)
-* -m, --no-modify : do not modify pages (default : false)
-* -r, --resume : try to resume previous sync (default : false)
-* -e, --export-dir <directory> : write resume files in this directory (default : current directory)
-* -w, --thumbwidth :try to download thumbnail image with this width instead original image (default : 1024)
-* -s, --maxsize : do not files download greater to this limit (default : 100MB)
-* -a, --async : execute mirroring in async mode (5 threads / cpu). No works with SQLITE database. (default : false)
+* `-f, --force` : always copy  the content (even if page exist on site dest) (default : false)
+* `-t, --no-sync-templates` : do not copy templates used by the pages to sync. (default : false)
+* `-u, --no-upload-files` : do not copy files (images, css, js, sounds, ...) used by the pages to sync (default : false)
+* `-p, --no-sync` : do not copy anything (default : false)
+* `-m, --no-modify` : do not modify pages (default : false)
+* `-r, --resume` : try to resume previous sync (default : false)
+* `-e, --export-dir <directory>` : write resume files in this directory (default : current directory)
+* `-w, --thumbwidth` :try to download thumbnail image with this width instead original image (default : 1024)
+* `-s, --maxsize` : do not files download greater to this limit (default : 100MB)
+* `-a, --async` : execute mirroring in async mode (5 threads / cpu). No works with SQLITE database. (default : false)
   
 Case usaging :
 
-
-* ./wikimedia_sync.py -m 5MB -w 2000 config.json : sync page, templates, files and modify pages. Do not copy file > 5MB and Copy images (jpeg and png) in 2000px (if available).
-* ./wikimedia_sync.py -tu config.json : sync and modify pages. Do not copy dependances (templates and files).
-* ./wikimedia_sync.py -p config.json : just modify pages.
-* ./wikimedia_sync.py -pm config.json : do anything.
-* ./wikimedia_sync.py -af config.json : copy all pages and their dependencies in async mode.
- 
+* `MIRRORING_OPTIONS='-m 5MB -w 2000'` : sync page, templates, files and modify pages. Do not copy file > 5MB and Copy images (jpeg and png) in 2000px (if available).
+* `MIRRORING_OPTIONS='-tu'` : sync and modify pages. Do not copy dependances (templates and files).
+* `MIRRORING_OPTIONS='-p'` : just modify pages.
+* `MIRRORING_OPTIONS='-pm'` : do anything.
+* `MIRRORING_OPTIONS=-'af'` : copy all pages and their dependencies in async mode.
  
 After mirroring, you can generate tarball by going [http://localhost:8080/export_data.php](http://localhost:8080/export_data.php)
 
