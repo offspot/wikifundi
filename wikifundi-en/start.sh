@@ -3,6 +3,7 @@
 LOG_DIR=${DATA_DIR}/log
 DATABASE_FILE=${DATA_DIR}/${DATABASE_NAME}.sqlite
 README_FILE=${DATA_DIR}/README
+MEDIAWIKI_CONFIG_FILENAME_CUSTOM=./LocalSettings.custom.php
 
 cp README ${README_FILE} 
 
@@ -13,8 +14,8 @@ ln -s ${DATA_DIR} data
 if [ ${MIRRORING} ]
 then
   #use specific config to mirroring
-  cp ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ${MEDIAWIKI_CONFIG_FILE_CUSTOM}.backup
-  cp LocalSettings.mirroring.php ${MEDIAWIKI_CONFIG_FILE_CUSTOM}
+  cp ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM} ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}.backup
+  cp LocalSettings.mirroring.php ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}
   
   echo "Start services"
   service nginx start

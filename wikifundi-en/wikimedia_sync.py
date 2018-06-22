@@ -202,7 +202,7 @@ def importPagesTitle(fileName, directory):
       'r', encoding='utf-8') as f:
         return json.load(f)
   except FileNotFoundError:
-      log_err ("No precedent list of %s is found" % fileName)
+      log_err ("No previous list of %s is found" % fileName)
   return []   
   
 
@@ -531,10 +531,10 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
   # export titles of collected pages to sync
   exportPagesTitle(pages,"pages",exportDir)
     
-  # try to restore precedent state
+  # try to restore previous state
   templates = importPagesTitle("templates",exportDir)
   if(options['templatesSync']):
-    if(option['resume'] and len(templates) > 0):
+    if(options['resume'] and len(templates) > 0):
       # the imported file contains all templates to sync
       options['templatesDepSync'] = False
     else:
@@ -543,10 +543,10 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
       exportPagesTitle(templates,"templates",exportDir)
     log ("%i templates to sync" % len(templates))
     
-  # try to restore precedent state
+  # try to restore previous state
   files = importPagesTitle("files",exportDir)
   if(options['filesUpload']) :
-    if((not option['resume']) or (len(files) == 0)):
+    if((not options['resume']) or (len(files) == 0)):
       #collect files used by pages
       files = getFilesFromPages(siteSrc, pages)
       exportPagesTitle(files,"files",exportDir)

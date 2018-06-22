@@ -75,8 +75,7 @@
   ],
   
   "categories":[
-    { "title" : "Projet_WikiFundi_Contenu"},
-    { "title" : "Article_de_qualité"}
+    { "title" : "Projet_WikiFundi_Contenu"}
   ],
   
   "modifications":[
@@ -121,18 +120,6 @@
         }     
       ]
     },
-    {
-      "pages":["Template:Coord"],
-      "empty":true
-    },
-    {
-      "pages":["Template:Portail"],
-      "empty":true
-    },   
-    {
-      "pages":["Infobox_Logiciel"],
-      "empty":true
-    },       
     {
       "categories":[{ "title" : "Projet_WikiFundi_Contenu"}],
       "substitutions":[
