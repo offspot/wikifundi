@@ -12,25 +12,31 @@ ln -s ${DATA_DIR} data
 
 if [ ${MIRRORING} ]
 then
+  #use specific config to mirroring
+  cp ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ${MEDIAWIKI_CONFIG_FILE_CUSTOM}.backup
+  cp LocalSettings.mirroring.php ${MEDIAWIKI_CONFIG_FILE_CUSTOM}
+  
+  echo "Start services"
   service nginx start
   service php7.0-fpm start
   service memcached start 
 
-  echo "Starting mirroring ..."
+  echo "Start mirroring ..."
   wikimedia_sync ${MIRRORING_OPTIONS} -e "${LOG_DIR}" mirroring.json | tee -a ${LOG_DIR}/mirroring.log 
-
-  chown -R www-data:www-data ${DATA_DIR}
   
-  echo "Starting Mediawiki maintenance ..."
+  echo "Start Mediawiki maintenance ..."
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
-  echo "Deleting revisions ..."
+  echo "Delete old revisions ..."
   php maintenance/deleteOldRevisions.php --delete >> ${LOG_DIR}/mw_update.log 
   echo "Refresh links ..."
   php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
 
+  echo "Stop services"
   service memcached stop
   service php7.0-fpm stop
   service nginx stop
+  
+  cp ${MEDIAWIKI_CONFIG_FILE_CUSTOM}.backup ${MEDIAWIKI_CONFIG_FILE_CUSTOM}
 fi
 
 if [ ${DEBUG}  ]
