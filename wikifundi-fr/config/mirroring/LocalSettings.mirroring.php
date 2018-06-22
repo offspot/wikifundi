@@ -1,5 +1,8 @@
 <?php
 
+$wgShowExceptionDetails = true;
+$wgShowDBErrorBacktrace = true;
+
 # General
 $wgLanguageCode     = "fr";
 $wgSitename         = "WikiFundi";

@@ -17,6 +17,8 @@ then
   cp ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM} ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}.backup
   cp LocalSettings.mirroring.php ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}
   
+  chmod 666 ${DATABASE_FILE} && chown www-data:www-data ${DATABASE_FILE}  
+  
   echo "Start services"
   service nginx start
   service php7.0-fpm start
