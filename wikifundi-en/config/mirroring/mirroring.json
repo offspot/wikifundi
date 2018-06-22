@@ -149,14 +149,14 @@
     {
       "categories":[  
         { 
-          "title" : "WikiProject_Wikipack_Africa_Content",
+          "title" : "WikiProject_WikiFundi_Content",
           "namespace" : 4,
           "recurse" : 0
         }
       ],
       "substitutions":[
         {
-          "pattern":"\\[\\[Category:WikiProject( |_)Wikipack( |_)Africa( |_)Content\\]\\]",
+          "pattern":"\\[\\[Category:WikiProject( |_)WikiFundi( |_)Content\\]\\]",
           "repl":" "
         },
         {

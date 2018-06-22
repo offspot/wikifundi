@@ -134,10 +134,10 @@
       "empty":true
     },       
     {
-      "categories":[{ "title" : "Projet_Wikipack_Africa_Contenu"}],
+      "categories":[{ "title" : "Projet_WikiFundi_Contenu"}],
       "substitutions":[
         {
-          "pattern":"\\[\\[(Category|Catégorie):Projet( |_)Wikipack( |_)Africa( |_|)(Contenu|)\\]\\]",
+          "pattern":"\\[\\[(Category|Catégorie):Projet( |_)WikiFundi( |_|)(Contenu|)\\]\\]",
           "repl":" "
         },
         {
