@@ -16,17 +16,24 @@
  usage : ./wikimedia_sync.py [options] config_file1.json, config_file2.json, ...
  
  options :
-  -f, --force : always copy  the content (even if page exist on site dest) (default : false).
-  -t, --no-sync-templates : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates (default : false).
-  -d, --no-sync-dependances-templates : do not copy templates used by templates (default : false).
-  -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync (default : false).
-  -p, --no-sync : do not copy anything. If not -m, just modify (default : false).
-  -m, --no-modify : do not modify pages (default : false).
-  -e, --export-dir <directory> : write json export files in this directory
-  -w, --thumbwidth :try to download thumbnail image with this width instead original image (default : 2000)
+  -f, --force : always copy  the content (even if page exist on site dest) (default : false)
+  -t, --no-sync-templates : do not copy templates used by the pages to sync. (default : false)
+  -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync (default : false)
+  -p, --no-sync : do not copy anything (default : false)
+  -m, --no-modify : do not modify pages (default : false)
+  -r, --resume : try to resume previous sync (default : false)
+  -e, --export-dir <directory> : write resume files in this directory (default : current directory)
+  -w, --thumbwidth :try to download thumbnail image with this width instead original image (default : 1024)
   -s, --maxsize : do not files download greater to this limit (default : 100MB)
   -a, --async : execute mirroring in async mode (5 threads / cpu). No works with SQLITE database. (default : false)
   
+ exemples :
+ ./wikimedia_sync.py -m 5MB -w 2000 config.json : sync page, templates, files and modify pages. Do not copy file > 5MB and Copy images (jpeg and png) in 2000px (if available).
+ ./wikimedia_sync.py -tu config.json : sync and modify pages. Do not copy dependances (templates and files).
+ ./wikimedia_sync.py -p config.json : just modify pages.
+ ./wikimedia_sync.py -pm config.json : do anything.
+ ./wikimedia_sync.py -af config.json : copy all pages and their dependencies in async mode.
+ 
  json file config :
    
    {
@@ -130,6 +137,9 @@
  IMPORTANT : We must have user-password.py and user-config.py in same 
  directory of this script or set PYWIKIBOT2_DIR to congigure pywikibot. 
  See : https://www.mediawiki.org/wiki/Manual:Pywikibot/user-config.py
+ 
+ author : Florent Kaisser <florent@kaisser.name>
+ maintainer : Kiwix 
 """
 
 # To use WikiMedia API
@@ -157,7 +167,8 @@ DEFAULT_OPTIONS = dict(
     filesUpload = True,
     modifyPages = True,
     exportDir = "." ,
-    thumbWidth = 2000  ,
+    resume = False,
+    thumbWidth = 1024  ,
     maxSize = 100*1024*1024*1024, 
     async = False
 )
@@ -340,7 +351,7 @@ def syncPage(src, dst, force, checkRedirect, nbPages, iTitles):
     # always copy page for "Project pages"
     # TODO : use an option ! 
     if((not force) and newPage.exists() and ns.id != 4 and ns.id != 102):  
-      log ("%i/%i %s already exist. Use -f to force)" % (i+1,nbPages,pageTitle))
+      log ("%i/%i %s already exist. Use -f to force" % (i+1,nbPages,pageTitle))
       return 0
     
     #sync also the redirect target 
@@ -523,7 +534,7 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
   # try to restore precedent state
   templates = importPagesTitle("templates",exportDir)
   if(options['templatesSync']):
-    if(len(templates) > 0 and not force):
+    if(option['resume'] and len(templates) > 0):
       # the imported file contains all templates to sync
       options['templatesDepSync'] = False
     else:
@@ -535,7 +546,7 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
   # try to restore precedent state
   files = importPagesTitle("files",exportDir)
   if(options['filesUpload']) :
-    if(len(files) == 0 or force):
+    if((not option['resume']) or (len(files) == 0)):
       #collect files used by pages
       files = getFilesFromPages(siteSrc, pages)
       exportPagesTitle(files,"files",exportDir)
@@ -659,7 +670,7 @@ def main():
   
   try:
     opts, args = getopt.getopt(sys.argv[1:], 
-      "hftdupme:w:s:a", 
+      "hftdupmre:w:s:a", 
       [ "help",
         "force",
         "no-sync-templates",
@@ -667,6 +678,7 @@ def main():
         "no-upload-files",
         "no-sync",
         "no-modify",
+        "resume",
         "export-dir",
         "thumbwidth",
         "maxsize",
@@ -688,6 +700,7 @@ def main():
       options["force"] = True
     if opt in ("-t", "--no-sync-templates"):
       options["templatesSync"] = False
+      options["templatesDepSync"] = False
     if opt in ("-d", "--no-sync-dependances-templates"):
       options["templatesDepSync"] = False
     if opt in ("-u", "--no-upload-files"):  
@@ -695,7 +708,9 @@ def main():
     if opt in ("-p", "--no-sync"):  
       options["pagesSync"] = False
     if opt in ("-m", "--no-modify"):  
-      options["modifyPages"] = False      
+      options["modifyPages"] = False 
+    if opt in ("-r", "--resume"):  
+      options["resume"] = False            
     if opt in ("-e", "--export-dir"):  
       options["exportDir"] = arg
     if opt in ("-w", "--thumbwidth"):  
@@ -703,11 +718,9 @@ def main():
     if opt in ("-s", "--maxsize"):  
       options["maxSize"] = int(arg)   
     if opt in ("-a", "--async"):  
-      options["async"] = True                
+      options["async"] = True           
             
   # check coherence, fix if needed
-  if(options["templatesDepSync"] and not options["templatesSync"]):
-      options["templatesSync"] = True
   if(not options["pagesSync"]):
       options["templatesSync"] = False
       options["templatesDepSync"] = False

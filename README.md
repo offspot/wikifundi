@@ -7,6 +7,24 @@ you do not have access to Internet!
 
 Here steps to install it with Docker or on a RaspberryPi.
 
+Using MediaWiki
+---------------
+
+To build and run :
+
+```
+mkdir -p data
+docker build -t wikifundi_en .
+docker run -p 8080:80 -v ${PWD}/data:/var/www/data -it wikifundi_en
+```
+
+Go to  [http://localhost:8080/](http://localhost:8080/)
+
+Default admin logging :
+
+* User : Admin
+* Password : wikiadmin
+
 Mirroring with WikiFundi
 ------------------------
 
@@ -35,43 +53,31 @@ This directory contain the configuration of :
 
 
 You can also customize your logo in `assets/images` as customize the `assets/docs/README` embeded with data 
-
-To build and run :
-
-```
-mkdir -p data
-docker build -t wikifundi_en .
-sudo docker run -p 8080:80 -v ${PWD}/data:/var/www/data -it wikifundi_en
-```
   
 On start, if the database not exist, then it is initialized. You can 
-lauch mirroring by changing environments variables :
+lauch mirroring by changing environments variables MIRRORING :
 
-`sudo docker run -p 8080:80 -e MIRRORING=1 -v ${PWD}/data:/var/www/data -it wikifundi_en`
+`docker run -p 8080:80 -e MIRRORING=1 -v ${PWD}/data:/var/www/data -it wikifundi_en`
  
 You can also change options script with MIRRORING_OPTIONS : 
 
-* -f, --force : always copy  the content (even if page exist on site dest) (default : false).
-* -t, --no-sync-templates : do not copy templates used by the pages to sync. Involve no-sync-dependances-templates (default : false).
-* -d, --no-sync-dependances-templates : do not copy templates used by templates (default : false).
-* -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync (default : false).
-* -p, --no-sync : do not copy anything. If not -m, just modify (default : false).
-* -m, --no-modify : do not modify pages (default : false).
-* -e, --export-dir <directory> : write json export files in this directory
-* -w, --thumbwidth :try to download thumbnail image with this width instead original image (default : 2000)
+* -f, --force : always copy  the content (even if page exist on site dest) (default : false)
+* -t, --no-sync-templates : do not copy templates used by the pages to sync. (default : false)
+* -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync (default : false)
+* -p, --no-sync : do not copy anything (default : false)
+* -m, --no-modify : do not modify pages (default : false)
+* -r, --resume : try to resume previous sync (default : false)
+* -e, --export-dir <directory> : write resume files in this directory (default : current directory)
+* -w, --thumbwidth :try to download thumbnail image with this width instead original image (default : 1024)
 * -s, --maxsize : do not files download greater to this limit (default : 100MB)
 * -a, --async : execute mirroring in async mode (5 threads / cpu). No works with SQLITE database. (default : false)
-
-To Mirroring without templates dependences  :
-
- `sudo docker run -p 8080:80 -e MIRRORING=1 -e MIRRORING_OPTIONS="-d" -v ${PWD}/data:/var/www/data -it wikifundi_en`
- 
-Go to  [http://localhost:8080/](http://localhost:8080/)
-
-Default admin logging :
-
-* User : Admin
-* Password : wikiadmin
+  
+Case usaging :
+ ./wikimedia_sync.py -m 5MB -w 2000 config.json : sync page, templates, files and modify pages. Do not copy file > 5MB and Copy images (jpeg and png) in 2000px (if available).
+ ./wikimedia_sync.py -tu config.json : sync and modify pages. Do not copy dependances (templates and files).
+ ./wikimedia_sync.py -p config.json : just modify pages.
+ ./wikimedia_sync.py -pm config.json : do anything.
+ ./wikimedia_sync.py -af config.json : copy all pages and their dependencies in async mode.
  
 After mirroring, you can generate tarball by going [http://localhost:8080/export_data.php](http://localhost:8080/export_data.php)
 
