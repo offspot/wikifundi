@@ -5,10 +5,8 @@ WikiFundi is a solution which provide a pre-configured Mediawiki in a
 similar way like Wikipedia. Probably the easiest way to train users if
 you do not have access to Internet!
 
-Here steps to install it with Docker or on a RaspberryPi.
-
-Using MediaWiki
----------------
+Install empty MediaWiki 
+-----------------------
 Run for english version :
 
 ```
@@ -56,7 +54,7 @@ Case usaging :
 * `MIRRORING_OPTIONS='-pm'` : do anything.
 * `MIRRORING_OPTIONS=-'af'` : copy all pages and their dependencies in async mode.
  
-After mirroring, you can generate tarball by going [http://localhost:8080/export_data.php](http://localhost:8080/export_data.php)
+After mirroring, you can generate tarball by going [http://localhost:8080/export_data.php](http://localhost:8080/export_data.php). A README file is in this tarball to explain an installation without Docker.
 
 Build your Docker image
 -----------------------
