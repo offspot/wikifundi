@@ -11,6 +11,11 @@ mediawiki-init.sh
 
 ln -s ${DATA_DIR} data
 
+if [ ${PURGE_THUMBS} ]
+then
+  rm -rvf ${DATA_DIR}/images/thumb/*
+fi
+
 if [ ${MIRRORING} ]
 then
   #use specific config to mirroring
