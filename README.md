@@ -10,16 +10,16 @@ Install empty MediaWiki
 Run for english version :
 
 ```
-docker run -p 8080:80 -v ${PWD}/data-init:/var/www/data -it openzim/wikifundi-en
+docker run -p 80:80 -v ${PWD}/data-init:/var/www/data -it openzim/wikifundi-en
 ```
 
 For french version :
 
 ```
-docker run -p 8080:80 -v ${PWD}/data-init:/var/www/data -it openzim/wikifundi-fr
+docker run -p 80:80 -v ${PWD}/data-init:/var/www/data -it openzim/wikifundi-fr
 ```
 
-Go to  [http://localhost:8080/](http://localhost:8080/)
+Go to  [http://localhost/](http://localhost/)
 
 Default admin logging :
 
@@ -31,7 +31,7 @@ Mirroring with WikiFundi
 
 You can lauch mirroring by changing environments variables MIRRORING :
 
-`docker run -p 8080:80 -e MIRRORING=1 -v ${PWD}/data:/var/www/data -it openzim/wikifundi-en`
+`docker run -p 80:80 -e MIRRORING=1 -v ${PWD}/data:/var/www/data -it openzim/wikifundi-en`
  
 You can also change options script with MIRRORING_OPTIONS : 
 
@@ -54,7 +54,7 @@ Case usaging :
 * `MIRRORING_OPTIONS='-pm'` : do anything.
 * `MIRRORING_OPTIONS=-'af'` : copy all pages and their dependencies in async mode.
  
-After mirroring, you can generate tarball by going [http://localhost:8080/export_data.php](http://localhost:8080/export_data.php). A README file is in this tarball to explain an installation without Docker.
+After mirroring, you can generate tarball by going [http://localhost/export_data.php](http://localhost/export_data.php). A README file is in this tarball to explain an installation without Docker.
 
 Build your Docker image
 -----------------------
@@ -86,8 +86,7 @@ You can also customize your logo in `assets/images` as customize the `assets/doc
 To build and run :
 
 ```
-mkdir -p data
-docker build -t wikifundi_en .
-docker run -p 8080:80 -v ${PWD}/data:/var/www/data -it wikifundi_en
+docker build -t wikifundi_en wikifundi_en 
+docker run -p 80:80 -v ${PWD}/data:/var/www/data -it wikifundi_en
 ```
 As french version, yon can extend openzim/wikifundi-en to create an image for other Wikipedia language or other wiki.
