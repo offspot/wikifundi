@@ -22,30 +22,32 @@ then
   cp ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM} ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}.backup
   cp LocalSettings.mirroring.php ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}
   
-  echo "Start services"
+  echo "Start services ..."
   service nginx start
   service php7.0-fpm start
   service memcached start 
 
   #Allow to write on database
-  chmod 644 ${DATABASE_FILE} && chown www-data:www-data ${DATABASE_FILE}
-
+  chmod 644 ${DATABASE_FILE}  
+  
   echo "Start Mediawiki maintenance ..."
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
 
   echo "Start mirroring ..."
   wikimedia_sync ${MIRRORING_OPTIONS} -e "${LOG_DIR}" mirroring.json | tee -a ${LOG_DIR}/mirroring.log 
-  
+
   echo "Start Mediawiki maintenance ..."
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
   echo "Delete old revisions ..."
   php maintenance/deleteOldRevisions.php --delete >> ${LOG_DIR}/mw_update.log 
-  echo "Delete archive file" 
+  echo "Delete archive file ..." 
   php maintenance/deleteArchivedFiles.php --delete >> ${LOG_DIR}/mw_update.log 
   #echo "Refresh links ..."
   #php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
+  #To write in image dir
+  chown -R www-data:www-data ${DATA_DIR}
 
-  echo "Stop services"
+  echo "Stop services ..."
   service memcached stop
   service php7.0-fpm stop
   service nginx stop
