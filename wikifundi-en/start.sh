@@ -21,7 +21,10 @@ then
   service nginx start
   service php7.0-fpm start
   service memcached start 
-  
+
+  #Allow to write on database
+  chmod 644 ${DATABASE_FILE} && chown www-data:www-data ${DATABASE_FILE}
+
   echo "Start Mediawiki maintenance ..."
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
 
