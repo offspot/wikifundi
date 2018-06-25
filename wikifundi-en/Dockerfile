@@ -24,6 +24,7 @@ COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./LocalSettings.custom.php
 COPY ${MEDIAWIKI_LOGO_FILE} ../
 COPY ${README_FILE} ./ 
 COPY ./config/mirroring/LocalSettings.mirroring.php ./
+COPY ./config/mediawiki/LocalSettings.debug.php ./
 
 # Configure Parsoid with specific domain
 COPY ${PARSOID_CONFIG_FILE} ./parsoid/

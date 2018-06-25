@@ -3,7 +3,7 @@
 LOG_DIR=${DATA_DIR}/log
 DATABASE_FILE=${DATA_DIR}/${DATABASE_NAME}.sqlite
 README_FILE=${DATA_DIR}/README
-MEDIAWIKI_CONFIG_FILENAME_CUSTOM=./LocalSettings.custom.php
+CFG_DIR=${DATA_DIR}/config
 
 cp README ${README_FILE} 
 
@@ -19,9 +19,8 @@ fi
 if [ ${MIRRORING} ]
 then
   #use specific config to mirroring
-  cp ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM} ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}.backup
-  cp LocalSettings.mirroring.php ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}
-  
+  ln -fs ./LocalSettings.mirroring.php ./LocalSettings.custom.php
+
   echo "Start services ..."
   service nginx start
   service php7.0-fpm start
@@ -51,14 +50,19 @@ then
   service memcached stop
   service php7.0-fpm stop
   service nginx stop
-  
-  cp ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}.backup ${MEDIAWIKI_CONFIG_FILENAME_CUSTOM}
+ 
+  #use config in volume 
+  ln -fs ${CFG_DIR}/LocalSettings.custom.php ./LocalSettings.custom.php
 fi
 
 if [ ${DEBUG}  ]
 then
-  /bin/bash
-else
-  start-services.sh
+  ln -fs ./LocalSettings.debug.php ./LocalSettings.custom.php
 fi
 
+start-services.sh
+
+if [ ${BASH}  ]
+then
+  /bin/bash
+fi

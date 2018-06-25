@@ -1,17 +1,31 @@
 <?php
-
+  $excludeArgs = "--exclude=data/log* --exclude=data/images/thumb*";
+  $workingDir = "/var/www/";
+  $exportDir = "data";
   $wgSitename = "mywiki";
   $wgLanguageCode = "all";
 
   include 'w/LocalSettings.custom.php';
   
-  $filename=strtolower($wgSitename."-".$wgLanguageCode."_".date('Y-m-d').".tar.bz2");
+  $filename=strtolower($wgSitename."-".$wgLanguageCode."_".date('Y-m-d'));
 
-  header("Content-Type: application/x-bzip2");
-  header("Content-Disposition: attachment; filename=\"".$filename."\"");
-
-  passthru("tar -C /var/www/ -cj --exclude=data/log* data",$err);
+  if (isset($_GET["format"]) && $_GET["format"] == "tar")
+  {
+    $type="x-tar";
+    $ext="tar";
+    $cmd="tar -C ".$workingDir." -c ".$excludeArgs." ".$exportDir;
+  }else{
+    $type="x-bzip2";
+    $ext="tar.bz2";
+    $cmd="tar -C ".$workingDir." -cj ".$excludeArgs." ".$exportDir;
+  }
   
+  $headerContentType = "Content-Type: application/".$type;
+  $headerContentDisposition = "Content-Disposition: attachment; filename=\"".$filename.".".$ext."\"";
+
+  header($headerContentType);
+  header($headerContentDisposition);
+  passthru($cmd,$err);
 
   exit();
   
