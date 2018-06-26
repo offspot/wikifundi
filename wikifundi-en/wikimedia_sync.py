@@ -24,7 +24,7 @@
   -r, --resume : try to resume previous sync (default : false)
   -e, --export-dir <directory> : write resume files in this directory (default : current directory)
   -w, --thumbwidth :try to download thumbnail image with this width instead original image (default : 1024)
-  -s, --maxsize : do not files download greater to this limit (default : 100MB)
+  -s, --maxsize : do not files download greater to this limit (default : 400MB)
   -a, --async : execute mirroring in async mode (5 threads / cpu). No works with SQLITE database. (default : false)
   
  exemples :
@@ -169,7 +169,7 @@ DEFAULT_OPTIONS = dict(
     exportDir = "." ,
     resume = False,
     thumbWidth = 1024  ,
-    maxSize = 100*1024*1024*1024, 
+    maxSize = 400*1024*1024*1024, 
     async = False
 )
 
