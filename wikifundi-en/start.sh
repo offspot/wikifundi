@@ -10,8 +10,8 @@ function clean {
   php maintenance/deleteOldRevisions.php --delete  
   echo "Delete archive file ..." 
   php maintenance/deleteArchivedFiles.php --delete  
-  echo "Delete Thumbs ..."
-  rm -rvf ${DATA_DIR}/images/thumb/* ${DATA_DIR}/images/thumb/*
+  echo "Delete thumb, temp and archive ..."
+  rm -rvf ${DATA_DIR}/images/thumb/* ${DATA_DIR}/images/temp/* ${DATA_DIR}/images/archive/*
 }
 
 cp README ${README_FILE} 
