@@ -18,6 +18,8 @@
                     }
                 ],
                 "env": {   
+                    "MIRRORING":"1",
+                    "MIRRORING_OPTIONS":"-ftm"
                 },                
                 "volumes": [
                     {
@@ -41,6 +43,8 @@
                     }
                 ],
                 "env": {
+                    "MIRRORING":"1",
+                    "MIRRORING_OPTIONS":"-ftm"
                 },                
                 "volumes": [
                     {

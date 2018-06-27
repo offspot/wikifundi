@@ -5,15 +5,24 @@ DATABASE_FILE=${DATA_DIR}/${DATABASE_NAME}.sqlite
 README_FILE=${DATA_DIR}/README
 CFG_DIR=${DATA_DIR}/config
 
+function clean {
+  echo "Delete old revisions ..."
+  php maintenance/deleteOldRevisions.php --delete  
+  echo "Delete archive file ..." 
+  php maintenance/deleteArchivedFiles.php --delete  
+  echo "Delete Thumbs ..."
+  rm -rvf ${DATA_DIR}/images/thumb/* ${DATA_DIR}/images/thumb/*
+}
+
 cp README ${README_FILE} 
 
 mediawiki-init.sh
 
 ln -s ${DATA_DIR} data
 
-if [ ${PURGE_THUMBS} ]
+if [ ${CLEAN} ]
 then
-  rm -rvf ${DATA_DIR}/images/thumb/*
+  clean
 fi
 
 if [ ${MIRRORING} ]
@@ -22,9 +31,7 @@ then
   ln -fs ./LocalSettings.mirroring.php ./LocalSettings.custom.php
 
   echo "Start services ..."
-  service nginx start
-  service php7.0-fpm start
-  service memcached start 
+  start-services.sh  
 
   #Allow to write on database
   chmod 644 ${DATABASE_FILE}  
@@ -37,20 +44,12 @@ then
 
   echo "Start Mediawiki maintenance ..."
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
-  echo "Delete old revisions ..."
-  php maintenance/deleteOldRevisions.php --delete >> ${LOG_DIR}/mw_update.log 
-  echo "Delete archive file ..." 
-  php maintenance/deleteArchivedFiles.php --delete >> ${LOG_DIR}/mw_update.log 
+  clean
   #echo "Refresh links ..."
   #php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
   #To write in image dir
   chown -R www-data:www-data ${DATA_DIR}
 
-  echo "Stop services ..."
-  service memcached stop
-  service php7.0-fpm stop
-  service nginx stop
- 
   #use config in volume 
   ln -fs ${CFG_DIR}/LocalSettings.custom.php ./LocalSettings.custom.php
 fi
