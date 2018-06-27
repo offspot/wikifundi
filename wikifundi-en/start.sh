@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 LOG_DIR=${DATA_DIR}/log
 DATABASE_FILE=${DATA_DIR}/${DATABASE_NAME}.sqlite
