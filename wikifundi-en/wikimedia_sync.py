@@ -157,8 +157,9 @@ import re
 from functools import partial
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import cpu_count
-MAX_WORKERS = cpu_count() * 5
 
+MAX_WORKERS = cpu_count() * 5
+LIMIT_DEPTH_SUBCAT = 5
 DEFAULT_OPTIONS = dict(
     force = False, 
     pagesSync = True,    
@@ -253,19 +254,30 @@ def getFilesFromPage(siteSrc, nbPages, iTitles) :
              (i+1,nbPages,title))  
   return mapTitle(pages)  
   
-def getPagesTitleFromCategorie(site, categories):
+def getPagesTitleFromCategorie(catTitle,ns,r):
+  
+  return 
+  
+def getPagesTitleFromCategories(site, categories, depth = 0):
   pages = []
-  cats = [(Category(
-              site,
-              c['title']),
-              c['namespace'] if ("namespace" in c) else None,
-              c['recurse'] if ("recurse" in c) else 0,
-          ) for c in categories ]
   # retrieve all pages from categories
-  for (cat,ns,r) in cats :
-    pages.append(cat.title())
-    log ("Retrieve pages from %s" % cat.title())
+  for c in categories :
+    catTitle = c['title']
+    cat = Category(site,catTitle)
+  
+    # to get content of category page
+    pages.append(catTitle)
+    
+    # explore sub-categories
+    if (depth < LIMIT_DEPTH_SUBCAT):
+      subcats = [ {'title':subcat.title()} for subcat in cat.subcategories()]
+      pages.extend(getPagesTitleFromCategories(site,subcats,depth+1))
+      
+    
     # add pages to sync of this categorie
+    ns = c['namespace'] if ("namespace" in c) else None
+    r = c['recurse'] if ("recurse" in c) else 0
+    log ("Retrieve pages from %s" % catTitle)
     pages.extend(mapTitle(cat.articles( namespaces=ns, recurse=r )))
     
   return pages  
@@ -348,9 +360,7 @@ def syncPage(src, dst, force, checkRedirect, nbPages, iTitles):
      
   try:      
     # if page exist on dest and no force -> do not sync this page
-    # always copy page for "Project pages"
-    # TODO : use an option ! 
-    if((not force) and newPage.exists() and ns.id != 4 and ns.id != 102):  
+    if((not force) and newPage.exists()):  
       log ("%i/%i %s already exist. Use -f to force" % (i+1,nbPages,pageTitle))
       return 0
     
@@ -490,7 +500,7 @@ def modifyPages(siteSrc, siteDst,
                ))
     
     if('categories' in mod):
-        pageMods.extend (getPagesTitleFromCategorie(siteSrc, 
+        pageMods.extend (getPagesTitleFromCategories(siteSrc, 
                           mod['categories']))
     
     if('namespaces' in mod):
@@ -622,13 +632,14 @@ def mirroringAndModifyPages(
   
   # get pages in categories
   if( categories ):
-    pages.extend(getPagesTitleFromCategorie(siteSrc, categories))
+    pages.extend(getPagesTitleFromCategories(siteSrc, categories))
 
     
   if( options["pagesSync"] ):
     # copy all pages !
+    # use list(set()) to remove replicate
     (nbPagesSync,nbPagesUpload) = mirroringPagesWithDependances(
-                                    siteSrc, siteDst, pages, options)    
+                                    siteSrc, siteDst, list(set(pages)), options)    
 
   if( modifications and options["modifyPages"] ):
     nbMods =  modifyPages(siteSrc, siteDst, pages, modifications)        
