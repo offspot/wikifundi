@@ -7,6 +7,9 @@ ENV PYWIKIBOT2_DIR /usr/local/etc
 
 # Custom image
 ENV MEDIAWIKI_LOGO_FILE ./assets/images/logo.png
+ENV MEDIAWIKI_LICENCE ./assets/images/A_WikiAfrica_project.png
+ENV MEDIAWIKI_CONF_MIRRORING ./config/mediawiki/LocalSettings.mirroring.php 
+ENV MEDIAWIKI_CONF_DEBUG ./config/mediawiki/LocalSettings.debug.php
 
 ENV DATABASE_NAME mw_wikifundi_en
 
@@ -22,9 +25,10 @@ COPY ${PYWIKIBOT_CONFIG_FILE} ${PYWIKIBOT2_DIR}/
 # Configure MediaWiki
 COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./LocalSettings.custom.php
 COPY ${MEDIAWIKI_LOGO_FILE} ../
+COPY ${MEDIAWIKI_LICENCE} ../
+COPY ${MEDIAWIKI_CONF_MIRRORING} ./
+COPY ${MEDIAWIKI_CONF_DEBUG} ./
 COPY ${README_FILE} ./ 
-COPY ./config/mirroring/LocalSettings.mirroring.php ./
-COPY ./config/mediawiki/LocalSettings.debug.php ./
 
 # Configure Parsoid with specific domain
 COPY ${PARSOID_CONFIG_FILE} ./parsoid/

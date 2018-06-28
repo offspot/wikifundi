@@ -12,6 +12,7 @@ function clean {
   php maintenance/deleteArchivedFiles.php --delete  
   echo "Delete thumb, temp and archive ..."
   rm -rvf ${DATA_DIR}/images/thumb/* ${DATA_DIR}/images/temp/* ${DATA_DIR}/images/archive/*
+  cp -f ./LocalSettings.custom.origin.php ${CFG_DIR}/LocalSettings.custom.php
 }
 
 cp README ${README_FILE} 
@@ -27,9 +28,6 @@ fi
 
 if [ ${MIRRORING} ]
 then
-  #use specific config to mirroring
-  ln -fs ./LocalSettings.mirroring.php ./LocalSettings.custom.php
-
   echo "Start services ..."
   start-services.sh  
 
@@ -49,19 +47,20 @@ then
   #php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
   #To write in image dir
   chown -R www-data:www-data ${DATA_DIR}
-
-  #use config in volume 
-  ln -fs ${CFG_DIR}/LocalSettings.custom.php ./LocalSettings.custom.php
+else
+  # ignore mirroring LocalSettings
+  echo '<?php ?>' > ./LocalSettings.mirroring.php
 fi
 
-if [ ${DEBUG}  ]
+if [ ! ${DEBUG}  ]
 then
-  ln -fs ./LocalSettings.debug.php ./LocalSettings.custom.php
+  # ignore debug LocalSettings
+  echo '<?php ?>' > ./LocalSettings.debug.php
 fi
 
-start-services.sh
-
-if [ ${BASH}  ]
+if [ ${GO_BASH}  ]
 then
   /bin/bash
+else
+  start-services.sh
 fi

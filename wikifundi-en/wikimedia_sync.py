@@ -254,10 +254,6 @@ def getFilesFromPage(siteSrc, nbPages, iTitles) :
              (i+1,nbPages,title))  
   return mapTitle(pages)  
   
-def getPagesTitleFromCategorie(catTitle,ns,r):
-  
-  return 
-  
 def getPagesTitleFromCategories(site, categories, depth = 0):
   pages = []
   # retrieve all pages from categories
@@ -270,10 +266,9 @@ def getPagesTitleFromCategories(site, categories, depth = 0):
     
     # explore sub-categories
     if (depth < LIMIT_DEPTH_SUBCAT):
-      subcats = [ {'title':subcat.title()} for subcat in cat.subcategories()]
+      subcats = [ {'title':subcat.title()} for subcat in cat.subcategories() ]
       pages.extend(getPagesTitleFromCategories(site,subcats,depth+1))
       
-    
     # add pages to sync of this categorie
     ns = c['namespace'] if ("namespace" in c) else None
     r = c['recurse'] if ("recurse" in c) else 0
@@ -585,7 +580,8 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
       
     if(options['filesUpload']):
       log ("====== Upload files with %i thread pool" % MAX_WORKERS)
-      nbPageUpload += uploadFilesWithThreadPool (siteSrc, siteSrc.image_repository(), siteDst, 
+      nbPageUpload += uploadFilesWithThreadPool (
+                siteSrc, siteSrc.image_repository(), siteDst, 
                 files, options["thumbWidth"], options["maxSize"])
   else:
     log ("====== Sync pages")
@@ -597,7 +593,8 @@ def mirroringPagesWithDependances( siteSrc, siteDst,
       
     if(options['filesUpload']):
       log ("====== Upload files")
-      nbPageUpload += uploadFiles (siteSrc, siteSrc.image_repository(), siteDst, 
+      nbPageUpload += uploadFiles (
+                siteSrc, siteSrc.image_repository(), siteDst, 
                 files, options["thumbWidth"], options["maxSize"])  
               
   return (nbPageSync,nbPageUpload)
