@@ -41,12 +41,14 @@ You can also change options script with MIRRORING_OPTIONS :
 * `-p, --no-sync` : do not copy anything (default : false)
 * `-m, --no-modify` : do not modify pages (default : false)
 * `-r, --resume` : try to resume previous sync (default : false)
+* `-d, --template-nb-parse` : number of dependance template parsing (default : 1)
+* `-x, --expand-text` : copy the generated content of a page (default : false)
 * `-e, --export-dir <directory>` : write resume files in this directory (default : current directory)
 * `-w, --thumbwidth` :try to download thumbnail image with this width instead original image (default : 1024)
 * `-s, --maxsize` : do not files download greater to this limit (default : 400MB)
 * `-a, --async` : execute mirroring in async mode (5 threads / cpu). No works with SQLITE database. (default : false)
   
-Case usaging :
+Examples :
 
 * `MIRRORING_OPTIONS='-m 5MB -w 2000'` : sync page, templates, files and modify pages. Do not copy file > 5MB and Copy images (jpeg and png) in 2000px (if available).
 * `MIRRORING_OPTIONS='-tu'` : sync and modify pages. Do not copy dependances (templates and files).
