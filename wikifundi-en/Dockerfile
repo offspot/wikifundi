@@ -13,6 +13,9 @@ ENV MEDIAWIKI_CONF_DEBUG ./config/mediawiki/LocalSettings.debug.php
 
 ENV DATABASE_NAME mw_wikifundi_en
 
+# Specific default admin password
+ENV MEDIAWIKI_ADMIN_PASSWORD adminadmin
+
 # Install PyWikiBot library
 RUN apt-get update \
    && apt-get install -y --no-install-recommends python3-pip \
