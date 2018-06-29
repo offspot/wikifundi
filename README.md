@@ -41,7 +41,7 @@ You can also change options script with MIRRORING_OPTIONS :
 * `-p, --no-sync` : do not copy anything (default : false)
 * `-m, --no-modify` : do not modify pages (default : false)
 * `-r, --resume` : try to resume previous sync (default : false)
-* `-d, --template-nb-parse` : number of dependance template parsing (default : 1)
+* `-d, --dependance-nb-parse` : number of dependance parsing (default : 2)
 * `-x, --expand-text` : copy the generated content of a page (default : false)
 * `-e, --export-dir <directory>` : write resume files in this directory (default : current directory)
 * `-w, --thumbwidth` :try to download thumbnail image with this width instead original image (default : 1024)
