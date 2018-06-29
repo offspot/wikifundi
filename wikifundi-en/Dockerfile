@@ -52,6 +52,9 @@ RUN chmod a+x /usr/local/bin/wikimedia_sync
 
 COPY ./export_data.php ../
 
+COPY ./index_mirroring.php ./
+RUN mv index.php index_mediawiki.php
+
 #ENTRYPOINT /bin/bash
 
 # Run start script

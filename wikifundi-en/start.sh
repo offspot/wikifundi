@@ -28,8 +28,13 @@ fi
 
 if [ ${MIRRORING} ]
 then
+  # show mirroring page in index
+  ln -fs index_mirroring.php index.php 
+
   echo "Start services ..."
-  start-services.sh  
+  service memcached start 
+  service php7.0-fpm start
+  service nginx start
 
   #Allow to write on database
   chmod 644 ${DATABASE_FILE}  
@@ -46,7 +51,12 @@ then
   #echo "Refresh links ..."
   #php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
   #To write in image dir
-  chown -R www-data:www-data ${DATA_DIR}
+  chown -R www-data:www-data ${DATA_DIR}  
+  
+  service memcached stop 
+  service php7.0-fpm stop
+  service nginx stop  
+  
 else
   # ignore mirroring LocalSettings
   echo '<?php ?>' > ./LocalSettings.mirroring.php
@@ -57,6 +67,9 @@ then
   # ignore debug LocalSettings
   echo '<?php ?>' > ./LocalSettings.debug.php
 fi
+
+# restore index
+ln -fs index_mediawiki.php index.php 
 
 if [ ${GO_BASH}  ]
 then
