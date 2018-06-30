@@ -282,7 +282,7 @@ def getPagesTitleFromCategories(site, categories, depth = 0):
     cat = Category(site,catTitle)
   
     # to get content of category and sub-category 
-    catsTitle = cat.title() + [ subcat.title() for subcat in cat.subcategories() ]
+    catsTitle = [cat.title()] + [ subcat.title() for subcat in cat.subcategories() ]
     pages.extend(catsTitle)
       
     # add pages to sync of this categorie
