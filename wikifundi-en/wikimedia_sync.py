@@ -281,13 +281,9 @@ def getPagesTitleFromCategories(site, categories, depth = 0):
     catTitle = c['title']
     cat = Category(site,catTitle)
   
-    # to get content of category page
-    pages.append(catTitle)
-    
-    # explore sub-categories
-    if (depth < LIMIT_DEPTH_SUBCAT):
-      subcats = [ {'title':subcat.title()} for subcat in cat.subcategories() ]
-      pages.extend(getPagesTitleFromCategories(site,subcats,depth+1))
+    # to get content of category and sub-category 
+    catsTitle = cat.title() + [ subcat.title() for subcat in cat.subcategories() ]
+    pages.extend(catsTitle)
       
     # add pages to sync of this categorie
     ns = c['namespace'] if ("namespace" in c) else None

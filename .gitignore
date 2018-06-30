@@ -4,4 +4,7 @@ tmp/
 *apicache-py3
 *pywikibot.lwp
 *throttle.ctrl
-*user-password.py
+user-password.py
+*.log
+mirroring_export*
+sloppy-tmp.json
