@@ -6,7 +6,15 @@ header("HTTP/1.0 503 Mirroring in progress ...");
 <h2>Mirroring in progress ...</h2>
 <body>
 <p>
-        <a href="../w/data/log/mirroring.log">Log</a>
+	<h3>Mirroring log :</h3>
+	<pre>
+
+<?php
+	passthru('tail -n 20  /var/www/data/log/mirroring.log',$err);
+?>
+
+	</pre>
+        <a href="../w/data/log/mirroring.log">Download the complet log</a>
 </p>
 </body>
 </html>
