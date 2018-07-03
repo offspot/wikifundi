@@ -27,7 +27,8 @@
     "MediaWiki:Common.js",
     "MediaWiki:Common.css",
     "MediaWiki:Vector.css",
-    
+    "MediaWiki:Licenses",
+
     "Template:WikiFundi_credit_attribution",
     "Wikipedia:NPOV",
     "Wikipedia:Core_content_policies",

@@ -13,7 +13,8 @@
   "pages":[
     "MediaWiki:Common.js",
     "MediaWiki:Common.css",
-    "MediaWiki:Vector.css"
+    "MediaWiki:Vector.css",
+    "MediaWiki:Licenses"
   ],
   
   "categories":[

@@ -38,23 +38,24 @@ You can also change options script with MIRRORING_OPTIONS :
 * `-f, --force` : always copy  the content (even if page exist on site dest) (default : false)
 * `-t, --no-sync-templates` : do not copy templates used by the pages to sync. (default : false)
 * `-u, --no-upload-files` : do not copy files (images, css, js, sounds, ...) used by the pages to sync (default : false)
-* `-p, --no-sync` : do not copy anything (default : false)
+* `-p, --no-sync` : do not copy pages (default : false)
 * `-m, --no-modify` : do not modify pages (default : false)
 * `-r, --resume` : try to resume previous sync (default : false)
 * `-d, --dependance-nb-parse` : number of dependance parsing (default : 2)
 * `-x, --expand-text` : copy the generated content of a page (default : false)
 * `-e, --export-dir <directory>` : write resume files in this directory (default : current directory)
 * `-w, --thumbwidth` :try to download thumbnail image with this width instead original image (default : 1024)
-* `-s, --maxsize` : do not files download greater to this limit (default : 400MB)
+* `-s, --maxsize` : do not files download greater to this limit (default : 200MB)
 * `-a, --async` : execute mirroring in async mode (5 threads / cpu). No works with SQLITE database. (default : false)
   
 Examples :
 
 * `MIRRORING_OPTIONS='-m 5MB -w 2000'` : sync page, templates, files and modify pages. Do not copy file > 5MB and Copy images (jpeg and png) in 2000px (if available).
-* `MIRRORING_OPTIONS='-tu'` : sync and modify pages. Do not copy dependances (templates and files).
-* `MIRRORING_OPTIONS='-p'` : just modify pages.
-* `MIRRORING_OPTIONS='-pm'` : do anything.
-* `MIRRORING_OPTIONS=-'af'` : copy all pages and their dependencies in async mode.
+* `MIRRORING_OPTIONS='-d0'` : sync and modify pages. Do not process dependances (templates and files).
+* `MIRRORING_OPTIONS='-utd0'` : just copy and modify pages.
+* `MIRRORING_OPTIONS='-rputd0'` : just modify previously copied pages. 
+* `MIRRORING_OPTIONS='-putmd0'` : do anything.
+* `MIRRORING_OPTIONS='-af'` : copy all pages and their dependencies in async mode.
  
 After mirroring, you can generate tarball by going [http://localhost/export_data.php](http://localhost/export_data.php). A README file is in this tarball to explain an installation without Docker.
 
