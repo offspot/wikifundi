@@ -28,8 +28,6 @@ fi
 
 if [ ${MIRRORING} ]
 then
-  # show mirroring page in index
-  ln -fs index_mirroring.php index.php 
 
   echo "Start services ..."
   service memcached start 
@@ -42,8 +40,14 @@ then
   echo "Start Mediawiki maintenance ..."
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
 
+  # show mirroring page in index
+  ln -fs index_mirroring.php index.php 
+
   echo "Start mirroring ..."
   wikimedia_sync ${MIRRORING_OPTIONS} -e "${LOG_DIR}" mirroring.json | tee -a ${LOG_DIR}/mirroring.log 
+
+  # restore index
+  ln -fs index_mediawiki.php index.php 
 
   echo "Start Mediawiki maintenance ..."
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
@@ -57,9 +61,6 @@ then
   service php7.0-fpm stop
   service nginx stop  
   
-else
-  # ignore mirroring LocalSettings
-  echo '<?php ?>' > ./LocalSettings.mirroring.php
 fi
 
 if [ ! ${DEBUG}  ]
@@ -68,8 +69,11 @@ then
   echo '<?php ?>' > ./LocalSettings.debug.php
 fi
 
-# restore index
+# force mediawiki index
 ln -fs index_mediawiki.php index.php 
+
+# ignore mirroring LocalSettings
+echo '<?php ?>' > ./LocalSettings.mirroring.php
 
 if [ ${GO_BASH}  ]
 then
