@@ -19,7 +19,7 @@
   -f, --force : always copy  the content (even if page exist on site dest) (default : false)
   -t, --no-sync-templates : do not copy templates used by the pages to sync. (default : false)
   -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync (default : false)
-  -p, --no-sync : do not copy anything (default : false)
+  -p, --no-sync : do not copy pages (default : false)
   -m, --no-modify : do not modify pages (default : false)
   -r, --resume : try to resume previous sync (default : false)
   -d, --dependance-nb-parse : number of dependance parsing (default : 2)
@@ -31,9 +31,10 @@
   
  examples :
  ./wikimedia_sync.py -m 5MB -w 2000 config.json : sync page, templates, files and modify pages. Do not copy file > 5MB and Copy images (jpeg and png) in 2000px (if available).
- ./wikimedia_sync.py -tu config.json : sync and modify pages. Do not copy dependances (templates and files).
- ./wikimedia_sync.py -p config.json : just modify pages.
- ./wikimedia_sync.py -pm config.json : do anything.
+ ./wikimedia_sync.py -d0 config.json : sync and modify pages. Do not process dependances (templates and files).
+ ./wikimedia_sync.py -utd0 config.json : just copy and modify pages.
+ ./wikimedia_sync.py -rputd0 config.json : just modify previously copied pages. 
+ ./wikimedia_sync.py -putmd0 config.json : do anything.
  ./wikimedia_sync.py -af config.json : copy all pages and their dependencies in async mode.
  
  json file config :
@@ -623,64 +624,64 @@ def mirroringAndModifyPages(
     
   exportPagesTitle(pages,"pages",exportDir)  
 
-  if( options["pagesSync"] ):
-    #try to resume
-    if( options["resume"] ):
-      templates = importPagesTitle("templates",exportDir)
-      files = importPagesTitle("files",exportDir)
-    
-    # copy templates and files
-    for i in range(options["nbDepParse"]): 
-        log ("==============================") 
-        log ("====== Collect Dependances #%i" % i)
-        (depTmpt,depFiles) = getDependances(siteSrc, pages + templates + files, options)
-        # update list of templates and files
-        #  with duplicates removed
-        templates = list(set(templates + depTmpt))
-        files = list(set(files + depFiles))
-        exportPagesTitle(templates,"templates",exportDir)
-        exportPagesTitle(files,"files",exportDir)
-        
-    #sync all pages, templates and associated files
-    log ("======================") 
-    log ("====== Start Mirroring")     
+  #try to resume
+  if( options["resume"] ):
+    templates = importPagesTitle("templates",exportDir)
+    files = importPagesTitle("files",exportDir)
+  
+  # copy templates and files
+  for i in range(options["nbDepParse"]): 
+      log ("==============================") 
+      log ("====== Collect Dependances #%i" % i)
+      (depTmpt,depFiles) = getDependances(siteSrc, pages + templates + files, options)
+      # update list of templates and files
+      #  with duplicates removed
+      templates = list(set(templates + depTmpt))
+      files = list(set(files + depFiles))
+      exportPagesTitle(templates,"templates",exportDir)
+      exportPagesTitle(files,"files",exportDir)
+      
+  #sync all pages, templates and associated files
+  log ("======================") 
+  log ("====== Start Mirroring")     
 
-    if(options["async"]):
-
+  if(options["async"]):
+    if( options["pagesSync"] ):
       log ("====== Sync pages with %i thread pool" % MAX_WORKERS)
       nbPagesSync = syncPagesWithThreadPool(siteSrc, siteDst, pages, 
                                               options["expandText"], force )    
-        
-      if(options['templatesSync']):
-        log ("====== Sync template with %i thread pool" % MAX_WORKERS)
-        nbPagesTemplate = syncPagesWithThreadPool(siteSrc, siteDst, 
-                          templates,expandText, force )
-        
-      if(options['filesUpload']):
-        log ("====== Upload files with %i thread pool" % MAX_WORKERS)
-        nbPagesUpload = uploadFilesWithThreadPool (
-                  siteSrc, siteSrc.image_repository(), siteDst, 
-                  files, options["thumbWidth"], options["maxSize"])
-    else:
-    
+      
+    if(options['templatesSync']):
+      log ("====== Sync template with %i thread pool" % MAX_WORKERS)
+      nbPagesTemplate = syncPagesWithThreadPool(siteSrc, siteDst, 
+                        templates,expandText, force )
+      
+    if(options['filesUpload']):
+      log ("====== Upload files with %i thread pool" % MAX_WORKERS)
+      nbPagesUpload = uploadFilesWithThreadPool (
+                siteSrc, siteSrc.image_repository(), siteDst, 
+                files, options["thumbWidth"], options["maxSize"])
+  else:
+    if( options["pagesSync"] ):
       log ("====== Sync pages")
       nbPagesSync = syncPages(siteSrc, siteDst, pages, 
-                                options["expandText"], force )      
-      if(options['templatesSync']):
-        log ("====== Sync template")
-        nbPagesTemplate = syncPages(siteSrc, siteDst, 
-                              templates, expandText, force )
-        
-      if(options['filesUpload']):
-        log ("====== Upload files")
-        nbPagesUpload = uploadFiles (
-                  siteSrc, siteSrc.image_repository(), siteDst, 
-                  files, options["thumbWidth"], options["maxSize"])            
+                                options["expandText"], force )  
+                                    
+    if(options['templatesSync']):
+      log ("====== Sync template")
+      nbPagesTemplate = syncPages(siteSrc, siteDst, 
+                            templates, expandText, force )
+      
+    if(options['filesUpload']):
+      log ("====== Upload files")
+      nbPagesUpload = uploadFiles (
+                siteSrc, siteSrc.image_repository(), siteDst, 
+                files, options["thumbWidth"], options["maxSize"])            
 
   if( modifications and options["modifyPages"] ):
     log ("============================") 
     log ("====== Process Modifications")
-    nbMods =  modifyPages(siteSrc, siteDst, pages, modifications)        
+    nbMods =  modifyPages(siteSrc, siteDst, pages + templates + files, modifications)        
       
   return (nbPagesSync,nbPagesUpload,nbPagesTemplate,nbMods)
 

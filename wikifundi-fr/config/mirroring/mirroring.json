@@ -23,58 +23,13 @@
   
   "modifications":[
     {
-      "pages":["^Help:"],
-      "substitutions":[
-        {
-          "pattern":"<[/]*translate>",
-          "repl":" "
-        },     
-        {
-          "pattern":"<languages[ ]*/>",
-          "repl":" "
-        },     
-        {
-          "pattern":"<!--T:[\\d]+-->",
-          "repl":" "
-        },     
-        {
-          "pattern":"{{ll\\|([^}|]+)(|[^}]*)}}",
-          "repl":"\"[[\".\\1.\"]]\""
-        },     
-        {
-          "pattern":"{{TNT\\|[^}]+}}",
-          "repl":" "
-        },     
-        {
-          "pattern":"<tvar\\|[^>]+>(Special:MyLanguage\\/|)([^>]+)</>",
-          "repl":"\\2"
-        },     
-        {
-          "pattern":"\\[\\[(C|c)ategory:[^]]+\\]\\]",
-          "repl":" "
-        },     
-        {
-          "pattern":"\n[ ]+",
-          "repl":"\n"
-        },     
-        {
-          "pattern":"\n+",
-          "repl":"\n"
-        }     
-      ]
-    },
-    {
-      "pages":["Template:Coord"],
+      "pages":["^Modèle:Coord$"],
       "empty":true
     },
     {
-      "pages":["Template:Portail"],
+      "pages":["^Modèle:Portail$"],
       "empty":true
-    },   
-    {
-      "pages":["Infobox_Logiciel"],
-      "empty":true
-    },       
+    },        
     {
       "categories":[{ "title" : "Projet_WikiFundi_Contenu"}],
       "substitutions":[
