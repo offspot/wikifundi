@@ -4,8 +4,9 @@
   $exportDir = "data";
   $wgSitename = "mywiki";
   $wgLanguageCode = "all";
+  $IP = "w";
 
-  include 'w/LocalSettings.custom.php';
+  include "$IP/LocalSettings.custom.php" ;
   
   $filename=strtolower($wgSitename."-".$wgLanguageCode."_".date('Y-m-d'));
 
