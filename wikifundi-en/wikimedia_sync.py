@@ -773,12 +773,6 @@ def main():
     if opt in ("-a", "--async"):  
       options["async"] = True           
             
-  # check coherence, fix if needed
-  if(not options["pagesSync"]):
-      options["templatesSync"] = False
-      options["nbDepParse"] = 0
-      options["filesUpload"] = False
-
   log (options)
 
   # process each config file
