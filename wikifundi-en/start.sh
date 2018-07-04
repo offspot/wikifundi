@@ -26,6 +26,11 @@ then
   clean
 fi
 
+if [ ${IMAGE_OVERSIZE} ]
+then 
+  find ${DATA_DIR}/images -size +${IMAGE_OVERSIZE}M -exec rm -f {} \;
+fi
+
 if [ ${MIRRORING} ]
 then
 
