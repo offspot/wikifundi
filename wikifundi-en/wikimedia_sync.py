@@ -550,7 +550,7 @@ def modifyPages(siteSrc, siteDst,
     if('substitutions' in mod):
       # get all supstitution to apply on list of pages
       subs = map( 
-               lambda s : (re.compile(s['pattern']),s['repl']), 
+               lambda s : (re.compile(s['pattern'],re.DOTALL),s['repl']), 
                mod['substitutions']
              )
       nbMods += subsOnPages(siteSrc, siteDst, pageModsUniq, list(subs))

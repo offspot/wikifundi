@@ -140,7 +140,7 @@
           "repl":" "
         },
         {
-          "pattern":"^<!--2BREINSERTED(.*)-->$",
+          "pattern":"<!--2BREINSERTED(.*)-->",
           "repl":"\\1"
         }         
       ]
