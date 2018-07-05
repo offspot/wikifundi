@@ -40,7 +40,7 @@ You can also change options script with MIRRORING_OPTIONS :
 * `-u, --no-upload-files` : do not copy files (images, css, js, sounds, ...) used by the pages to sync (default : false)
 * `-p, --no-sync` : do not copy pages (default : false)
 * `-m, --no-modify` : do not modify pages (default : false)
-* `-r, --resume` : try to resume previous sync (default : false)
+* `-r, --resume` : try to resume previous sync (default : false). Associate with -d0 to not re-process dependency search.
 * `-d, --dependance-nb-parse` : number of dependance parsing (default : 2)
 * `-x, --expand-text` : copy the generated content of a page (default : false)
 * `-e, --export-dir <directory>` : write resume files in this directory (default : current directory)
@@ -59,6 +59,14 @@ Examples :
  
 After mirroring, you can generate tarball by going [http://localhost/export_data.php](http://localhost/export_data.php). A README file is in this tarball to explain an installation without Docker.
 
+Other options
+-------------
+
+* `CLEAN=1` : delete thumbs, old revisions, archived and temp files. Reset LocalSettings.custom.php. Always set with mirroring
+* `DEBUG=1` : show debug informations in pages
+* `IMAGE_OVERSIZE=<size>` : deletes all files upper of <size>
+* `GO_BASH=1` : lauch bash instead services
+
 Build your Docker image
 -----------------------
 The WikiFundi image extends the `openzim/mediawiki` Docker image to
@@ -71,11 +79,7 @@ This directory contain the configuration of :
 
 * `mirroring/mirroring.json` : 
     Pages to copy from an other wiki and modifications after copy. 
-    To get file structure :
-      ```
-        export PYWIKIBOT2_DIR=config/pywikibot/`
-        ./wikimedia_sync.py --help
-      ```
+    Read help part of `wikimedia_sync.py` to get file structure.
 * `mediawiki/LocalSettings.custom.php` : 
     You can customise the Mediawiki by editing your this file. 
     If you want to know more, have a look to [documentation](https://www.mediawiki.org/wiki/Manual:LocalSettings.php)
