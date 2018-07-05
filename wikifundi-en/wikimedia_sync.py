@@ -386,14 +386,9 @@ def syncPage(src, dst, force, checkRedirect, expandText, nbPages, iTitles):
     if(not p.exists()):
       log_err ("%s not exist on source !" % pageTitle)
       return 0 
-      
-    print (newPage.title())  
      
     # if page exist on dest and no force -> do not sync this page
-    if(     (not force) 
-        and (not (newPage.title() in ALWAYS_FORCE)) 
-        and  newPage.exists()
-    ):  
+    if((not force)  and (not (newPage.title() in ALWAYS_FORCE))  and  newPage.exists() ):  
       log ("%i/%i %s already exist. Use -f to force" % (i+1,nbPages,pageTitle))
       return 0
     
