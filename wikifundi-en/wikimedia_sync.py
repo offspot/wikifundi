@@ -21,7 +21,7 @@
   -u, --no-upload-files : do not copy files (images, css, js, sounds, ...) used by the pages to sync (default : false)
   -p, --no-sync : do not copy pages (default : false)
   -m, --no-modify : do not modify pages (default : false)
-  -r, --resume : try to resume previous sync (default : false)
+  -r, --resume : try to resume previous sync (default : false). Associate with -d0 to not re-process dependency search.
   -d, --dependance-nb-parse : number of dependance parsing (default : 2)
   -x, --expand-text : copy the generated content of a page (default : false)
   -e, --export-dir <directory> : write resume files in this directory (default : current directory)
@@ -180,7 +180,9 @@ DEFAULT_OPTIONS = dict(
 
 # try to download thumb only for this mime type 
 # (is needed fot not try with no thumbnaible files )
-thumbmime = ['image/jpeg','image/png']
+THUMB_MIME = ['image/jpeg','image/png']
+# always force copy this pages
+ALWAYS_FORCE = ['Main Page','MediaWiki:Licenses']
 
 ##############################
 # Logs
@@ -383,10 +385,15 @@ def syncPage(src, dst, force, checkRedirect, expandText, nbPages, iTitles):
     # if the page not exists, abord
     if(not p.exists()):
       log_err ("%s not exist on source !" % pageTitle)
-      return 0   
+      return 0 
+      
+    print (newPage.title())  
      
     # if page exist on dest and no force -> do not sync this page
-    if((not force) and newPage.exists()):  
+    if(     (not force) 
+        and (not (newPage.title() in ALWAYS_FORCE)) 
+        and  newPage.exists()
+    ):  
       log ("%i/%i %s already exist. Use -f to force" % (i+1,nbPages,pageTitle))
       return 0
     
@@ -435,8 +442,8 @@ def uploadFile(src, srcFileRepo, dst, maxwith, maxsize, nbFiles, iTitles ):
       pageDst = FilePage(dst, fileTitle)
 
     # get thumbnail instead original file
-    #  only avaible if file is in thumbmime list
-    if( f.latest_file_info['mime'] in thumbmime ):
+    #  only avaible if file is in THUMB_MIME list
+    if( f.latest_file_info['mime'] in THUMB_MIME ):
       url = f.get_file_url(maxwith) 
       maxsize = 0 # do not check thumbnail file size
     else:      
@@ -567,6 +574,8 @@ def getDependances( site, pages, options) :
     
     return the number of succes synchronized pages and files 
   """
+  templates = []
+  files = []  
   
   if(options['templatesSync']):
     # collect template used by pages
