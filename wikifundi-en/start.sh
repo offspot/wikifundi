@@ -21,16 +21,6 @@ mediawiki-init.sh
 
 ln -s ${DATA_DIR} data
 
-if [ ${CLEAN} ]
-then
-  clean
-fi
-
-if [ ${IMAGE_OVERSIZE} ]
-then 
-  find ${DATA_DIR}/images -size +${IMAGE_OVERSIZE}M -exec rm -f {} \;
-fi
-
 if [ ${MIRRORING} ]
 then
 
@@ -53,12 +43,19 @@ then
 
   # restore index
   ln -fs index_mediawiki.php index.php 
+  
+  # purge cache
+  service memcached restart
+  
+  # force to purge page cache
+  touch LocalSettings.php
 
   echo "Start Mediawiki maintenance ..."
   maintenance/update.php --quick > ${LOG_DIR}/mw_update.log 
-  clean
-  #echo "Refresh links ..."
-  #php maintenance/refreshLinks.php >> ${LOG_DIR}/mw_update.log 
+
+  echo "Refresh links ..."
+  su -c 'php maintenance/refreshLinks.php -e 200 --namespace 0' -s /bin/bash  www-data >> ${LOG_DIR}/mw_update.log 
+   
   #To write in image dir
   chown -R www-data:www-data ${DATA_DIR}  
   
@@ -66,6 +63,16 @@ then
   service php7.0-fpm stop
   service nginx stop  
   
+fi
+
+if [ ${IMAGE_OVERSIZE} ]
+then 
+  find ${DATA_DIR}/images -size +${IMAGE_OVERSIZE}M -exec rm -f {} \;
+fi
+
+if [ ${CLEAN} ]
+then
+  clean
 fi
 
 if [ ! ${DEBUG}  ]
