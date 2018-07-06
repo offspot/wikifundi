@@ -16,6 +16,10 @@ $wgDBuser        = "";
 $wgDBpassword    = "";
 $wgSQLiteDataDir = "/var/www/data";
 
+# Set FR Wikipédia namespace
+$wgExtraNamespaces[NS_FOO] = "Wikipédia";
+$wgExtraNamespaces[NS_FOO_TALK] = "Wikipédia_talk"; // Note underscores in the namespace name.
+
 # Custom logo
 $wgLogo = "/logo.png";
 $wgRightsIcon = "/A_WikiAfrica_project.png";
