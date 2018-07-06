@@ -72,6 +72,8 @@ then
   php maintenance/deleteOldRevisions.php --delete  
   echo "Delete archive file ..." 
   php maintenance/deleteArchivedFiles.php --delete  
+  echo "Start Mediawiki maintenance ..."
+  maintenance/update.php --quick
 fi
 
 if [ ! ${DEBUG}  ]
