@@ -320,10 +320,12 @@ def getPageSrcDstFromTitle(src, dst, pageTitle, checkExist = True):
   
   newPage = Page(dst, title)
   
-  if(newPage.site != dst):
+  # if a ohter site, try to download of this site
+  # ignore pages in a extended namespace (id >= 100)
+  if(newPage.site != dst && ns.id < 100):
     newPage = Page(dst, newPage.titleWithoutNamespace(), ns.id)
 
-   # if not exist on this site, test on file repository
+  # if not exist on this site, test on file repository
   if(checkExist and fileRepo and (not p.exists())):
      return getPageSrcDstFromTitle(
                 fileRepo,dst,re.sub(".*:",str(ns),pageTitle),False)
