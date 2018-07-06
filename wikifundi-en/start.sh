@@ -6,10 +6,6 @@ README_FILE=${DATA_DIR}/README
 CFG_DIR=${DATA_DIR}/config
 
 function clean {
-  echo "Delete old revisions ..."
-  php maintenance/deleteOldRevisions.php --delete  
-  echo "Delete archive file ..." 
-  php maintenance/deleteArchivedFiles.php --delete  
   echo "Delete thumb, temp and archive ..."
   rm -rvf ${DATA_DIR}/images/thumb/* ${DATA_DIR}/images/temp/* ${DATA_DIR}/images/archive/*
   cp -f ./LocalSettings.custom.origin.php ${CFG_DIR}/LocalSettings.custom.php
@@ -72,7 +68,10 @@ fi
 
 if [ ${CLEAN} ]
 then
-  clean
+  echo "Delete old revisions ..."
+  php maintenance/deleteOldRevisions.php --delete  
+  echo "Delete archive file ..." 
+  php maintenance/deleteArchivedFiles.php --delete  
 fi
 
 if [ ! ${DEBUG}  ]
