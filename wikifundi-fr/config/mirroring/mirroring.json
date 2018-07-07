@@ -29,7 +29,62 @@
     {
       "pages":["^Modèle:Portail$"],
       "empty":true
-    },        
+    },
+    
+    
+    
+    {
+      "pages":["^Module:Coordinates$"],
+      "substitutions":[
+        {
+          "pattern":"=wikidatacat\\(globe\\)",
+          "repl":"={} -- Wikifundi not use Wikidata"
+        },
+        {
+          "pattern":"if maplink then.*?end",
+          "repl":"-- Wikifundi not use Wikidata"
+        },
+        {
+          "pattern":"if wikidata == \\'true\\' then",
+          "repl":"if false then -- Wikifundi not use Wikidata"
+        } 
+        
+               
+      ]      
+    },
+    
+    {
+      "pages":["^Module:Bandeau$","^Module:Wikidata$"],
+      "substitutions":[
+        {
+          "pattern":"mw.wikibase.getEntity\\(.*?\\)",
+          "repl":"nil -- Wikifundi not use Wikidata"
+        }       
+      ]      
+    },    
+
+    {
+      "pages":["^Module:Infobox/Localdata$"],
+      "substitutions":[
+        {
+          "pattern":"wikidata.getEntity\\(localdata.wikidata\\)",
+          "repl":"nil -- Wikifundi not use Wikidata"
+        }       
+      ]      
+    },     
+    
+    {
+      "pages":["^Module:Infobox$"],
+      "substitutions":[
+        {
+          "pattern":"wd.getClaims\\(query\\)",
+          "repl":"nil -- Wikifundi not use Wikidata"
+        }       
+      ]      
+    },     
+        
+    
+    
     {
       "categories":[{ "title" : "Projet_WikiFundi_Contenu"}],
       "substitutions":[
