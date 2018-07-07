@@ -325,8 +325,9 @@ def getPageSrcDstFromTitle(src, dst, pageTitle, checkExist = True):
   # if(newPage.site != dst and ns.id < 100):
   #  newPage = Page(dst, newPage.titleWithoutNamespace(), ns.id)
 
+  # for dependency (ns != 0) 
   # if not exist on this site, test on file repository
-  if(checkExist and fileRepo and (not p.exists())):
+  if(ns !=0 and checkExist and fileRepo and (not p.exists())):
      return getPageSrcDstFromTitle(
                 fileRepo,dst,re.sub(".*:",str(ns),pageTitle),False)
   
@@ -388,15 +389,17 @@ def syncPage(src, dst, force, checkRedirect, expandText, nbPages, iTitles):
     if(not p.exists()):
       log_err ("%s not exist on source !" % pageTitle)
       return 0 
-     
+
+    log ("%i/%i %s Copy %s (%s) -> %s (%s)" % (i+1,nbPages,pageTitle,p.title(),str(p.namespace()),newPage.title(),str(newPage.namespace())))
+
     # if page exist on dest and no force -> do not sync this page
-    if((not force)  and (not (newPage.title() in ALWAYS_FORCE))  and  newPage.exists() ):  
+    if((not force)  and (not (newPage.title() in ALWAYS_FORCE))  and  newPage.exists() ):
       log ("%i/%i %s already exist. Use -f to force" % (i+1,nbPages,pageTitle))
       return 0
     
     # sync also the redirect target 
     if(checkRedirect and p.isRedirectPage()):
-      syncPage(src, dst, force, False, expandText, nbPages, 
+      syncPage(src, dst, force, False, expandText, nbPages,
         (i,p.getRedirectTarget().title()))
 
     # copy the content of the page
@@ -404,8 +407,6 @@ def syncPage(src, dst, force, checkRedirect, expandText, nbPages, iTitles):
       newPage.text = p.expand_text()
     else:
       newPage.text = p.text 
-    
-    log ("%i/%i Copy %s" % (i+1,nbPages,pageTitle))
     
     # commit the new page on dest wiki
     if ( dst.editpage(newPage) ):
