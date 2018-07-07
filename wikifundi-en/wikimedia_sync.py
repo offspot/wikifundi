@@ -299,7 +299,7 @@ def getPagesTitleFromCategories(site, categories, depth = 0):
 ###########################################
 # Modify wiki pages
 
-def getPageSrcDstFromTitle(src, dst, pageTitle, checkExist = True):
+def getPageSrcDstFromTitle(src, dst, pageTitle, primary = True, checkExist = True):
   
   p = Page(src, pageTitle)
   fileRepo = src.image_repository()
@@ -308,7 +308,7 @@ def getPageSrcDstFromTitle(src, dst, pageTitle, checkExist = True):
   
   # specific case for "Project pages"
   # TODO : use an option ! 
-  if(ns.id == 4 or ns.id == 102):
+  if(primary and (ns.id == 4 or ns.id == 102)):
     if(ns.subpages):
       subPage = pageTitle.split("/",1)
       if(len(subPage) > 1):
@@ -327,9 +327,9 @@ def getPageSrcDstFromTitle(src, dst, pageTitle, checkExist = True):
 
   # for dependency (ns != 0) 
   # if not exist on this site, test on file repository
-  if(ns !=0 and checkExist and fileRepo and (not p.exists())):
+  if(ns != 0 and checkExist and fileRepo and (not p.exists())):
      return getPageSrcDstFromTitle(
-                fileRepo,dst,re.sub(".*:",str(ns),pageTitle),False)
+                fileRepo,dst,re.sub(".*:",str(ns),pageTitle),False,False)
   
   return (p,newPage,ns)
 
@@ -375,15 +375,24 @@ def subsOnPage(src, dst, subs, nbPages, iTitles)  :
 #####################################  
 # Mirroring wiki pages 
     
-def syncPage(src, dst, force, checkRedirect, expandText, nbPages, iTitles):
+def syncPage(src, dst, force, checkRedirect, expandText, primary, nbPages, iTitles):
   """Synchronize ONE wiki pages from src to dst
-  
+
+     src : source site
+     dst : destination site
+     force : copy page if already exist
+     checkRedirect : if true, follow redirect and copy also the targe
+     expandText : use expandText méthode instead text variable to get page content 
+     primary : if False, the page to copy is not a dependance 
+     nbPages : total number of page to copy (for log)
+     iTitles : (i,title) Id and title of the page to copy (for log)
+
      return true if success
   """
 
   (i,pageTitle) = iTitles
   try:
-    (p,newPage,ns) = getPageSrcDstFromTitle(src,dst,pageTitle)
+    (p,newPage,ns) = getPageSrcDstFromTitle(src,dst,pageTitle,primary)
 
     # if the page not exists, abord
     if(not p.exists()):
@@ -497,14 +506,14 @@ def uploadFiles(src, srcFileRepo, dst, files, maxwith, maxsize) :
                     dst, maxwith, maxsize,len(files))
   return sum(map(upload,enumerate(files)))  
   
-def syncPagesWithThreadPool(src, dst, pages, expandText, force = False): 
-  sync = partial(syncPage, src,dst,force,True, expandText, len(pages))
+def syncPagesWithThreadPool(src, dst, pages, expandText, primary, force = False): 
+  sync = partial(syncPage, src,dst,force,True, expandText, primary,  len(pages))
   with ThreadPoolExecutor(max_workers=MAX_WORKERS) as ex:
     return sum(ex.map(sync,enumerate(pages)))
   return 0
 
-def syncPages(src, dst, pages, expandText, force = False): 
-  sync = partial(syncPage, src,dst,force,True, expandText, len(pages))
+def syncPages(src, dst, pages, expandText, primary, force = False): 
+  sync = partial(syncPage, src,dst,force,True, expandText, primary,  len(pages))
   return sum(map(sync,enumerate(pages)))
     
 def getTemplatesFromPages(siteSrc, pages) :
@@ -655,13 +664,13 @@ def mirroringAndModifyPages(
   if(options["async"]):
     if( options["pagesSync"] ):
       log ("====== Sync pages with %i thread pool" % MAX_WORKERS)
-      nbPagesSync = syncPagesWithThreadPool(siteSrc, siteDst, pages, 
-                                              options["expandText"], force )    
+      nbPagesSync = syncPagesWithThreadPool(siteSrc, siteDst, 
+			pages, expandText, True, force )    
       
     if(options['templatesSync']):
       log ("====== Sync template with %i thread pool" % MAX_WORKERS)
       nbPagesTemplate = syncPagesWithThreadPool(siteSrc, siteDst, 
-                        templates,expandText, force )
+                        templates,expandText, False, force )
       
     if(options['filesUpload']):
       log ("====== Upload files with %i thread pool" % MAX_WORKERS)
@@ -671,13 +680,13 @@ def mirroringAndModifyPages(
   else:
     if( options["pagesSync"] ):
       log ("====== Sync pages")
-      nbPagesSync = syncPages(siteSrc, siteDst, pages, 
-                                options["expandText"], force )  
+      nbPagesSync = syncPages(siteSrc, siteDst, 
+			pages, expandText, True,force )  
                                     
     if(options['templatesSync']):
       log ("====== Sync template")
       nbPagesTemplate = syncPages(siteSrc, siteDst, 
-                            templates, expandText, force )
+                        templates, expandText, False ,force )
       
     if(options['filesUpload']):
       log ("====== Upload files")
