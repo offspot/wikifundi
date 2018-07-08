@@ -62,7 +62,7 @@ After mirroring, you can generate tarball by going [http://localhost/export_data
 Other options
 -------------
 
-* `CLEAN=1` : delete thumbs, old revisions, archived and temp files. Reset LocalSettings.custom.php. Always set with mirroring
+* `CLEAN=1` : delete old revisions and archived files. 
 * `DEBUG=1` : show debug informations in pages
 * `IMAGE_OVERSIZE=<size>` : deletes all files upper of <size>
 * `GO_BASH=1` : lauch bash instead services
