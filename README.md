@@ -24,7 +24,7 @@ Go to  [http://localhost/](http://localhost/)
 Default admin logging :
 
 * User : Admin
-* Password : wikiadmin
+* Password : adminadmin
 
 Mirroring with WikiFundi
 ------------------------
