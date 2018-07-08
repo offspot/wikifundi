@@ -64,7 +64,6 @@ Other options
 
 * `CLEAN=1` : delete old revisions and archived files. 
 * `DEBUG=1` : show debug informations in pages
-* `IMAGE_OVERSIZE=<size>` : deletes all files upper of <size>
 * `GO_BASH=1` : lauch bash instead services
 
 Build your Docker image
@@ -97,3 +96,14 @@ docker build -t wikifundi_en wikifundi_en
 docker run -p 80:80 -v ${PWD}/data:/var/www/data -it wikifundi_en
 ```
 As french version, yon can extend openzim/wikifundi-en to create an image for other Wikipedia language or other wiki.
+
+Managing Wikifundi with Sloppy hosting
+--------------------------------------
+You can use `./install_sloppy_cli.sh` to install Sloppy CLI. We must define SLOPPY_TOKEN environnement variable with your token. Then, we can us `wikifundi_management.sh` to manage Wikifundi :
+
+* `./wikifundi_management.sh restart <LANG>` : restart <LANG> instance. If not LANG is defined, restart all instance.
+* `./wikifundi_management.sh full_mirroring` : delete all Wikifundi instances (!!) and lauch mirroring
+* `./wikifundi_management.sh partial_mirroring` : lauch a mirroring which force copy pages exclusively (no copy files and templates)
+* `./wikifundi_management.sh delete_all` : delete all instance
+* `./wikifundi_management.sh wait_running` : wait until all instances are ready 
+
