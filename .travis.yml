@@ -1,0 +1,9 @@
+language: sh
+before_install:
+- sudo apt-get update
+- sudo apt-get install jq
+install: "./install_sloppy_cli.sh"
+script: "./wikifundi_management.sh restart"
+env:
+  global:
+  - secure: nl79okco9bzsXwfloDGfEAgDR3bUBKYQzwsp5CGeR/woVgCcSm5yvX0B240vqSmYUF8Jkw8jK1kgPs53P9zkCFFtpkcR5dWzfc4J25uxin/r68BldvTR/ztqoqEgSVKzt0/zs4bE+agVhKT/3LGsNhyrEU9/wGrSdWQNA3M3R79tGN7NduzokIQjAuF8sT0z5unQMeU77aAKnJHinYKQYqe1V/QCX51nNmQtLvoCHXSACdY8nfhkpQJb2dKiRTqQrcvEuZWeQNuNjZSyrg4ysRxDxrDMX9DzOubKLrXrbyobB/9hwxGg9OfYiVFw4iH9a03UppcdbhELGnUrTaUPrfdhXtc454wyy2QS547Y0fPNwUCfoItuMDRF68Z+/Nc+pzsZ8lFZxEeLfX2febozgmwE109LBRXmAR9v/WH1mLShusKFZ5+cec7UgjhzEZk+E1QaYP3DC6z7x66PuOmijpInxPm2FobRrahRDqYVBb6tC4bm7ge2cKtOcNdr5yKKaCADBG8D2+P6Fi4jBcIGoPSodpxYGf99mlyv9k7qvJJx7VZ0N4UKz95EHskFD+G1Zx7nLc/hRk+YqeV5YwYO4/wwozbYeASsJIaVClyW/ruGxWinPy5hCosOORidC+qyCRzREXIgchqoc1xF89kM1uVgm+FPz1/eAhQv9ujYW+Y=
