@@ -31,8 +31,17 @@
       "empty":true
     },
     
-    
-    
+    {
+      "pages":["^MediaWiki:Common.css$"],
+      "substitutions":[
+        {
+          "pattern":".mw-wiki-logo.*?}",
+          "repl":"/* keep Wikifundi Logo  */"
+        }       
+      ]      
+    }, 
+
+
     {
       "pages":["^Module:Coordinates$"],
       "substitutions":[
