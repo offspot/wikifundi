@@ -305,7 +305,8 @@ def getPageSrcDstFromTitle(src, dst, pageTitle, primary = True, checkExist = Tru
   fileRepo = src.image_repository()
  
   ns = p.namespace()
-  
+
+ 
   # specific case for "Project pages"
   # TODO : use an option ! 
   if(primary and (ns.id == 4 or ns.id == 102)):
@@ -394,22 +395,28 @@ def syncPage(src, dst, force, checkRedirect, expandText, primary, nbPages, iTitl
   try:
     (p,newPage,ns) = getPageSrcDstFromTitle(src,dst,pageTitle,primary)
 
+
+    if((not primary) and ns == 0):
+      return 0
+
     # if the page not exists, abord
     if(not p.exists()):
       log_err ("%s not exist on source !" % pageTitle)
       return 0 
 
-    log ("%i/%i %s Copy %s (%s) -> %s (%s)" % (i+1,nbPages,pageTitle,p.title(),str(p.namespace()),newPage.title(),str(newPage.namespace())))
+    log ("%i/%i %s Copy %s (%s) -> %s (%s)" % (i+1,nbPages,pageTitle,p.title(),
+		str(p.namespace()),newPage.title(),str(newPage.namespace())))
 
     # if page exist on dest and no force -> do not sync this page
-    if((not force)  and (not (newPage.title() in ALWAYS_FORCE))  and  newPage.exists() ):
+    if((not force)  and (not (newPage.title() in ALWAYS_FORCE))  
+		    and  newPage.exists() ):
       log ("%i/%i %s already exist. Use -f to force" % (i+1,nbPages,pageTitle))
       return 0
     
     # sync also the redirect target 
     if(checkRedirect and p.isRedirectPage()):
-      syncPage(src, dst, force, False, expandText, nbPages,
-        (i,p.getRedirectTarget().title()))
+      syncPage(src, dst, force, False, expandText, primary,
+	nbPages,(i,p.getRedirectTarget().title()))
 
     # copy the content of the page
     if ( expandText ) :
