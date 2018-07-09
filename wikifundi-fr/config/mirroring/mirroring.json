@@ -62,7 +62,7 @@
     },
     
     {
-      "pages":["^Module:Bandeau$","^Module:Wikidata$"],
+      "pages":["^Module:Bandeau$","^Module:Wikidata$","^Module:Autorité$"],
       "substitutions":[
         {
           "pattern":"mw.wikibase.getEntity\\(.*?\\)",
