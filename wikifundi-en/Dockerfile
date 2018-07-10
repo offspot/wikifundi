@@ -2,6 +2,7 @@ FROM openzim/mediawiki
 
 ENV PYWIKIBOT_CONFIG_FILE ./config/pywikibot/user-config.py
 ENV MIRRORING_CONFIG_FILE ./config/mirroring/mirroring.json
+ENV MIRRORING_DELETE_FILE ./config/mirroring/deleteBatch.txt
 ENV README_FILE ./assets/docs/README
 ENV PYWIKIBOT2_DIR /usr/local/etc
 
@@ -38,11 +39,12 @@ COPY ${PARSOID_CONFIG_FILE} ./parsoid/
 
 # Copy the Mirroring Script
 COPY ${MIRRORING_CONFIG_FILE} ./mirroring.json
+COPY ${MIRRORING_DELETE_FILE} ./
 
 # Generate Passord file for pywikibot
 RUN { \
  echo "# -*- coding: utf-8 -*-" ; \
- echo "(u'Admin', u'${MEDIAWIKI_ADMIN_PASSWORD}')" ; \
+ echo "(u'botimport', u'${MEDIAWIKI_ADMIN_PASSWORD}')" ; \
 } > ${PYWIKIBOT2_DIR}/user-password.py \
  &&  chmod 700 ${PYWIKIBOT2_DIR}/user-password.py 
 

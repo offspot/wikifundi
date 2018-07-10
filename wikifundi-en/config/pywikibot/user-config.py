@@ -44,7 +44,7 @@ family_files['kiwix']='http://localhost/w/api.php'
 # family , you can use '*'
 usernames['wikipedia']['fr'] = u'kiwix'
 usernames['wikipedia']['en'] = u'kiwix'
-usernames['kiwix']['*'] = u'Admin'
+usernames['kiwix']['*'] = u'botimport'
 
 # The list of BotPasswords is saved in another file. Import it if needed.
 # See https://www.mediawiki.org/wiki/Manual:Pywikibot/BotPasswords to know how

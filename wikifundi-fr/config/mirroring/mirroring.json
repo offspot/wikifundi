@@ -39,8 +39,10 @@
         }       
       ]      
     }, 
-
-
+    {
+      "pages":["^Main Page$"],
+      "delete":true
+    },
     {
       "pages":["^Module:Coordinates$"],
       "substitutions":[

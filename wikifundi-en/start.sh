@@ -14,6 +14,9 @@ ln -s ${DATA_DIR} data
 if [ ${MIRRORING} ]
 then
 
+  #Create the bot user
+  php maintenance/createAndPromote.php --bureaucrat --sysop --bot --force botimport $MEDIAWIKI_ADMIN_PASSWORD
+
   #Allow to write on database
   chmod 644 ${DATABASE_FILE}  
   
@@ -39,6 +42,9 @@ then
   service php7.0-fpm stop
   service memcached stop 
   
+  # delete pages
+  php maintenance/deleteBatch.php  --conf ./LocalSettings.php -r "No needed for Wikifundi" ./deleteBatch.txt  
+  
   # force to purge page cache
   touch LocalSettings.php
 
@@ -47,7 +53,7 @@ then
 
   echo "Refresh links ..."
   su -c 'php maintenance/refreshLinks.php -e 200 --namespace 0' -s /bin/bash  www-data >> ${LOG_DIR}/mw_update.log 
-   
+
   #To write in image dir
   chown -R www-data:www-data ${DATA_DIR}  
   

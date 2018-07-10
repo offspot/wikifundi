@@ -334,6 +334,23 @@ def getPageSrcDstFromTitle(src, dst, pageTitle, primary = True, checkExist = Tru
   
   return (p,newPage,ns)
 
+def deletePage(src, dst, nbPages, iTitles)  :
+  (i,title) = iTitles
+  try:
+    (pSrc,p,ns) = getPageSrcDstFromTitle(src,dst,title)
+
+    
+    log ("%i/%i Delete %s " % 
+          (i+1,nbPages,title))
+
+    if(p.delete("Page not needed for Wikifundi", False, True, True)):
+      return 1
+    
+  except Exception as e:
+      log_err ("Error to delete page %s (%s)" % 
+        (title, e))
+  return 0 
+
 def emptyPage(src, dst, nbPages, iTitles)  :
   (i,title) = iTitles
   try:
@@ -501,6 +518,10 @@ def emptyPages(src, dst, pages) :
   empty = partial(emptyPage,src,dst,len(pages))
   return sum(map(empty,enumerate(pages)))
   
+def deletePages(src, dst, pages) : 
+  delete = partial(deletePage,src,dst,len(pages))
+  return sum(map(delete,enumerate(pages)))  
+  
 def uploadFilesWithThreadPool(src, srcFileRepo, dst, files, maxwith, maxsize) :
   upload = partial(uploadFile,src, srcFileRepo, 
                     dst, maxwith, maxsize,len(files))
@@ -546,6 +567,9 @@ def modifyPages(siteSrc, siteDst,
                pages, modifications):
   # apply modifications
   nbMods = 0   
+  
+  #add page already exist in dst
+  pages.extend(mapTitle(siteDst.allpages()))
 
   for mod in modifications :
     pageMods = []
@@ -578,7 +602,10 @@ def modifyPages(siteSrc, siteDst,
         
     if('empty' in mod):
       nbMods += emptyPages(siteSrc, siteDst, pageModsUniq) 
-  
+      
+    if('delete' in mod):
+      nbMods += deletePages(siteSrc, siteDst, pageModsUniq)       
+      
   return nbMods;
   
 def getDependances( site, pages, options) : 

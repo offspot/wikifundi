@@ -7,4 +7,4 @@ COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./
 
 # Copy the mirroring file config 
 COPY ${MIRRORING_CONFIG_FILE} ./
-
+COPY ${MIRRORING_DELETE_FILE} ./
