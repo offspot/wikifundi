@@ -32,7 +32,7 @@ then
   ln -fs index_mirroring.php index.php 
 
   echo "Start mirroring ..."
-  wikimedia_sync ${MIRRORING_OPTIONS} -e "${LOG_DIR}" mirroring.json | tee -a ${LOG_DIR}/mirroring.log 
+  wikimedia_sync ${MIRRORING_OPTIONS} -e "${LOG_DIR}" mirroring.json 2>&1 | tee -a ${LOG_DIR}/mirroring.log 
 
   # restore index
   ln -fs index_mediawiki.php index.php 
