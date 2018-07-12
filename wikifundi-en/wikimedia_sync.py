@@ -691,42 +691,48 @@ def mirroringAndModifyPages(
       exportPagesTitle(templates,"templates",exportDir)
       exportPagesTitle(files,"files",exportDir)
       
-  #sync all pages, templates and associated files
+  # sync all pages, templates and associated files
   log ("======================") 
   log ("====== Start Mirroring")     
 
+  # Now, upload file, templates and pages ! 
+  # The ORDER is important !
   if(options["async"]):
-    if( options["pagesSync"] ):
-      log ("====== Sync pages with %i thread pool" % MAX_WORKERS)
-      nbPagesSync = syncPagesWithThreadPool(siteSrc, siteDst, 
-			pages, expandText, True, force )    
+    if(options['filesUpload']):
+      log ("====== Upload files with %i thread pool" % MAX_WORKERS)
+      nbPagesUpload = uploadFilesWithThreadPool (
+                siteSrc, siteSrc.image_repository(), siteDst, 
+                files, options["thumbWidth"], options["maxSize"])    
       
     if(options['templatesSync']):
       log ("====== Sync template with %i thread pool" % MAX_WORKERS)
       nbPagesTemplate = syncPagesWithThreadPool(siteSrc, siteDst, 
                         templates,expandText, False, force )
-      
-    if(options['filesUpload']):
-      log ("====== Upload files with %i thread pool" % MAX_WORKERS)
-      nbPagesUpload = uploadFilesWithThreadPool (
-                siteSrc, siteSrc.image_repository(), siteDst, 
-                files, options["thumbWidth"], options["maxSize"])
+                        
+    if( options["pagesSync"] ):
+      log ("====== Sync pages with %i thread pool" % MAX_WORKERS)
+      nbPagesSync = syncPagesWithThreadPool(siteSrc, siteDst, 
+			pages, expandText, True, force )                          
   else:
+    if(options['filesUpload']):
+      log ("====== Upload files")
+      nbPagesUpload = uploadFiles (
+                siteSrc, siteSrc.image_repository(), siteDst, 
+                files, options["thumbWidth"], options["maxSize"])     
+                
+    if(options['templatesSync']):
+      log ("====== Sync template")
+      nbPagesTemplate = syncPages(siteSrc, siteDst, 
+                        templates, expandText, False ,force )  
+                        
     if( options["pagesSync"] ):
       log ("====== Sync pages")
       nbPagesSync = syncPages(siteSrc, siteDst, 
 			pages, expandText, True,force )  
                                     
-    if(options['templatesSync']):
-      log ("====== Sync template")
-      nbPagesTemplate = syncPages(siteSrc, siteDst, 
-                        templates, expandText, False ,force )
+
       
-    if(options['filesUpload']):
-      log ("====== Upload files")
-      nbPagesUpload = uploadFiles (
-                siteSrc, siteSrc.image_repository(), siteDst, 
-                files, options["thumbWidth"], options["maxSize"])            
+         
 
   if( modifications and options["modifyPages"] ):
     log ("============================") 
