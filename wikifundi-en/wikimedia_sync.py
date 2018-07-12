@@ -178,11 +178,14 @@ DEFAULT_OPTIONS = dict(
     async = False
 )
 
+#TODO : put in config file
 # try to download thumb only for this mime type 
 # (is needed fot not try with no thumbnaible files )
 THUMB_MIME = ['image/jpeg','image/png']
 # always force copy this pages
 ALWAYS_FORCE = ['Main Page','MediaWiki:Licenses']
+# regex to exclude dependances
+DEP_EXLUDE = "/Documentation$"
 
 ##############################
 # Logs
@@ -233,7 +236,7 @@ def getPageFromTitle(siteSrc, title):
   
   return p
   
-def getTemplateTitlesFromPage(siteSrc, nbPages, iTitles) :
+def getTemplateTitlesFromPage(siteSrc, exclude, nbPages, iTitles) :
   (i,title) = iTitles
  
   p = getPageFromTitle(siteSrc,title)
@@ -243,17 +246,20 @@ def getTemplateTitlesFromPage(siteSrc, nbPages, iTitles) :
     log_err ("%s not exist on source (%s) !" % (p.title(),str(p.site)))
     return []   
 
-  # get templates
-  tplt = p.templates()
-    
-  nbTplt = len(tplt)
+  # get templates and apply exclude dependances filter
+  tpltTitle = list(
+                filter(
+                   lambda t : not re.search(exclude,t),
+                      mapTitle(p.templates())))
+
+  nbTplt = len(tpltTitle)
   if(nbTplt > 0):
     log ("%i/%i Process %s : %i templates found " % 
             (i+1,nbPages,title,nbTplt))
   else:
     log ("%i/%i Process %s :no templates found " % 
             (i+1,nbPages,title))            
-  return mapTitle(tplt)
+  return tpltTitle;
   
 def getFilesFromPage(siteSrc, nbPages, iTitles) : 
   (i,title) = iTitles
@@ -267,6 +273,10 @@ def getFilesFromPage(siteSrc, nbPages, iTitles) :
   
   # get files
   files = p.imagelinks()
+
+  #if is a file page, do not get redirection
+  if(p.is_filepage()):
+    files = filter( lambda f : not f.isRedirectPage(),files)
   
   nbFiles = len(list(files))
   if(nbFiles > 0):
@@ -274,8 +284,8 @@ def getFilesFromPage(siteSrc, nbPages, iTitles) :
              (i+1,nbPages,title,nbFiles))
   else:
     log ("%i/%i Process %s : no files found" % 
-             (i+1,nbPages,title))  
-  return mapTitle(files)  
+             (i+1,nbPages,title))
+  return mapTitle(files)
   
 def getPagesTitleFromCategories(site, categories, depth = 0):
   pages = []
@@ -379,7 +389,7 @@ def subsOnPage(src, dst, subs, nbPages, iTitles)  :
       repl = s[1]
       p.text = re.sub(pattern, repl, p.text)
       
-    log ("%i/%i Modification of %s " % 
+    log ("%i/%i Process %s " %
       (i+1,nbPages,title))
       
     if(dst.editpage(p)):
@@ -440,7 +450,7 @@ def syncPage(src, dst, force, checkRedirect, expandText, primary, nbPages, iTitl
       newPage.text = p.expand_text()
     else:
       newPage.text = p.text 
-    
+
     # commit the new page on dest wiki
     if ( dst.editpage(newPage) ):
       return 1
@@ -543,9 +553,9 @@ def syncPagesWithThreadPool(src, dst, pages, expandText, primary, force = False)
 def syncPages(src, dst, pages, expandText, primary, force = False): 
   sync = partial(syncPage, src,dst,force,True, expandText, primary,  len(pages))
   return sum(map(sync,enumerate(pages)))
-    
-def getTemplatesFromPages(siteSrc, pages) :
-  getTplt = partial(getTemplateTitlesFromPage, siteSrc, len(pages))
+
+def getTemplatesFromPages(siteSrc, pages, exclude) :
+  getTplt = partial(getTemplateTitlesFromPage, siteSrc, exclude, len(pages))
   templates = []
   for tList in map(getTplt,enumerate(pages)):
     templates.extend(tList)
@@ -606,31 +616,7 @@ def modifyPages(siteSrc, siteDst,
     if('delete' in mod):
       nbMods += deletePages(siteSrc, siteDst, pageModsUniq)       
       
-  return nbMods;
-  
-def getDependances( site, pages, options) : 
-  """ Get the dependances of pages (templates and files),
-  
-    options : dict from args scripts
-    
-    return the number of succes synchronized pages and files 
-  """
-  templates = []
-  files = []  
-  
-  if(options['templatesSync']):
-    # collect template used by pages
-    log ("====== Collect Templates Dependances")
-    templates = getTemplatesFromPages(site, pages)
-    log ("%i templates to sync" % len(templates))  
-    
-  if(options['filesUpload']) :
-    log ("====== Collect Files Dependances")
-    files = getFilesFromPages(site, pages)
-    log ("%i files to sync" % len(files))    
-    
-  return (templates,files)  
-
+  return nbMods
         
 def mirroringAndModifyPages(
   srcFam, srcCode, dstFam, dstCode, 
@@ -663,6 +649,9 @@ def mirroringAndModifyPages(
   templates = []
   files = []
   
+  # regex compile to exlucde dependances pages
+  reg_exlude_dep = re.compile(DEP_EXLUDE)
+
   nbMods = 0
   nbPagesSync = 0
   nbPagesUpload = 0
@@ -683,7 +672,17 @@ def mirroringAndModifyPages(
   for i in range(options["nbDepParse"]): 
       log ("==============================") 
       log ("====== Collect Dependances #%i" % i)
-      (depTmpt,depFiles) = getDependances(siteSrc, pages + templates + files, options)
+
+      if(options['templatesSync']):
+        log ("====== Collect Templates Dependances")
+        depTmpt = getTemplatesFromPages(siteSrc, pages + templates + files, reg_exlude_dep)
+        log ("%i templates to sync" % len(templates))
+
+      if(options['filesUpload']) :
+        log ("====== Collect Files Dependances")
+        depFiles = getFilesFromPages(siteSrc, pages + files)
+        log ("%i files to sync" % len(files))
+
       # update list of templates and files
       #  with duplicates removed
       templates = list(set(templates + depTmpt))
@@ -731,13 +730,12 @@ def mirroringAndModifyPages(
 			pages, expandText, True,force )  
                                     
 
-      
-         
-
   if( modifications and options["modifyPages"] ):
     log ("============================") 
     log ("====== Process Modifications")
-    nbMods =  modifyPages(siteSrc, siteDst, pages + templates + files, modifications)        
+    nbMods =  modifyPages(siteSrc, siteDst, pages + templates + files, modifications)
+    log ("====== Commit all pages ")
+    subsOnPages(siteSrc, siteDst, pages + templates, [])
       
   return (nbPagesSync,nbPagesUpload,nbPagesTemplate,nbMods)
 
