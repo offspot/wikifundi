@@ -671,19 +671,20 @@ def mirroringAndModifyPages(
     
   exportPagesTitle(pages,"pages",exportDir)  
 
-  #try to resume
+  # try to resume
   if( options["resume"] ):
     templates = importPagesTitle("templates",exportDir)
     files = importPagesTitle("files",exportDir)
   
+  # get files to copy
   if(options['filesUpload']) :
     log ("====== Collect Files Dependances")
     # do not get images on templates (to avoid to many unused files)
-    depFiles = getFilesFromPages(siteSrc, pages)
+    files = getFilesFromPages(siteSrc, pages)
     log ("%i files to sync" % len(files))
     exportPagesTitle(files,"files",exportDir)  
   
-  # copy templates and files
+  # get templates to copy
   for i in range(options["nbDepParse"]): 
       log ("==============================") 
       log ("====== Collect Templates Dependances #%i" % i)
@@ -708,7 +709,7 @@ def mirroringAndModifyPages(
       nbPagesUpload = uploadFilesWithThreadPool (
                 siteSrc, siteSrc.image_repository(), siteDst, 
                 files, options["thumbWidth"], options["maxSize"]) 
-      log ("====== UUpload images used by all file pages with %i thread pool" % MAX_WORKERS)  
+      log ("====== Upload images used by all file pages with %i thread pool" % MAX_WORKERS)  
       nbPagesUpload += uploadFilesWithThreadPool (
                 siteSrc, siteSrc.image_repository(), siteDst, 
                 set(imagesUsedByAllFilePage(siteDst)), 
