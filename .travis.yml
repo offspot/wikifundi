@@ -3,7 +3,7 @@ before_install:
 - sudo apt-get update
 - sudo apt-get install jq
 install: "./install_sloppy_cli.sh"
-script: "./wikifundi_management.sh restart"
+script: "./wikifundi_management.sh cron"
 env:
   global:
   - secure: DpiA3UyxHjX3rl1437ITGKL+/nFZq+h5uWUTsRcqJysSRsqpHoR0cHnsxICYKyBcFZK5Ym6fzdGjnNkxnRwRMhQ3l0GteYcDVMHizcpcIvCHGPUU9eh3pDhl6yGMm1pEPqU1vhze5D0U2VJpyK/CzVbnJPtsyvhWKTebmNKM73w+epsqGRmotgdjUOiDjhVn5IkYnC3I5QSy84NjD++rRhBTPEfng8yLhrgDiw9BMUFKAxKgW5V6Uc0tq3WuyLX1d5F9nqdcGC5lt21tRb32JSKWuxnk2AQpFm/eThYpTq2F3qOnInVocz3noQoxlZ8Q7JCnGG1eEdO4z/VKidAlq7A4ncCpiQRgPwqry4AyLAL9IpyZhQUeOfX2gH6SrVAmPjr5QmGlRkQy4T8mRJQjS7d/m/7Qru9C3K40JDqc2i8gRu33plkD+ZW9KgXLwTTeM8AF89tiTdINSVKFOyEGSiCMV3v8/ZDAxfVak6BWVbdF9+wXZLefSSoIkocFEOkGJJM398CSX5Ra7+ntY9kQwbKfkt4Nsp8Fq1gmL4xvM0SV4SVvd5YsBnG04LjfhIGDNaixNlN35X1cXZSQzXO8CEWkVWm83zZMIhYjZ0jGAu8mfi2xwa7/O11bI8ytr3dGXmWPAyJ+6rRRK8/ELEV9nBp/VmoGzl0QYPzbJj8w/8Q=

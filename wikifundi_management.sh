@@ -122,6 +122,17 @@ function full_mirroring
   sloppy_change sloppy-full-mirroring.json
 }
 
+function cron
+{
+  #run full mirroring only the sunday
+  if [ `date +%w` == "0" ] 
+  then 
+    full_mirroring
+  else
+    partial_mirroring
+  fi  
+}
+
 ACTION=$1
 
 case $ACTION in
@@ -139,6 +150,9 @@ case $ACTION in
     ;;
   delete_all)
     delete_all $2
+    ;;
+  cron)
+    cron
     ;;
 esac
 

@@ -106,4 +106,4 @@ You can use `./install_sloppy_cli.sh` to install Sloppy CLI. We must define SLOP
 * `./wikifundi_management.sh partial_mirroring` : lauch a mirroring which force copy pages exclusively (no copy files and templates)
 * `./wikifundi_management.sh delete_all` : delete all instance
 * `./wikifundi_management.sh wait_running` : wait until all instances are ready 
-
+* `./wikifundi_management.sh cron` : start full mirroring on sunday and partial mirroring the other day
