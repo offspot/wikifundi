@@ -47,6 +47,13 @@ RUN { \
  echo "(u'botimport', u'${MEDIAWIKI_ADMIN_PASSWORD}')" ; \
 } > ${PYWIKIBOT2_DIR}/user-password.py \
  &&  chmod 700 ${PYWIKIBOT2_DIR}/user-password.py 
+ 
+# Allow to avoid thumbs generation error with error in a PDF 
+RUN { \
+  mv /usr/bin/gs /usr/bin/gs9-20 ; \
+  echo '/usr/bin/gs9-20 -sstdout=%stderr $@' > /usr/bin/gs ; \
+  chmod a+x /usr/bin/gs ; \
+}
 
 # Copy script used by start.sh to sync wikimedia pages
 COPY ./wikimedia_sync.py /usr/local/bin/wikimedia_sync
