@@ -383,17 +383,18 @@ def subsOnPage(src, dst, subs, nbPages, iTitles)  :
   (i,title) = iTitles
   try:  
     (pSrc,p,ns) = getPageSrcDstFromTitle(src,dst,title)
-
-    for s in subs :
-      pattern = s[0]
-      repl = s[1]
-      p.text = re.sub(pattern, repl, p.text)
-      
-    log ("%i/%i Process %s " %
-      (i+1,nbPages,title))
-      
-    if(dst.editpage(p)):
-      return 1
+    
+    if(p.exists()):
+      for s in subs :
+        pattern = s[0]
+        repl = s[1]
+        p.text = re.sub(pattern, repl, p.text)
+        
+      log ("%i/%i Process %s " %
+        (i+1,nbPages,title))
+        
+      if(dst.editpage(p)):
+        return 1
     
   except Exception as e:
       log_err ("Error to modify page %s (%s)" % 
@@ -570,6 +571,13 @@ def getFilesFromPages(siteSrc, pages) :
   # apply set() to delete duplicate
   return list(set(files))
   
+def imagesUsedByAllFilePage(site):
+  for title,images in map(  lambda f : (f.title(),f.imagelinks()) ,
+                        site.allimages()):
+      log ("Process %s" % title)
+      for i in images:
+        yield i.title()
+  
 ######################################
 # Entry points  
 
@@ -668,27 +676,25 @@ def mirroringAndModifyPages(
     templates = importPagesTitle("templates",exportDir)
     files = importPagesTitle("files",exportDir)
   
+  if(options['filesUpload']) :
+    log ("====== Collect Files Dependances")
+    # do not get images on templates (to avoid to many unused files)
+    depFiles = getFilesFromPages(siteSrc, pages)
+    log ("%i files to sync" % len(files))
+    exportPagesTitle(files,"files",exportDir)  
+  
   # copy templates and files
   for i in range(options["nbDepParse"]): 
       log ("==============================") 
-      log ("====== Collect Dependances #%i" % i)
-
-      if(options['templatesSync']):
-        log ("====== Collect Templates Dependances")
-        depTmpt = getTemplatesFromPages(siteSrc, pages + templates + files, reg_exlude_dep)
-        log ("%i templates to sync" % len(templates))
-
-      if(options['filesUpload']) :
-        log ("====== Collect Files Dependances")
-        depFiles = getFilesFromPages(siteSrc, pages + files)
-        log ("%i files to sync" % len(files))
+      log ("====== Collect Templates Dependances #%i" % i)
+      depTmpt = getTemplatesFromPages(siteSrc, pages + templates, reg_exlude_dep)
+      log ("%i templates to sync" % len(templates))
 
       # update list of templates and files
       #  with duplicates removed
       templates = list(set(templates + depTmpt))
-      files = list(set(files + depFiles))
       exportPagesTitle(templates,"templates",exportDir)
-      exportPagesTitle(files,"files",exportDir)
+
       
   # sync all pages, templates and associated files
   log ("======================") 
@@ -701,8 +707,12 @@ def mirroringAndModifyPages(
       log ("====== Upload files with %i thread pool" % MAX_WORKERS)
       nbPagesUpload = uploadFilesWithThreadPool (
                 siteSrc, siteSrc.image_repository(), siteDst, 
-                files, options["thumbWidth"], options["maxSize"])    
-      
+                files, options["thumbWidth"], options["maxSize"]) 
+      log ("====== UUpload images used by all file pages with %i thread pool" % MAX_WORKERS)  
+      nbPagesUpload += uploadFilesWithThreadPool (
+                siteSrc, siteSrc.image_repository(), siteDst, 
+                set(imagesUsedByAllFilePage(siteDst)), 
+                options["thumbWidth"], options["maxSize"]) 
     if(options['templatesSync']):
       log ("====== Sync template with %i thread pool" % MAX_WORKERS)
       nbPagesTemplate = syncPagesWithThreadPool(siteSrc, siteDst, 
@@ -717,8 +727,12 @@ def mirroringAndModifyPages(
       log ("====== Upload files")
       nbPagesUpload = uploadFiles (
                 siteSrc, siteSrc.image_repository(), siteDst, 
-                files, options["thumbWidth"], options["maxSize"])     
-                
+                files, options["thumbWidth"], options["maxSize"])  
+      log ("====== Upload images used by all file pages")  
+      nbPagesUpload += uploadFiles (
+                siteSrc, siteSrc.image_repository(), siteDst, 
+                set(imagesUsedByAllFilePage(siteDst)), 
+                options["thumbWidth"], options["maxSize"])          
     if(options['templatesSync']):
       log ("====== Sync template")
       nbPagesTemplate = syncPages(siteSrc, siteDst, 
