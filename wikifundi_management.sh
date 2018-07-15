@@ -1,4 +1,5 @@
 #!/bin/bash
+NB_TRY=10
 PAUSE=5
 PROJECT="wikifundi"
 
@@ -112,14 +113,22 @@ function partial_mirroring
 
 function full_mirroring
 {
-  delete_all "force"
-  
-  sleep $PAUSE
-  sleep $PAUSE
-  sleep $PAUSE
-  sleep $PAUSE
-  
-  sloppy_change sloppy-full-mirroring.json
+  for i in `seq 1 $NB_TRY`
+  do
+    echo "Try to reset all #$i"
+
+    delete_all "force"
+    
+    sleep $PAUSE
+    sleep $PAUSE
+    sleep $PAUSE
+    sleep $PAUSE
+    
+    if [ sloppy_change sloppy-full-mirroring.json ]
+    then
+      return
+    fi
+  done
 }
 
 function cron
