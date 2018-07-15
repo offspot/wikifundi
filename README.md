@@ -79,6 +79,8 @@ This directory contain the configuration of :
 * `mirroring/mirroring.json` : 
     Pages to copy from an other wiki and modifications after copy. 
     Read help part of `wikimedia_sync.py` to get file structure.
+* `mirroring/deleteBatch.txt` :
+    List of pages to delete. You can also use `mirroring.json` to mark pages to delete, but human interevention is needed to really delete pages.
 * `mediawiki/LocalSettings.custom.php` : 
     You can customise the Mediawiki by editing your this file. 
     If you want to know more, have a look to [documentation](https://www.mediawiki.org/wiki/Manual:LocalSettings.php)
