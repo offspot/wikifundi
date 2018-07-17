@@ -124,7 +124,7 @@ function full_mirroring
     sleep $PAUSE
     sleep $PAUSE
     
-    if [ sloppy_change sloppy-full-mirroring.json ]
+    if sloppy_change sloppy-full-mirroring.json
     then
       return
     fi
