@@ -77,7 +77,7 @@ function restart
 
 function sloppy_change
 {
-  PARAMS=$*
+  PARAMS=$1
   sloppy change $PARAMS
 }
 
