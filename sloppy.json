@@ -22,7 +22,7 @@
                 "volumes": [
                     {
                         "container_path": "/var/www/data",
-                        "size": "24GB"
+                        "size": "6GB"
                     }
                 ]
             },
@@ -45,7 +45,7 @@
                 "volumes": [
                     {
                         "container_path": "/var/www/data",
-                        "size": "24GB"
+                        "size": "6GB"
                     }
                 ]
             }
