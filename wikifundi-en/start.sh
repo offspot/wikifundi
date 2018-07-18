@@ -43,7 +43,7 @@ then
   service memcached stop 
   
   # delete pages
-  php maintenance/deleteBatch.php  --conf ./LocalSettings.php -r "No needed for Wikifundi" ./deleteBatch.txt  
+  php maintenance/deleteBatch.php  --conf ./LocalSettings.php -u botimport -r "No needed for Wikifundi" ./deleteBatch.txt  
   
   # force to purge page cache
   touch LocalSettings.php
