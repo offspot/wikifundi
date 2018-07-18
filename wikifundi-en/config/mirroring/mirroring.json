@@ -113,6 +113,16 @@
         }       
       ]      
     }, 
+    
+    {
+      "pages":["^Module:Wikidata$","^Module:EditAtWikidata$","^Module:Taxonbar$"],
+      "substitutions":[
+        {
+          "pattern":"mw.wikibase.getEntity.*?\\(.*?\\)",
+          "repl":"nil -- Wikifundi not use Wikidata"
+        }       
+      ]      
+    },     
         
     {
       "categories":[  
@@ -127,6 +137,10 @@
           "pattern":"\\[\\[Category:WikiProject( |_)WikiFundi( |_)Content\\]\\]",
           "repl":" "
         },
+        {
+          "pattern":"<nowiki>.*?</nowiki>",
+          "repl":" "
+        },        
         {
           "pattern":"<!--2BREINSERTED(.*)-->",
           "repl":"\\1"
