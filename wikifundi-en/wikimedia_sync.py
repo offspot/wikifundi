@@ -837,8 +837,8 @@ def mirroringAndModifyPages(
     log ("====== Process Modifications")
     nbMods =  modifyPages(siteSrc, siteDst, 
                           pages + templates + files, modifications)
-    #log ("====== Commit all pages ")
-    #subsOnPages(siteSrc, siteDst, pages + templates, [])
+    log ("====== Commit all pages ")
+    subsOnPages(siteSrc, siteDst, pages + templates, [])
 
   return (nbPagesSync,nbPagesUpload,nbPagesTemplate,nbMods)
 
