@@ -24,6 +24,9 @@ $wgExtraNamespaces[NS_FOO_TALK] = "Wikipédia_talk"; // Note underscores in the 
 $wgLogo = "/logo.png";
 $wgRightsIcon = "/A_WikiAfrica_project.png";
 
+# License
+$wgRightsUrl = 'https://creativecommons.org/licenses/by-sa/4.0/';
+
 # Uploads
 ini_set('memory_limit', '512M');
 ini_set('post_max_size', '5M');
