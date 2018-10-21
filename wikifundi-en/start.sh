@@ -54,6 +54,9 @@ then
   echo "Refresh links ..."
   su -c 'php maintenance/refreshLinks.php -e 200 --namespace 0' -s /bin/bash  www-data >> ${LOG_DIR}/mw_update.log 
 
+  echo "Empty recentchange table"
+  sqlite3 ${DATABASE_FILE} "DELETE FROM recentchanges;"
+
   #To write in image dir
   chown -R www-data:www-data ${DATA_DIR}  
   
