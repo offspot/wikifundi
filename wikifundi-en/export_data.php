@@ -10,12 +10,11 @@
   
   $filename=strtolower($wgSitename."-".$wgLanguageCode."_".date('Y-m-d'));
 
-  if (isset($_GET["format"]) && $_GET["format"] == "tar")
-  {
+  if (isset($_GET["format"]) && $_GET["format"] == "tar") {
     $type="x-tar";
     $ext="tar";
     $cmd="tar -C ".$workingDir." -c ".$excludeArgs." ".$exportDir;
-  }else{
+  } else {
     $type="x-bzip2";
     $ext="tar.bz2";
     $cmd="tar -C ".$workingDir." -cj ".$excludeArgs." ".$exportDir;
@@ -29,5 +28,4 @@
   passthru($cmd,$err);
 
   exit();
-  
 ?>
