@@ -22,6 +22,9 @@ RUN apt-get update \
    && apt-get install -y --no-install-recommends python3-pip \
    && pip3 install -U setuptools \
    && pip3 install pywikibot
+
+# Configure PHP-fpm
+COPY config/php-fpm/*.conf /etc/php/7.0/fpm/pool.d/
    
 # Configure Pywikibot (must be in same directory of wikimedia_sync.py)
 COPY ${PYWIKIBOT_CONFIG_FILE} ${PYWIKIBOT2_DIR}/ 
