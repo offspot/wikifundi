@@ -21,6 +21,7 @@ ENV MEDIAWIKI_ADMIN_PASSWORD adminadmin
 RUN apt-get update \
    && apt-get install -y --no-install-recommends python3-pip \
    && pip3 install -U setuptools \
+   && pip3 install wheel \
    && pip3 install pywikibot
 
 # Configure PHP-fpm
