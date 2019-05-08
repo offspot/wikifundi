@@ -9,7 +9,7 @@
 #   here. Not all properties are documented here.
 
 # The number of http workers (as opposed to `cpu_workers` below)
-num_workers: 2
+num_workers: 4
 
 worker_heartbeat_timeout: 300000
 
