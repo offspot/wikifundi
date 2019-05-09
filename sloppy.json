@@ -9,7 +9,7 @@
                 "domain": {
                     "uri": "wikifundi-fr.openzim.org"
                 },
-                "mem": 2048,
+                "mem": 768,
                 "instances": 1,
                 "image": "openzim/wikifundi-fr:latest",
                 "port_mappings": [
@@ -32,7 +32,7 @@
                 "domain": {
                     "uri": "wikifundi-en.openzim.org"
                 },
-                "mem": 2048,
+                "mem": 768,
                 "instances": 1,
                 "image": "openzim/wikifundi-en:latest",
                 "port_mappings": [
