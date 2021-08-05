@@ -32,19 +32,19 @@ from __future__ import absolute_import, unicode_literals
 # If you use either of these functions to define the family to work on by
 # default (the ‘family’ variable below), you must place the function call
 # before the definition of the ‘family’ variable.
-family = 'wikipedia'
+family = "wikipedia"
 
 # The language code of the site we're working on.
-mylang = 'en'
+mylang = "en"
 
-family_files['kiwix']='http://localhost/w/api.php'
+family_files["kiwix"] = "http://localhost/w/api.php"
 
 # The dictionary usernames should contain a username for each site where you
 # have a bot account. If you have a unique username for all languages of a
 # family , you can use '*'
-usernames['wikipedia']['fr'] = u'kiwix'
-usernames['wikipedia']['en'] = u'kiwix'
-usernames['kiwix']['*'] = u'botimport'
+usernames["wikipedia"]["fr"] = "kiwix"
+usernames["wikipedia"]["en"] = "kiwix"
+usernames["kiwix"]["*"] = "botimport"
 
 # The list of BotPasswords is saved in another file. Import it if needed.
 # See https://www.mediawiki.org/wiki/Manual:Pywikibot/BotPasswords to know how
@@ -64,7 +64,7 @@ password_file = "user-password.py"
 # Per default, logging of interwiki.py is enabled because its logfiles can
 # be used to generate so-called warnfiles.
 # This setting can be overridden by the -log or -nolog command-line arguments.
-log = ['interwiki']
+log = ["interwiki"]
 # filename defaults to modulename-bot.log
 logfilename = None
 # maximal size of a logfile in kilobytes. If the size reached that limit the
@@ -133,7 +133,7 @@ interwiki_min_subjects = 100
 # interwiki_graph_formats = ['png', 'cmap']
 # If you only need SVG images, use:
 # interwiki_graph_formats = ['svg']
-interwiki_graph_formats = ['png']
+interwiki_graph_formats = ["png"]
 
 # You can post the contents of your autonomous_problems.dat to the wiki,
 # e.g. to https://de.wikipedia.org/wiki/Wikipedia:Interwiki-Konflikte .
@@ -236,11 +236,11 @@ weblink_dead_days = 7
 # db_hostname = 'enwiki.labsdb'
 # db_name_format = '{0}_p'
 # db_connect_file = user_home_path('replica.my.cnf')
-db_hostname = 'localhost'
-db_username = ''
-db_password = ''
-db_name_format = '{0}'
-db_connect_file = user_home_path('.my.cnf')
+db_hostname = "localhost"
+db_username = ""
+db_password = ""
+db_name_format = "{0}"
+db_connect_file = user_home_path(".my.cnf")
 # local port for mysql server
 # ssh -L 4711:enwiki.labsdb:3306 user@tools-login.wmflabs.org
 db_port = 3306
@@ -249,20 +249,20 @@ db_port = 3306
 
 # Yahoo! Search Web Services are not operational.
 # See https://phabricator.wikimedia.org/T106085
-yahoo_appid = ''
+yahoo_appid = ""
 
 # To use Windows Live Search web service you must get an AppID from
 # http://www.bing.com/dev/en-us/dev-center
-msn_appid = ''
+msn_appid = ""
 
 # ############# FLICKR RIPPER SETTINGS ##############
 
 # Using the Flickr api
 flickr = {
-    'api_key': u'',  # Provide your key!
-    'api_secret': u'',  # Api secret of your key (optional)
-    'review': False,  # Do we use automatically make our uploads reviewed?
-    'reviewer': u'',  # If so, under what reviewer name?
+    "api_key": "",  # Provide your key!
+    "api_secret": "",  # Api secret of your key (optional)
+    "review": False,  # Do we use automatically make our uploads reviewed?
+    "reviewer": "",  # If so, under what reviewer name?
 }
 
 # ############# COPYRIGHT SETTINGS ##############
@@ -370,8 +370,12 @@ cosmetic_changes_disable = {}
 # cosmetic_changes_deny_script += ['your_script_name_1', 'your_script_name_2']
 # Appending the script name also works:
 # cosmetic_changes_deny_script.append('your_script_name')
-cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
-                                'newitem', 'touch']
+cosmetic_changes_deny_script = [
+    "category_redirect",
+    "cosmetic_changes",
+    "newitem",
+    "touch",
+]
 
 # ############# REPLICATION BOT ################
 # You can add replicate_replace to your user-config.py, which has the following
@@ -413,7 +417,7 @@ max_queue_size = 64
 # pages fetched from screen (mostly) have "\r\n". Interwiki and category
 # separator settings in family files should use multiplied of this.
 # LS is a shortcut alias.
-line_separator = LS = u'\n'
+line_separator = LS = "\n"
 
 # Settings to enable mwparserfromhell
 # <https://mwparserfromhell.readthedocs.org/en/latest/>

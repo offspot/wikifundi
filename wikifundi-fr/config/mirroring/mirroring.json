@@ -1,115 +1,124 @@
 {
-  "sites":{
-    "src":{
+  "sites": {
+    "src": {
       "fam": "wikipedia",
       "code": "fr"
     },
-    "dst":{
+    "dst": {
       "fam": "kiwix",
-      "code": "fr"    
+      "code": "fr"
     }
   },
-
-  "pages":[
+  "pages": [
     "MediaWiki:Common.js",
     "MediaWiki:Common.css",
     "MediaWiki:Vector.css"
   ],
-  
-  "categories":[
-    { "title" : "Projet_WikiFundi_Contenu"}
+  "categories": [
+    {
+      "title": "Projet_WikiFundi_Contenu"
+    }
   ],
-  
-  "modifications":[
+  "modifications": [
     {
-      "pages":["^Modèle:Coord$"],
-      "empty":true
+      "pages": [
+        "^Modèle:Coord$"
+      ],
+      "empty": true
     },
     {
-      "pages":["^Modèle:Portail$"],
-      "empty":true
+      "pages": [
+        "^Modèle:Portail$"
+      ],
+      "empty": true
     },
-    
     {
-      "pages":["^MediaWiki:Common.css$"],
-      "substitutions":[
+      "pages": [
+        "^MediaWiki:Common.css$"
+      ],
+      "substitutions": [
         {
-          "pattern":".mw-wiki-logo.*?}",
-          "repl":"/* keep Wikifundi Logo  */"
-        }       
-      ]      
-    }, 
-    {
-      "pages":["^Main Page$"],
-      "delete":true
+          "pattern": ".mw-wiki-logo.*?}",
+          "repl": "/* keep Wikifundi Logo  */"
+        }
+      ]
     },
     {
-      "pages":["^Module:Coordinates$"],
-      "substitutions":[
+      "pages": [
+        "^Main Page$"
+      ],
+      "delete": true
+    },
+    {
+      "pages": [
+        "^Module:Coordinates$"
+      ],
+      "substitutions": [
         {
-          "pattern":"=wikidatacat\\(globe\\)",
-          "repl":"={} -- Wikifundi not use Wikidata"
+          "pattern": "=wikidatacat\\(globe\\)",
+          "repl": "={} -- Wikifundi not use Wikidata"
         },
         {
-          "pattern":"if maplink then.*?end",
-          "repl":"-- Wikifundi not use Wikidata"
+          "pattern": "if maplink then.*?end",
+          "repl": "-- Wikifundi not use Wikidata"
         },
         {
-          "pattern":"if wikidata == \\'true\\' then",
-          "repl":"if false then -- Wikifundi not use Wikidata"
-        } 
-        
-               
-      ]      
+          "pattern": "if wikidata == \\'true\\' then",
+          "repl": "if false then -- Wikifundi not use Wikidata"
+        }
+      ]
     },
-    
     {
-      "pages":["^Module:Bandeau$","^Module:Wikidata$","^Module:Autorité$"],
-      "substitutions":[
+      "pages": [
+        "^Module:Bandeau$",
+        "^Module:Wikidata$",
+        "^Module:Autorité$"
+      ],
+      "substitutions": [
         {
-          "pattern":"mw.wikibase.getEntity\\(.*?\\)",
-          "repl":"nil -- Wikifundi not use Wikidata"
-        }       
-      ]      
-    },    
-
+          "pattern": "mw.wikibase.getEntity\\(.*?\\)",
+          "repl": "nil -- Wikifundi not use Wikidata"
+        }
+      ]
+    },
     {
-      "pages":["^Module:Infobox/Localdata$"],
-      "substitutions":[
+      "pages": [
+        "^Module:Infobox/Localdata$"
+      ],
+      "substitutions": [
         {
-          "pattern":"wikidata.getEntity\\(localdata.wikidata\\)",
-          "repl":"nil -- Wikifundi not use Wikidata"
-        }       
-      ]      
-    },     
-    
+          "pattern": "wikidata.getEntity\\(localdata.wikidata\\)",
+          "repl": "nil -- Wikifundi not use Wikidata"
+        }
+      ]
+    },
     {
-      "pages":["^Module:Infobox$"],
-      "substitutions":[
+      "pages": [
+        "^Module:Infobox$"
+      ],
+      "substitutions": [
         {
-          "pattern":"wd.getClaims\\(query\\)",
-          "repl":"nil -- Wikifundi not use Wikidata"
-        }       
-      ]      
-    },     
-        
-    
-    
+          "pattern": "wd.getClaims\\(query\\)",
+          "repl": "nil -- Wikifundi not use Wikidata"
+        }
+      ]
+    },
     {
-      "categories":[{ "title" : "Projet_WikiFundi_Contenu"}],
-      "substitutions":[
+      "categories": [
         {
-          "pattern":"\\[\\[(Category|Catégorie):Projet( |_)WikiFundi( |_|)(Contenu|)\\]\\]",
-          "repl":" "
+          "title": "Projet_WikiFundi_Contenu"
+        }
+      ],
+      "substitutions": [
+        {
+          "pattern": "\\[\\[(Category|Catégorie):Projet( |_)WikiFundi( |_|)(Contenu|)\\]\\]",
+          "repl": " "
         },
         {
-          "pattern":"<!--2BREINSERTED(.*)-->",
-          "repl":"\\1"
-        }         
+          "pattern": "<!--2BREINSERTED(.*)-->",
+          "repl": "\\1"
+        }
       ]
     }
-  ]  
-
+  ]
 }
-
-

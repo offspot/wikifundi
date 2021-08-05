@@ -6,11 +6,11 @@ PROJECT="wikifundi"
 function running_status
 {
   RUNNING=0;
-  
-  for i in `sloppy show -r  $PROJECT | jq .[0].apps[].status[0]` 
-  do 
-    if [ !  "$i" = "\"running\""  ] 
-    then 
+
+  for i in `sloppy show -r  $PROJECT | jq .[0].apps[].status[0]`
+  do
+    if [ !  "$i" = "\"running\""  ]
+    then
       RUNNING=1 ;
     fi
   done
@@ -19,7 +19,7 @@ function running_status
 function wait_running
 {
   RUNNING=1;
-  while [ $RUNNING -eq 1 ] 
+  while [ $RUNNING -eq 1 ]
   do
     echo "in process ..."
     running_status
@@ -48,7 +48,7 @@ function delete_app
 function restart_all
 {
   get_list_apps
-  
+
   for app in $APPS
   do
     restart_app
@@ -65,12 +65,12 @@ function get_app_from_lang
 function restart
 {
   lang=$1
-  if [ -z $lang ] 
+  if [ -z $lang ]
   then
     restart_all
   else
     get_app_from_lang $lang
-    restart_app 
+    restart_app
   fi
 }
 
@@ -105,9 +105,9 @@ function delete_all
 function partial_mirroring
 {
   sloppy_change sloppy-partial-mirroring.json
-  
+
   wait_running
-  
+
   restart_all
 }
 
@@ -118,12 +118,12 @@ function full_mirroring
     echo "Try to reset all #$i"
 
     delete_all "force"
-    
+
     sleep $PAUSE
     sleep $PAUSE
     sleep $PAUSE
     sleep $PAUSE
-    
+
     if sloppy_change sloppy-full-mirroring.json
     then
       return
@@ -134,12 +134,12 @@ function full_mirroring
 function cron
 {
   #run full mirroring only the sunday
-  if [ `date +%w` == "0" ] 
-  then 
+  if [ `date +%w` == "0" ]
+  then
     full_mirroring
   else
     partial_mirroring
-  fi  
+  fi
 }
 
 ACTION=$1
@@ -153,7 +153,7 @@ case $ACTION in
     ;;
   partial_mirroring)
     partial_mirroring
-    ;;         
+    ;;
   wait_running)
     wait_running
     ;;

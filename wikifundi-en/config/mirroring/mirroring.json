@@ -1,21 +1,19 @@
 {
-  "sites":{
-    "src":{
+  "sites": {
+    "src": {
       "fam": "wikipedia",
       "code": "en"
     },
-    "dst":{
+    "dst": {
       "fam": "kiwix",
-      "code": "en"    
+      "code": "en"
     }
   },
-
-  "pages":[
+  "pages": [
     "MediaWiki:Common.js",
     "MediaWiki:Common.css",
     "MediaWiki:Vector.css",
     "MediaWiki:Licenses",
-
     "Help:Contents",
     "Help:Navigation",
     "Help:Searching",
@@ -50,105 +48,109 @@
     "Help:Random_page",
     "Help:Recent_changes"
   ],
-  
-  "categories":[
-  { "title" : "WikiProject_WikiFundi_Content",
-    "namespace" : 4,
-    "recurse" : 0}
+  "categories": [
+    {
+      "title": "WikiProject_WikiFundi_Content",
+      "namespace": 4,
+      "recurse": 0
+    }
   ],
-  
-  "modifications":[
+  "modifications": [
     {
-      "pages":["^Help:"],
-      "substitutions":[
-        {
-          "pattern":"<[/]*translate>",
-          "repl":" "
-        },     
-        {
-          "pattern":"<languages[ ]*/>",
-          "repl":" "
-        },     
-        {
-          "pattern":"<!--T:[\\d]+-->",
-          "repl":" "
-        },     
-        {
-          "pattern":"{{ll\\|([^}|]+)(|[^}]*)}}",
-          "repl":"\"[[\".\\1.\"]]\""
-        },     
-        {
-          "pattern":"{{TNT\\|[^}]+}}",
-          "repl":" "
-        },     
-        {
-          "pattern":"<tvar\\|[^>]+>(Special:MyLanguage\\/|)([^>]+)</>",
-          "repl":"\\2"
-        },     
-        {
-          "pattern":"\\[\\[(C|c)ategory:[^]]+\\]\\]",
-          "repl":" "
-        },     
-        {
-          "pattern":"\n[ ]+",
-          "repl":"\n"
-        },     
-        {
-          "pattern":"\n+",
-          "repl":"\n"
-        }     
-      ]
-    },
-    {
-      "pages":["^Template:Coord$"],
-      "empty":true
-    },
-    
-    {
-      "pages":["^MediaWiki:Common.css$"],
-      "substitutions":[
-        {
-          "pattern":".mw-wiki-logo.*?}",
-          "repl":"/* keep Wikifundi Logo  */"
-        }       
-      ]      
-    }, 
-    
-    {
-      "pages":["^Module:Wikidata$","^Module:EditAtWikidata$","^Module:Taxonbar$"],
-      "substitutions":[
-        {
-          "pattern":"mw.wikibase.getEntity.*?\\(.*?\\)",
-          "repl":"nil -- Wikifundi not use Wikidata"
-        }       
-      ]      
-    },     
-        
-    {
-      "categories":[  
-        { 
-          "title" : "WikiProject_WikiFundi_Content",
-          "namespace" : 4,
-          "recurse" : 0
-        }
+      "pages": [
+        "^Help:"
       ],
-      "substitutions":[
+      "substitutions": [
         {
-          "pattern":"\\[\\[Category:WikiProject( |_)WikiFundi( |_)Content\\]\\]",
-          "repl":" "
+          "pattern": "<[/]*translate>",
+          "repl": " "
         },
         {
-          "pattern":"<nowiki>.*?</nowiki>",
-          "repl":" "
-        },        
+          "pattern": "<languages[ ]*/>",
+          "repl": " "
+        },
         {
-          "pattern":"<!--2BREINSERTED(.*)-->",
-          "repl":"\\1"
-        }         
+          "pattern": "<!--T:[\\d]+-->",
+          "repl": " "
+        },
+        {
+          "pattern": "{{ll\\|([^}|]+)(|[^}]*)}}",
+          "repl": "\"[[\".\\1.\"]]\""
+        },
+        {
+          "pattern": "{{TNT\\|[^}]+}}",
+          "repl": " "
+        },
+        {
+          "pattern": "<tvar\\|[^>]+>(Special:MyLanguage\\/|)([^>]+)</>",
+          "repl": "\\2"
+        },
+        {
+          "pattern": "\\[\\[(C|c)ategory:[^]]+\\]\\]",
+          "repl": " "
+        },
+        {
+          "pattern": "\n[ ]+",
+          "repl": "\n"
+        },
+        {
+          "pattern": "\n+",
+          "repl": "\n"
+        }
+      ]
+    },
+    {
+      "pages": [
+        "^Template:Coord$"
+      ],
+      "empty": true
+    },
+    {
+      "pages": [
+        "^MediaWiki:Common.css$"
+      ],
+      "substitutions": [
+        {
+          "pattern": ".mw-wiki-logo.*?}",
+          "repl": "/* keep Wikifundi Logo  */"
+        }
+      ]
+    },
+    {
+      "pages": [
+        "^Module:Wikidata$",
+        "^Module:EditAtWikidata$",
+        "^Module:Taxonbar$"
+      ],
+      "substitutions": [
+        {
+          "pattern": "mw.wikibase.getEntity.*?\\(.*?\\)",
+          "repl": "nil -- Wikifundi not use Wikidata"
+        }
+      ]
+    },
+    {
+      "categories": [
+        {
+          "title": "WikiProject_WikiFundi_Content",
+          "namespace": 4,
+          "recurse": 0
+        }
+      ],
+      "substitutions": [
+        {
+          "pattern": "\\[\\[Category:WikiProject( |_)WikiFundi( |_)Content\\]\\]",
+          "repl": " "
+        },
+        {
+          "pattern": "<nowiki>.*?</nowiki>",
+          "repl": " "
+        },
+        {
+          "pattern": "<!--2BREINSERTED(.*)-->",
+          "repl": "\\1"
+        }
       ]
     }
-  ]  
-
+  ]
 }
-
-

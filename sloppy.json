@@ -1,55 +1,52 @@
 {
-  "project": "wikifundi",
-  "services":[
-    {
-        "id": "wikifundi",
-        "apps": [
-            {
-                "id": "wikifundi-fr",
-                "domain": {
-                    "uri": "wikifundi-fr.openzim.org"
+    "project": "wikifundi",
+    "services": [
+        {
+            "id": "wikifundi",
+            "apps": [
+                {
+                    "id": "wikifundi-fr",
+                    "domain": {
+                        "uri": "wikifundi-fr.openzim.org"
+                    },
+                    "mem": 768,
+                    "instances": 1,
+                    "image": "openzim/wikifundi-fr:latest",
+                    "port_mappings": [
+                        {
+                            "container_port": 80
+                        }
+                    ],
+                    "env": {},
+                    "volumes": [
+                        {
+                            "container_path": "/var/www/data",
+                            "size": "8GB"
+                        }
+                    ]
                 },
-                "mem": 768,
-                "instances": 1,
-                "image": "openzim/wikifundi-fr:latest",
-                "port_mappings": [
-                    {
-                        "container_port": 80
-                    }
-                ],
-                "env": {   
-                },                
-                "volumes": [
-                    {
-                        "container_path": "/var/www/data",
-                        "size": "8GB"
-                    }
-                ]
-            },
-            {
-                "id": "wikifundi-en",
-
-                "domain": {
-                    "uri": "wikifundi-en.openzim.org"
-                },
-                "mem": 768,
-                "instances": 1,
-                "image": "openzim/wikifundi-en:latest",
-                "port_mappings": [
-                    {
-                        "container_port": 80
-                    }
-                ],
-                "env": {
-                },                
-                "volumes": [
-                    {
-                        "container_path": "/var/www/data",
-                        "size": "8GB"
-                    }
-                ]
-            }
-        ]
-    }
-  ]
+                {
+                    "id": "wikifundi-en",
+                    "domain": {
+                        "uri": "wikifundi-en.openzim.org"
+                    },
+                    "mem": 768,
+                    "instances": 1,
+                    "image": "openzim/wikifundi-en:latest",
+                    "port_mappings": [
+                        {
+                            "container_port": 80
+                        }
+                    ],
+                    "env": {},
+                    "volumes": [
+                        {
+                            "container_path": "/var/www/data",
+                            "size": "8GB"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
 }

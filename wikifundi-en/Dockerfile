@@ -9,7 +9,7 @@ ENV PYWIKIBOT2_DIR /usr/local/etc
 # Custom image
 ENV MEDIAWIKI_LOGO_FILE ./assets/images/logo.png
 ENV MEDIAWIKI_LICENCE ./assets/images/A_WikiAfrica_project.png
-ENV MEDIAWIKI_CONF_MIRRORING ./config/mediawiki/LocalSettings.mirroring.php 
+ENV MEDIAWIKI_CONF_MIRRORING ./config/mediawiki/LocalSettings.mirroring.php
 ENV MEDIAWIKI_CONF_DEBUG ./config/mediawiki/LocalSettings.debug.php
 
 ENV DATABASE_NAME mw_wikifundi_en
@@ -26,9 +26,9 @@ RUN apt-get update \
 
 # Configure PHP-fpm
 COPY config/php-fpm/*.conf /etc/php/7.0/fpm/pool.d/
-   
+
 # Configure Pywikibot (must be in same directory of wikimedia_sync.py)
-COPY ${PYWIKIBOT_CONFIG_FILE} ${PYWIKIBOT2_DIR}/ 
+COPY ${PYWIKIBOT_CONFIG_FILE} ${PYWIKIBOT2_DIR}/
 
 # Configure MediaWiki
 COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./LocalSettings.custom.php
@@ -36,7 +36,7 @@ COPY ${MEDIAWIKI_LOGO_FILE} ../
 COPY ${MEDIAWIKI_LICENCE} ../
 COPY ${MEDIAWIKI_CONF_MIRRORING} ./
 COPY ${MEDIAWIKI_CONF_DEBUG} ./
-COPY ${README_FILE} ./ 
+COPY ${README_FILE} ./
 
 # Configure Parsoid with specific domain
 COPY ${PARSOID_CONFIG_FILE} ./parsoid/
@@ -50,9 +50,9 @@ RUN { \
  echo "# -*- coding: utf-8 -*-" ; \
  echo "(u'botimport', u'${MEDIAWIKI_ADMIN_PASSWORD}')" ; \
 } > ${PYWIKIBOT2_DIR}/user-password.py \
- &&  chmod 700 ${PYWIKIBOT2_DIR}/user-password.py 
- 
-# Allow to avoid thumbs generation error with error in a PDF 
+ &&  chmod 700 ${PYWIKIBOT2_DIR}/user-password.py
+
+# Allow to avoid thumbs generation error with error in a PDF
 RUN { \
   mv /usr/bin/gs /usr/bin/gs9-20 ; \
   echo '/usr/bin/gs9-20 -sstdout=%stderr $@' > /usr/bin/gs ; \
