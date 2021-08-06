@@ -6,7 +6,7 @@
     },
     "dst": {
       "fam": "kiwix",
-      "code": "en"
+      "code": "kiwix"
     }
   },
   "pages": [

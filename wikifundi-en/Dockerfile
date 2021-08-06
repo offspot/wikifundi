@@ -1,10 +1,10 @@
-FROM openzim/mediawiki
+FROM ghcr.io/offspot/mediawiki:1.36.1
 
 ENV PYWIKIBOT_CONFIG_FILE ./config/pywikibot/user-config.py
 ENV MIRRORING_CONFIG_FILE ./config/mirroring/mirroring.json
 ENV MIRRORING_DELETE_FILE ./config/mirroring/deleteBatch.txt
 ENV README_FILE ./assets/docs/README
-ENV PYWIKIBOT2_DIR /usr/local/etc
+ENV PYWIKIBOT_DIR /usr/local/etc
 
 # Custom image
 ENV MEDIAWIKI_LOGO_FILE ./assets/images/logo.png
@@ -22,15 +22,17 @@ RUN apt-get update \
    && apt-get install -y --no-install-recommends python3-pip \
    && pip3 install -U setuptools \
    && pip3 install wheel \
-   && pip3 install pywikibot
+   && pip3 install pywikibot==6.5.0 \
+   && pip3 install "mwparserfromhell==0.6.2"
 
 # Configure PHP-fpm
-COPY config/php-fpm/*.conf /etc/php/7.0/fpm/pool.d/
+COPY config/php-fpm/*.conf /etc/php/7.3/fpm/pool.d/
 
 # Configure Pywikibot (must be in same directory of wikimedia_sync.py)
-COPY ${PYWIKIBOT_CONFIG_FILE} ${PYWIKIBOT2_DIR}/
+COPY ${PYWIKIBOT_CONFIG_FILE} ${PYWIKIBOT_DIR}/
 
 # Configure MediaWiki
+WORKDIR /var/www/html/w
 COPY ${MEDIAWIKI_CONFIG_FILE_CUSTOM} ./LocalSettings.custom.php
 COPY ${MEDIAWIKI_LOGO_FILE} ../
 COPY ${MEDIAWIKI_LICENCE} ../
@@ -38,19 +40,15 @@ COPY ${MEDIAWIKI_CONF_MIRRORING} ./
 COPY ${MEDIAWIKI_CONF_DEBUG} ./
 COPY ${README_FILE} ./
 
-# Configure Parsoid with specific domain
-COPY ${PARSOID_CONFIG_FILE} ./parsoid/
 
 # Copy the Mirroring Script
 COPY ${MIRRORING_CONFIG_FILE} ./mirroring.json
 COPY ${MIRRORING_DELETE_FILE} ./
 
 # Generate Passord file for pywikibot
-RUN { \
- echo "# -*- coding: utf-8 -*-" ; \
- echo "(u'botimport', u'${MEDIAWIKI_ADMIN_PASSWORD}')" ; \
-} > ${PYWIKIBOT2_DIR}/user-password.py \
- &&  chmod 700 ${PYWIKIBOT2_DIR}/user-password.py
+RUN printf "# -*- coding: utf-8 -*-\n(\"botimport\", \"${MEDIAWIKI_ADMIN_PASSWORD}\")\n" \
+  > ${PYWIKIBOT_DIR}/user-password.py \
+  &&  chmod 600 ${PYWIKIBOT_DIR}/user-password.py
 
 # Allow to avoid thumbs generation error with error in a PDF
 RUN { \
@@ -68,9 +66,8 @@ COPY ./export_data.php ../
 COPY ./index_mirroring.php ./
 RUN mv index.php index_mediawiki.php
 
-#ENTRYPOINT /bin/bash
-
 # Run start script
 COPY ./start.sh /usr/local/bin/start.sh
 RUN chmod a+x /usr/local/bin/start.sh
-ENTRYPOINT "start.sh"
+ENTRYPOINT ["start.sh"]
+CMD ["nginx", "-g", "daemon off;"]

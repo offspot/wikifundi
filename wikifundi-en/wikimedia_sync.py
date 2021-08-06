@@ -161,7 +161,7 @@
 """
 
 # To use WikiMedia API
-from pywikibot import Site, Page, FilePage, Category, textlib
+from pywikibot import Site, Page, FilePage, Category
 
 # To load JSON file config and check options
 import sys
@@ -178,20 +178,20 @@ from multiprocessing import cpu_count
 
 MAX_WORKERS = cpu_count() * 5
 LIMIT_DEPTH_SUBCAT = 5
-DEFAULT_OPTIONS = dict(
-    force=False,
-    pagesSync=True,
-    templatesSync=True,
-    nbDepParse=2,
-    expandText=False,
-    filesUpload=True,
-    modifyPages=True,
-    exportDir=".",
-    resume=False,
-    thumbWidth=1024,
-    maxSize=200 * 1024 * 1024,
-    async=False,
-)
+DEFAULT_OPTIONS = {
+    "force": False,
+    "pagesSync": True,
+    "templatesSync": True,
+    "nbDepParse": 2,
+    "expandText": False,
+    "filesUpload": True,
+    "modifyPages": True,
+    "exportDir": ".",
+    "resume": False,
+    "thumbWidth": 1024,
+    "maxSize": 200 * 1024 * 1024,
+    "async": False,
+}
 
 # TODO : put in config file
 # try to download thumb only for this mime type
@@ -558,7 +558,7 @@ def syncPage(src, dst, force, checkRedirect, expandText, primary, nbPages, iTitl
             newPage.text = p.text
 
         # commit the new page on dest wiki
-        if dst.editpage(newPage):
+        if dst.editpage(newPage, contentmodel=p.content_model):
             return 1
 
     except Exception as e:
