@@ -11,7 +11,7 @@
                     },
                     "mem": 768,
                     "instances": 1,
-                    "image": "openzim/wikifundi-fr:latest",
+                    "image": "ghcr.io/offspot/wikifundi-fr:latest",
                     "port_mappings": [
                         {
                             "container_port": 80
@@ -32,7 +32,7 @@
                     },
                     "mem": 768,
                     "instances": 1,
-                    "image": "openzim/wikifundi-en:latest",
+                    "image": "ghcr.io/offspot/wikifundi-en:latest",
                     "port_mappings": [
                         {
                             "container_port": 80

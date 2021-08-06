@@ -1,4 +1,4 @@
-FROM openzim/wikifundi-en
+FROM ghcr.io/offspot/wikifundi-en
 
 ENV DATABASE_NAME mw_wikifundi_fr
 

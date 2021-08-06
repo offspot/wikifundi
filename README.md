@@ -10,13 +10,13 @@ Install empty MediaWiki
 Run for english version :
 
 ```
-docker run -p 80:80 -v ${PWD}/data-init:/var/www/data -it openzim/wikifundi-en
+docker run -p 80:80 -v ${PWD}/data-init:/var/www/data -it ghcr.io/offspot/wikifundi-en
 ```
 
 For french version :
 
 ```
-docker run -p 80:80 -v ${PWD}/data-init:/var/www/data -it openzim/wikifundi-fr
+docker run -p 80:80 -v ${PWD}/data-init:/var/www/data -it ghcr.io/offspot/wikifundi-fr
 ```
 
 Go to  [http://localhost/](http://localhost/)
@@ -24,14 +24,14 @@ Go to  [http://localhost/](http://localhost/)
 Default admin logging :
 
 * User : admin
-* Password : adminadmin
+* Password : mediawikipass
 
 Mirroring with WikiFundi
 ------------------------
 
 You can lauch mirroring by changing environments variables MIRRORING :
 
-`docker run -p 80:80 -e MIRRORING=1 -v ${PWD}/data:/var/www/data -it openzim/wikifundi-en`
+`docker run -p 80:80 -e MIRRORING=1 -v ${PWD}/data:/var/www/data -it ghcr.io/offspot/wikifundi-en`
  
 You can also change options script with MIRRORING_OPTIONS : 
 
@@ -97,7 +97,7 @@ To build and run :
 docker build -t wikifundi_en wikifundi_en 
 docker run -p 80:80 -v ${PWD}/data:/var/www/data -it wikifundi_en
 ```
-As french version, yon can extend openzim/wikifundi-en to create an image for other Wikipedia language or other wiki.
+As french version, yon can extend ghcr.io/offspot/wikifundi-en to create an image for other Wikipedia language or other wiki.
 
 Managing Wikifundi with Sloppy hosting
 --------------------------------------
