@@ -6,8 +6,8 @@ on:
       - master
 
 jobs:
-  build-and-push:
-    name: Deploy wikifundi Images
+  build-and-push-en:
+    name: Deploy wikifundi-en
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -23,6 +23,12 @@ jobs:
             GHCRIO_USERNAME=${{ secrets.GHCR_USERNAME }}
             GHCRIO_TOKEN=${{ secrets.GHCR_TOKEN }}
 
+  build-and-push-fr:
+    name: Deploy wikifundi-fr
+    needs: build-and-push-en
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
       - name: Build and push wikifundi-fr
         uses: openzim/docker-publish-action@v5
         with:
