@@ -1,4 +1,5 @@
 FROM ghcr.io/offspot/mediawiki:1.36.1
+LABEL org.opencontainers.image.source https://github.com/offspot/wikifundi
 
 ENV PYWIKIBOT_CONFIG_FILE ./config/pywikibot/user-config.py
 ENV MIRRORING_CONFIG_FILE ./config/mirroring/mirroring.json

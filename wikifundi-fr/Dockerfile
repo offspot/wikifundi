@@ -1,4 +1,5 @@
 FROM ghcr.io/offspot/wikifundi-en
+LABEL org.opencontainers.image.source https://github.com/offspot/wikifundi
 
 ENV DATABASE_NAME mw_wikifundi_fr
 
