@@ -4,7 +4,7 @@
 $wgLanguageCode     = "fr";
 $wgSitename         = "WikiFundi";
 
-# Site language 
+# Site language
 $wgLanguageCode = "fr";
 $wgUploadWizardConfig['uwLanguages'] = array( 'fr' => 'French' );
 
