@@ -7,6 +7,7 @@ CFG_DIR=${DATA_DIR}/config
 
 cp README ${README_FILE}
 
+handle-htpassword-opt.sh
 service memcached start
 mediawiki-init.sh
 
