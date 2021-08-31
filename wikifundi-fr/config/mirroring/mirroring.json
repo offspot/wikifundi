@@ -22,7 +22,8 @@
   "modifications": [
     {
       "pages": [
-        "^Modèle:Coord$"
+        "^Modèle:Coord$",
+        "^Modèle:Commons$"
       ],
       "empty": true
     },

@@ -101,7 +101,8 @@
     },
     {
       "pages": [
-        "^Template:Coord$"
+        "^Template:Coord$",
+        "^Template:Commons$"
       ],
       "empty": true
     },
