@@ -46,7 +46,8 @@
     "Help:Range_blocks",
     "Help:Diff",
     "Help:Random_page",
-    "Help:Recent_changes"
+    "Help:Recent_changes",
+    "Template:Top icon"
   ],
   "categories": [
     {
@@ -102,7 +103,23 @@
     {
       "pages": [
         "^Template:Coord$",
-        "^Template:Commons$"
+        "^Template:Commons$",
+        "^Template:Commons-inline$",
+        "^Template:Sister_project_auto$",
+        "^Template:Sister project links$",
+        "^Module:Sister project links$",
+        "^Template:Academic_peer_reviewed$",
+        "^Template:Wikidata$",
+        "^Template:coordinates_wikidata$",
+        "^Template:Commons category$",
+        "^Template:Commons category-inline$",
+        "^Template:Q$",
+        "^Template:Property$",
+        "^Template:Wikidata entity link$",
+        "^Template:Wikidata property link$",
+        "^Template:Wikidata property$",
+        "^Template:Pageid to title$",
+        "^Module:Wd$"
       ],
       "empty": true
     },

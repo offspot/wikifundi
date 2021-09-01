@@ -23,7 +23,11 @@
     {
       "pages": [
         "^Modèle:Coord$",
-        "^Modèle:Commons$"
+        "^Modèle:Commons$",
+        "^Modèle:Commons-inline$",
+        "^Modèle:Wikidata$",
+        "^Modèle:WikidataOI$",
+        "^Module:Wd$"
       ],
       "empty": true
     },
