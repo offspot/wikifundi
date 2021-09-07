@@ -21,10 +21,8 @@ ENV MEDIAWIKI_ADMIN_PASSWORD adminadmin
 # Install PyWikiBot library
 RUN apt-get update \
    && apt-get install -y --no-install-recommends python3-pip \
-   && pip3 install -U setuptools \
-   && pip3 install wheel \
-   && pip3 install pywikibot==6.5.0 \
-   && pip3 install "mwparserfromhell==0.6.2"
+   && pip3 install --no-cache-dir -U setuptools wheel \
+   && pip3 install --no-cache-dir pywikibot==6.5.0 "mwparserfromhell==0.6.2"
 
 # Configure PHP-fpm
 COPY config/php-fpm/*.conf /etc/php/7.3/fpm/pool.d/
