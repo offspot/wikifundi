@@ -119,8 +119,7 @@
         "^Template:Wikidata property link$",
         "^Template:Wikidata property$",
         "^Template:Pageid to title$",
-        "^Module:Wd$"
-      ],
+        ],
       "empty": true
     },
     {
@@ -136,14 +135,204 @@
     },
     {
       "pages": [
-        "^Module:Wikidata$",
-        "^Module:EditAtWikidata$",
-        "^Module:Taxonbar$"
+        ".+"
       ],
       "substitutions": [
         {
-          "pattern": "mw.wikibase.getEntity.*?\\(.*?\\)",
-          "repl": "nil -- Wikifundi not use Wikidata"
+          "pattern": "mw.wikibase.getEntityIdForCurrentPage\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getEntityIdForTitle\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getEntityObject\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getLabel\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getLabelByLanguage\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getLabelByLang\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getDescriptionWithLang\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getEntity\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entityExists\\(.*?\\)",
+          "repl": "false"
+        },
+        {
+          "pattern": "mw.wikibase.getEntityStatements\\(.*?\\)",
+          "repl": "{}"
+        },
+        {
+          "pattern": "mw.wikibase.getBestStatements\\(.*?\\)",
+          "repl": "{}"
+        },
+        {
+          "pattern": "mw.wikibase.getAllStatements\\(.*?\\)",
+          "repl": "{}"
+        },
+        {
+          "pattern": "mw.wikibase.getEntityUrl\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.renderSnak\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.formatValue\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.renderSnaks\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.formatValues\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getEntityId\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getReferencedEntityId\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getUserLang\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getDescription\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.resolvePropertyId\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getSitelink\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getSiteLinkPageName\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.incrementExpensiveFunctionCount\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.isValidEntityId\\(.*?\\)",
+          "repl": "false"
+        },
+        {
+          "pattern": "mw.wikibase.getPropertyOrder\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getGlobalSiteId\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.orderProperties\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.incrementStatsKey\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.getEntityModuleName\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.formatStatements\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.formatPropertyValues\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.addStatementUsage\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.addLabelUsage\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.addDescriptionUsage\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.addSiteLinksUsage\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.addOtherUsage\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.incrementStatsKey\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.create\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.getId\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.getLabelWithLang\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.getLabel\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.getDescription\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.getDescriptionWithLang\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.getSitelink\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.getBestStatements\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.getAllStatements\\(.*?\\)",
+          "repl": "nil"
+        },
+        {
+          "pattern": "mw.wikibase.entity.getProperties\\(.*?\\)",
+          "repl": "nil"
         }
       ]
     },
