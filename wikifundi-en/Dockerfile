@@ -22,7 +22,8 @@ ENV MEDIAWIKI_ADMIN_PASSWORD adminadmin
 RUN apt-get update \
    && apt-get install -y --no-install-recommends python3-pip \
    && pip3 install --no-cache-dir -U setuptools wheel \
-   && pip3 install --no-cache-dir pywikibot==6.5.0 "mwparserfromhell==0.6.2"
+   && pip3 install --no-cache-dir "mwparserfromhell==0.6.3" \
+   && pip3 install --no-cache-dir https://pywikibot.toolforge.org/core.zip
 
 # Configure PHP-fpm
 COPY config/php-fpm/*.conf /etc/php/7.3/fpm/pool.d/
