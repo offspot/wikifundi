@@ -35,6 +35,7 @@
   -s, --maxsize : do not files download greater to this limit (default : 200MB)
   -a, --async : execute mirroring in async mode (5 threads / cpu).
     Doesnt work with SQLITE database. (default : false)
+  -i, --remove-prefix : a string prefix to remove from all page titles
 
  examples :
  ./wikimedia_sync.py -m 5MB -w 2000 config.json : sync page, templates,
@@ -191,6 +192,7 @@ DEFAULT_OPTIONS = {
     "thumbWidth": 1024,
     "maxSize": 200 * 1024 * 1024,
     "async": False,
+    "removePrefix": "",
 }
 
 # TODO : put in config file
@@ -364,7 +366,7 @@ def getPagesTitleFromCategories(site, categories, depth=0):
 # Modify wiki pages
 
 
-def removeSubPageOfProject(pageTitle, ns):
+def removeSubPageOfProject(pageTitle, ns, removePrefix=""):
     """specific case for project pages"""
     if ns.id == 4 or ns.id == 102:
         if ns.subpages:
@@ -373,11 +375,14 @@ def removeSubPageOfProject(pageTitle, ns):
                 return subPage[1]
             else:
                 return pageTitle
-    else:
-        return pageTitle
+    if removePrefix:
+        return re.sub(r"^" + removePrefix, "", pageTitle)
+    return pageTitle
 
 
-def getPageSrcDstFromTitle(src, dst, pageTitle, primary=True, checkExist=True):
+def getPageSrcDstFromTitle(
+    src, dst, pageTitle, primary=True, checkExist=True, removePrefix=""
+):
     """return a tuple of :
       - source page instance,
       - new page instance on the destination,
@@ -401,7 +406,7 @@ def getPageSrcDstFromTitle(src, dst, pageTitle, primary=True, checkExist=True):
         )
 
     if primary:
-        return (p, Page(dst, removeSubPageOfProject(pageTitle, ns)), ns)
+        return (p, Page(dst, removeSubPageOfProject(pageTitle, ns, removePrefix)), ns)
     else:
         return (p, Page(dst, pageTitle), ns)
 
@@ -490,7 +495,9 @@ def subsOnPage(src, dst, subs, nbPages, iTitles):
 # Mirroring wiki pages
 
 
-def syncPage(src, dst, force, checkRedirect, expandText, primary, nbPages, iTitles):
+def syncPage(
+    src, dst, force, removePrefix, checkRedirect, expandText, primary, nbPages, iTitles
+):
     """Copy ONE wiki pages from src to dst
 
     src : source site
@@ -509,7 +516,9 @@ def syncPage(src, dst, force, checkRedirect, expandText, primary, nbPages, iTitl
 
     (i, pageTitle) = iTitles
     try:
-        (p, newPage, ns) = getPageSrcDstFromTitle(src, dst, pageTitle, primary)
+        (p, newPage, ns) = getPageSrcDstFromTitle(
+            src, dst, pageTitle, primary, removePrefix=removePrefix
+        )
 
         # do not copy page in "Main" namespace if it's dependency
         if (not primary) and ns == 0:
@@ -681,8 +690,10 @@ def syncPagesWithThreadPool(src, dst, pages, expandText, primary, force=False):
     return 0
 
 
-def syncPages(src, dst, pages, expandText, primary, force=False):
-    sync = partial(syncPage, src, dst, force, True, expandText, primary, len(pages))
+def syncPages(src, dst, pages, expandText, primary, force=False, removePrefix=""):
+    sync = partial(
+        syncPage, src, dst, force, removePrefix, True, expandText, primary, len(pages)
+    )
     return sum(map(sync, enumerate(pages)))
 
 
@@ -895,7 +906,15 @@ def mirroringAndModifyPages(
 
         if options["pagesSync"]:
             log("====== Sync pages")
-            nbPagesSync = syncPages(siteSrc, siteDst, pages, expandText, True, force)
+            nbPagesSync = syncPages(
+                siteSrc,
+                siteDst,
+                pages,
+                expandText,
+                True,
+                force,
+                options["removePrefix"],
+            )
 
     if modifications and options["modifyPages"]:
         log("============================")
@@ -946,7 +965,7 @@ def main():
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hftd:xupmre:w:s:a",
+            "hftd:xupmre:w:s:ai:",
             [
                 "help",
                 "force",
@@ -961,6 +980,7 @@ def main():
                 "thumbwidth",
                 "maxsize",
                 "async",
+                "removePrefix",
             ],
         )
 
@@ -998,6 +1018,8 @@ def main():
             options["maxSize"] = int(arg)
         if opt in ("-a", "--async"):
             options["async"] = True
+        if opt in ("-i", "--remove-prefix"):
+            options["removePrefix"] = arg
 
     log(options)
 

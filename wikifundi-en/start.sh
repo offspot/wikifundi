@@ -32,6 +32,11 @@ then
 
   echo "> Mirroring ..."
   wikimedia_sync ${MIRRORING_OPTIONS} -e "${LOG_DIR}" mirroring.json 2>&1 | tee -a ${LOG_DIR}/mirroring.log
+  if [ -f mirroring2.json ];
+  then
+    echo "> Mirroring from second source..."
+    wikimedia_sync ${MIRRORING_OPTIONS} -e "${LOG_DIR}" mirroring2.json 2>&1 | tee -a ${LOG_DIR}/mirroring2.log
+  fi
 
   echo "> Restoring MW standard use"
   ln -fs index_mediawiki.php index.php
