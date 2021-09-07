@@ -118,8 +118,8 @@
         "^Template:Wikidata entity link$",
         "^Template:Wikidata property link$",
         "^Template:Wikidata property$",
-        "^Template:Pageid to title$",
-        ],
+        "^Template:Pageid to title$"
+      ],
       "empty": true
     },
     {
