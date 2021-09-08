@@ -61,3 +61,11 @@ password_file = "user-password.py"
 # be used to generate so-called warnfiles.
 # This setting can be overridden by the -log or -nolog command-line arguments.
 log = ["interwiki"]
+
+# ############# HTTP SETTINGS ##############
+# Default socket timeout in seconds.
+# DO NOT set to None to disable timeouts. Otherwise this may freeze your
+# script.
+# You may assign either a tuple of two int or float values for connection and
+# read timeout, or a single value for both in a tuple.
+socket_timeout = (6.05, 300)
