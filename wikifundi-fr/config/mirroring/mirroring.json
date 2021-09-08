@@ -126,8 +126,14 @@
       ]
     },
     {
-      "pages": [
-        ".+"
+      "namespaces": [
+        "",
+        "Project",
+        "MediaWiki",
+        "Template",
+        "Help",
+        "Category",
+        "Module"
       ],
       "substitutions": [
         {
