@@ -402,7 +402,7 @@ def getPageSrcDstFromTitle(
     # if not exist on this site, test on file repository
     if ns != 0 and checkExist and fileRepo and (not p.exists()):
         return getPageSrcDstFromTitle(
-            fileRepo, dst, re.sub(".*:", str(ns), pageTitle), False, False
+            fileRepo, dst, re.sub(".*:", str(ns), pageTitle), False, False, removePrefix
         )
 
     if primary:
@@ -553,6 +553,7 @@ def syncPage(
                 src,
                 dst,
                 force,
+                removePrefix,
                 False,
                 expandText,
                 primary,
@@ -683,8 +684,12 @@ def uploadFiles(src, srcFileRepo, dst, files, maxwith, maxsize):
     return sum(map(upload, enumerate(files)))
 
 
-def syncPagesWithThreadPool(src, dst, pages, expandText, primary, force=False):
-    sync = partial(syncPage, src, dst, force, True, expandText, primary, len(pages))
+def syncPagesWithThreadPool(
+    src, dst, pages, expandText, primary, force=False, removePrefix=""
+):
+    sync = partial(
+        syncPage, src, dst, force, removePrefix, True, expandText, primary, len(pages)
+    )
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as ex:
         return sum(ex.map(sync, enumerate(pages)))
     return 0
@@ -870,13 +875,25 @@ def mirroringAndModifyPages(
         if options["templatesSync"]:
             log("====== Sync template with %i thread pool" % MAX_WORKERS)
             nbPagesTemplate = syncPagesWithThreadPool(
-                siteSrc, siteDst, templates, expandText, False, force
+                siteSrc,
+                siteDst,
+                templates,
+                expandText,
+                False,
+                force,
+                options["removePrefix"],
             )
 
         if options["pagesSync"]:
             log("====== Sync pages with %i thread pool" % MAX_WORKERS)
             nbPagesSync = syncPagesWithThreadPool(
-                siteSrc, siteDst, pages, expandText, True, force
+                siteSrc,
+                siteDst,
+                pages,
+                expandText,
+                True,
+                force,
+                options["removePrefix"],
             )
     else:
         if options["filesUpload"]:
@@ -901,7 +918,13 @@ def mirroringAndModifyPages(
         if options["templatesSync"]:
             log("====== Sync template")
             nbPagesTemplate = syncPages(
-                siteSrc, siteDst, templates, expandText, False, force
+                siteSrc,
+                siteDst,
+                templates,
+                expandText,
+                False,
+                force,
+                options["removePrefix"],
             )
 
         if options["pagesSync"]:
