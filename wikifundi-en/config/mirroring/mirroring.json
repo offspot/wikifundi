@@ -47,7 +47,8 @@
     "Help:Diff",
     "Help:Random_page",
     "Help:Recent_changes",
-    "Template:Top icon"
+    "Template:Top icon",
+    "Template:Infobox_settlement/styles.css"
   ],
   "categories": [
     {
@@ -118,7 +119,9 @@
         "^Template:Wikidata entity link$",
         "^Template:Wikidata property link$",
         "^Template:Wikidata property$",
-        "^Template:Pageid to title$"
+        "^Template:Pageid to title$",
+        "Template:Taxonbar",
+        "Template:Template link general"
       ],
       "empty": true
     },
