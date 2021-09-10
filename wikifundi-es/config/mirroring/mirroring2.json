@@ -41,7 +41,27 @@
         "^Plantilla:Commons$",
         "^Plantilla:Commons-inline$",
         "^Plantilla:Wikidata$",
-        "^Plantilla:WikidataOI$"
+        "^Plantilla:WikidataOI$",
+        "^Plantilla:Control_de_autoridades$",
+        "^Plantilla:Commonscat$",
+        "^Plantilla:Ficha_de_conflicto$",
+        "^Plantilla:Ficha_de_organización$",
+        "^Plantilla:Twitter$",
+        "^Plantilla:NF$",
+        "^Plantilla:Ficha de enfermedad$",
+        "^Plantilla:Ficha de edificio$",
+        "^Plantilla:Extracto$",
+        "^Plantilla:Ficha de elemento químico$",
+        "^Plantilla:Ficha de localidad de España$",
+        "^Plantilla:Ficha de espacio natural$",
+        "^Plantilla:Ficha de Patrimonio de la Unesco$",
+        "^Ficha de país$",
+        "^Plantilla:Ficha de monumento$",
+        "^Plantilla:Ficha de teatro$",
+        "^Plantilla:Ficha de cuerpo celeste$",
+        "^Plantilla:Ficha de sitio web$",
+        "^Plantilla:Wikipedia gráfico de artículos$",
+        "^Plantilla:Wikipedia editores activos$"
       ],
       "empty": true
     },
@@ -64,7 +84,8 @@
     },
     {
       "pages": [
-        "^Main Page$"
+        "^Main Page$",
+        "^Main_Page$"
       ],
       "delete": true
     },
