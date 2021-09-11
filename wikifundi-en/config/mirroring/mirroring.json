@@ -18,41 +18,41 @@
     "Help:Navigation",
     "Help:Searching",
     "Help:Watchlist",
-    "Help:Starting_a_new_page",
+    "Help:Starting a new page",
     "Help:Formatting",
     "Help:Links",
-    "Help:User_page",
-    "Help:Talk_pages",
+    "Help:User page",
+    "Help:Talk pages",
     "Help:Signatures",
-    "Help:VisualEditor/User_guide",
+    "Help:VisualEditor/User guide",
     "Help:Images",
     "Help:Lists",
     "Help:Tables",
     "Help:Categories",
     "Help:Subpages",
-    "Help:Moving_a_page",
+    "Help:Moving a page",
     "Help:Redirects",
-    "Help:Protected_pages",
+    "Help:Protected pages",
     "Help:Templates",
-    "Help:Magic_words",
+    "Help:Magic words",
     "Help:Namespaces",
     "Help:Cite",
-    "Help:Special_pages",
+    "Help:Special pages",
     "Help:Bots",
     "Help:Notifications",
     "Help:Preferences",
     "Help:Skins",
-    "Help:Patrolled_edits",
-    "Help:Range_blocks",
+    "Help:Patrolled edits",
+    "Help:Range blocks",
     "Help:Diff",
-    "Help:Random_page",
-    "Help:Recent_changes",
+    "Help:Random page",
+    "Help:Recent changes",
     "Template:Top icon",
-    "Template:Infobox_settlement/styles.css"
+    "Template:Infobox settlement/styles.css"
   ],
   "categories": [
     {
-      "title": "WikiProject_WikiFundi_Content",
+      "title": "WikiProject WikiFundi Content",
       "namespace": 4,
       "recurse": 0
     }
@@ -106,12 +106,12 @@
         "^Template:Coord$",
         "^Template:Commons$",
         "^Template:Commons-inline$",
-        "^Template:Sister_project_auto$",
+        "^Template:Sister project auto$",
         "^Template:Sister project links$",
         "^Module:Sister project links$",
-        "^Template:Academic_peer_reviewed$",
+        "^Template:Academic peer reviewed$",
         "^Template:Wikidata$",
-        "^Template:coordinates_wikidata$",
+        "^Template:coordinates wikidata$",
         "^Template:Commons category$",
         "^Template:Commons category-inline$",
         "^Template:Q$",
@@ -120,8 +120,8 @@
         "^Template:Wikidata property link$",
         "^Template:Wikidata property$",
         "^Template:Pageid to title$",
-        "Template:Taxonbar",
-        "Template:Template link general"
+        "^Template:Taxonbar$",
+        "^Template:Template link general$"
       ],
       "empty": true
     },
@@ -348,7 +348,7 @@
     {
       "categories": [
         {
-          "title": "WikiProject_WikiFundi_Content",
+          "title": "WikiProject WikiFundi Content",
           "namespace": 4,
           "recurse": 0
         }

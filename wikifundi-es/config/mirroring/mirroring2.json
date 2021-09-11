@@ -42,10 +42,10 @@
         "^Plantilla:Commons-inline$",
         "^Plantilla:Wikidata$",
         "^Plantilla:WikidataOI$",
-        "^Plantilla:Control_de_autoridades$",
+        "^Plantilla:Control de autoridades$",
         "^Plantilla:Commonscat$",
-        "^Plantilla:Ficha_de_conflicto$",
-        "^Plantilla:Ficha_de_organización$",
+        "^Plantilla:Ficha de conflicto$",
+        "^Plantilla:Ficha de organización$",
         "^Plantilla:Twitter$",
         "^Plantilla:NF$",
         "^Plantilla:Ficha de enfermedad$",
@@ -55,7 +55,7 @@
         "^Plantilla:Ficha de localidad de España$",
         "^Plantilla:Ficha de espacio natural$",
         "^Plantilla:Ficha de Patrimonio de la Unesco$",
-        "^Ficha de país$",
+        "^Plantilla:Ficha de país$",
         "^Plantilla:Ficha de monumento$",
         "^Plantilla:Ficha de teatro$",
         "^Plantilla:Ficha de cuerpo celeste$",
@@ -85,7 +85,6 @@
     {
       "pages": [
         "^Main Page$",
-        "^Main_Page$"
       ],
       "delete": true
     },
