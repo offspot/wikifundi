@@ -84,7 +84,7 @@
     },
     {
       "pages": [
-        "^Main Page$",
+        "^Main Page$"
       ],
       "delete": true
     },
