@@ -22,10 +22,12 @@ $wgExtraNamespaces[NS_FOO_TALK] = "Wikipedia_talk"; // Note underscores in the n
 
 # Custom logo
 $wgLogo = "/logo.png";
-$wgRightsIcon = "/A_WikiAfrica_project.png";
 
 # License
-$wgRightsUrl = 'https://creativecommons.org/licenses/by-sa/4.0/';
+$wgRightsUrl = null;
+$wgRightsPage = null;
+$wgRightsText = null;
+$wgRightsIcon = "/A_WikiAfrica_project.png";
 
 # Uploads
 ini_set('memory_limit', '512M');
