@@ -1,11 +1,11 @@
 <?php
 
 # General
-$wgLanguageCode     = "es";
 $wgSitename         = "WikiFundi";
 
 # Site language
 $wgLanguageCode = "es";
+$wgULSLanguageDetection = false; // don't detect user agent language
 $wgUploadWizardConfig['uwLanguages'] = array( 'es' => 'Spanish' );
 
 # Database settings
