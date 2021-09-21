@@ -2,6 +2,14 @@
 
 # General
 $wgSitename         = "WikiFundi";
+$wgNamespacesToBeSearchedDefault = [
+	NS_MAIN => true,
+	NS_PROJECT => true,
+	NS_CATEGORY => true,
+	NS_WP => true,
+	NS_HELP => true,
+	NS_USER => true,
+];
 
 # Site language
 $wgLanguageCode = "en";
