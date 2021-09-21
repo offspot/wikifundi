@@ -6,7 +6,7 @@ $wgSitename         = "WikiFundi";
 # Site language
 $wgLanguageCode = "es";
 $wgULSLanguageDetection = false; // don't detect user agent language
-$wgUploadWizardConfig['uwLanguages'] = array( 'es' => 'Spanish' );
+$wgUploadWizardConfig['uwLanguages'] = [ 'es' => 'Spanish' ];
 
 # Database settings
 $wgDBtype        = "sqlite";
@@ -56,7 +56,7 @@ function WikifundiPasswordPolicy($policyVal, $user, $password) {
 
 $wgPasswordPolicy['checks']['MinimalPasswordLength'] = 'WikifundiPasswordPolicy';
 $wgPasswordPolicy['checks']['PasswordCannotMatchUsername'] = 'WikifundiPasswordPolicy';
-$wgPasswordPolicy['checks']['PasswordCannotMatchBlacklist'] = 'WikifundiPasswordPolicy';
+$wgPasswordPolicy['checks']['PasswordCannotMatchDefaults'] = 'WikifundiPasswordPolicy';
 $wgPasswordPolicy['checks']['PasswordCannotBePopular'] = 'WikifundiPasswordPolicy';
 
 ?>
