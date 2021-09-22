@@ -38,8 +38,8 @@ family_files["kiwix"] = "http://localhost/w/api.php"
 # The dictionary usernames should contain a username for each site where you
 # have a bot account. If you have a unique username for all languages of a
 # family , you can use '*'
-usernames["wikipedia"]["fr"] = "kiwix"
-usernames["wikipedia"]["en"] = "kiwix"
+usernames["wikipedia"]["*"] = "kiwix"
+usernames["meta"]["*"] = "kiwix"
 usernames["kiwix"]["*"] = "botimport"
 
 # The list of BotPasswords is saved in another file. Import it if needed.
