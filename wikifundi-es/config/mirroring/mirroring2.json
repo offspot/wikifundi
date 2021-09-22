@@ -17,6 +17,20 @@
       "recurse": 0
     }
   ],
+  "renames": [
+    {
+      "title": "File:¿Qué es Wikipedia?.ogv",
+      "newTitle": "File:¿Qué es Wikipedia.ogv"
+    },
+    {
+      "title": "File:¿Cómo agregar referencias dentro de Wikipedia?.webm",
+      "newTitle": "File:¿Cómo agregar referencias dentro de Wikipedia.webm"
+    },
+    {
+      "title": "File:¿Cómo poner enlaces internos dentro de Wikipedia?.webm",
+      "newTitle": "File:¿Cómo poner enlaces internos dentro de Wikipedia.webm"
+    }
+  ],
   "modifications": [
     {
       "categories": [
@@ -104,6 +118,26 @@
         {
           "pattern": "if wikidata == \\'true\\' then",
           "repl": "if false then -- Wikifundi not use Wikidata"
+        }
+      ]
+    },
+    {
+      "pages": [
+        "^WikiAfrica Offline Resources/es$",
+        "^WikiFundi/2021/WikiFundi:Recursos/es$"
+      ],
+      "substitutions": [
+        {
+          "pattern": "File:¿Qué es Wikipedia\\?.ogv",
+          "repl": "File:¿Qué es Wikipedia.ogv"
+        },
+        {
+          "pattern": "File:¿Cómo agregar referencias dentro de Wikipedia\\?.webm",
+          "repl": "File:¿Cómo agregar referencias dentro de Wikipedia.webm"
+        },
+        {
+          "pattern": "File:¿Cómo poner enlaces internos dentro de Wikipedia\\?.webm",
+          "repl": "File:¿Cómo poner enlaces internos dentro de Wikipedia.webm"
         }
       ]
     },

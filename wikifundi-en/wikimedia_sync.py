@@ -168,6 +168,7 @@ from pywikibot import Site, Page, FilePage, Category
 import sys
 import json
 import getopt
+import logging
 
 # To use regular expression
 import re
@@ -193,6 +194,7 @@ DEFAULT_OPTIONS = {
     "maxSize": 200 * 1024 * 1024,
     "async": False,
     "removePrefix": "",
+    "renamePages": True,
 }
 
 # TODO : put in config file
@@ -206,6 +208,9 @@ DEP_EXLUDE = "/Documentation$"
 
 ##############################
 # Logs
+
+pywb_logger = logging.getLogger("pywiki")
+pywb_logger.setLevel(logging.DEBUG)
 
 
 def log(o):
@@ -775,8 +780,39 @@ def modifyPages(siteSrc, siteDst, pages, modifications):
     return nbMods
 
 
+def renamePage(dst, pageTitle, newPageTitle):
+    p = Page(dst, pageTitle)
+    if not p.exists():
+        return 0
+
+    p.move(newPageTitle, reason="rename", movetalk=False, noredirect=True)
+    return 1
+
+
+def renamePages(siteDst, renames):
+    """modify wiki pages on siteDst from pages titles
+
+    siteDst : destination site
+    renames : list of renames options
+
+    return the number of succes renamed pages
+    """
+
+    return sum(
+        [renamePage(siteDst, rename["title"], rename["newTitle"]) for rename in renames]
+    )
+
+
 def mirroringAndModifyPages(
-    srcFam, srcCode, dstFam, dstCode, pagesName, categories, modifications, options
+    srcFam,
+    srcCode,
+    dstFam,
+    dstCode,
+    pagesName,
+    categories,
+    modifications,
+    renames,
+    options,
 ):
     """Synchronize wiki pages from named page list
         and named categories list
@@ -808,6 +844,7 @@ def mirroringAndModifyPages(
     reg_exlude_dep = re.compile(DEP_EXLUDE)
 
     nbMods = 0
+    nbRenames = 0
     nbPagesSync = 0
     nbPagesUpload = 0
     nbPagesTemplate = 0
@@ -946,7 +983,12 @@ def mirroringAndModifyPages(
         log("====== Commit all pages ")
         subsOnPages(siteSrc, siteDst, pages + templates, [])
 
-    return (nbPagesSync, nbPagesUpload, nbPagesTemplate, nbMods)
+    if renames and options["renamePages"]:
+        log("============================")
+        log("====== Process Renames")
+        nbRenames = renamePages(siteDst, renames)
+
+    return (nbPagesSync, nbPagesUpload, nbPagesTemplate, nbMods, nbRenames)
 
 
 def processConfig(cfg, options):
@@ -961,17 +1003,33 @@ def processConfig(cfg, options):
         pages = cfg["pages"]
         cats = cfg["categories"]
         mods = cfg["modifications"]
+        renames = cfg["renames"]
 
-        (nbPagesSync, nbPagesUpload, nbPagesTemplate, nbMods) = mirroringAndModifyPages(
-            src["fam"], src["code"], dst["fam"], dst["code"], pages, cats, mods, options
+        (
+            nbPagesSync,
+            nbPagesUpload,
+            nbPagesTemplate,
+            nbMods,
+            nbRenames,
+        ) = mirroringAndModifyPages(
+            src["fam"],
+            src["code"],
+            dst["fam"],
+            dst["code"],
+            pages,
+            cats,
+            mods,
+            renames,
+            options,
         )
 
         log(
             "%i pages copied, \
           %i files copied, \
           %i templates copied, \
-          %i pages modified"
-            % (nbPagesSync, nbPagesUpload, nbPagesTemplate, nbMods)
+          %i pages modified, \
+          %i pages renamed"
+            % (nbPagesSync, nbPagesUpload, nbPagesTemplate, nbMods, nbRenames)
         )
 
     except KeyError as e:
