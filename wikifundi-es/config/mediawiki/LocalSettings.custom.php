@@ -6,7 +6,7 @@ $wgNamespacesToBeSearchedDefault = [
 	NS_MAIN => true,
 	NS_PROJECT => true,
 	NS_CATEGORY => true,
-	NS_WP => true,
+	4 => true,
 	NS_HELP => true,
 	NS_USER => true,
 ];
