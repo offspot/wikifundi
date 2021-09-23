@@ -292,7 +292,9 @@ def getTemplateTitlesFromPage(siteSrc, exclude, nbPages, iTitles):
 
     # get templates titles and apply exclude dependances filter
     tpltTitle = list(
-        filter(lambda t: not re.search(exclude, t), mapTitle(p.templates()))
+        filter(
+            lambda t: not re.search(exclude, t) and t != title, mapTitle(p.templates())
+        )
     )
 
     nbTplt = len(tpltTitle)
@@ -1003,7 +1005,7 @@ def processConfig(cfg, options):
         pages = cfg["pages"]
         cats = cfg["categories"]
         mods = cfg["modifications"]
-        renames = cfg["renames"]
+        renames = cfg.get("renames", [])
 
         (
             nbPagesSync,
