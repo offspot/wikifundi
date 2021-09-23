@@ -54,13 +54,6 @@ $wgHooks['SkinTemplateOutputPageBeforeExec'][] = function( $sk, &$tpl ) {
 require_once("$IP/LocalSettings.mirroring.php");
 require_once("$IP/LocalSettings.debug.php");
 
-function WikifundiPasswordPolicy($policyVal, $user, $password) {
-    return Status::newGood();
-}
-
-$wgPasswordPolicy['checks']['MinimalPasswordLength'] = 'WikifundiPasswordPolicy';
-$wgPasswordPolicy['checks']['PasswordCannotMatchUsername'] = 'WikifundiPasswordPolicy';
-$wgPasswordPolicy['checks']['PasswordCannotMatchDefaults'] = 'WikifundiPasswordPolicy';
-$wgPasswordPolicy['checks']['PasswordCannotBePopular'] = 'WikifundiPasswordPolicy';
+$wgPasswordPolicy = [ 'policies' => [ 'default' => [] ], 'checks' => [] ];
 
 ?>
