@@ -98,7 +98,8 @@
     },
     {
       "pages": [
-        "^Main Page$"
+        "^Main Page$",
+        "^Main_Page$"
       ],
       "delete": true
     },
@@ -124,7 +125,7 @@
     {
       "pages": [
         "^WikiAfrica Offline Resources/es$",
-        "^WikiFundi/2021/WikiFundi:Recursos/es$"
+        "^WikiFundi:Recursos/es$"
       ],
       "substitutions": [
         {

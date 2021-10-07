@@ -19,6 +19,20 @@
       "title": "Projet WikiFundi Contenu"
     }
   ],
+  "renames": [
+    {
+      "title": "File:¿Qué es Wikipedia?.ogv",
+      "newTitle": "File:¿Qué es Wikipedia.ogv"
+    },
+    {
+      "title": "File:¿Cómo agregar referencias dentro de Wikipedia?.webm",
+      "newTitle": "File:¿Cómo agregar referencias dentro de Wikipedia.webm"
+    },
+    {
+      "title": "File:¿Cómo poner enlaces internos dentro de Wikipedia?.webm",
+      "newTitle": "File:¿Cómo poner enlaces internos dentro de Wikipedia.webm"
+    }
+  ],
   "modifications": [
     {
       "pages": [
@@ -122,6 +136,25 @@
         {
           "pattern": "<!--2BREINSERTED(.*)-->",
           "repl": "\\1"
+        }
+      ]
+    },
+    {
+      "pages": [
+        "^WikiFundi:Ressources/es$"
+      ],
+      "substitutions": [
+        {
+          "pattern": "File:¿Qué es Wikipedia\\?.ogv",
+          "repl": "File:¿Qué es Wikipedia.ogv"
+        },
+        {
+          "pattern": "File:¿Cómo agregar referencias dentro de Wikipedia\\?.webm",
+          "repl": "File:¿Cómo agregar referencias dentro de Wikipedia.webm"
+        },
+        {
+          "pattern": "File:¿Cómo poner enlaces internos dentro de Wikipedia\\?.webm",
+          "repl": "File:¿Cómo poner enlaces internos dentro de Wikipedia.webm"
         }
       ]
     },
