@@ -373,6 +373,10 @@
           "repl": " "
         },
         {
+          "pattern": "\\[\\[Wikipedia:WikiProject( |_)WikiFundi( |_)Content\\/",
+          "repl": "[["
+        },
+        {
           "pattern": "<nowiki>.*?</nowiki>",
           "repl": " "
         },

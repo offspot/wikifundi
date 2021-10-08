@@ -134,6 +134,10 @@
           "repl": " "
         },
         {
+          "pattern": "\\[\\[(Projet|Project):WikiFundi( |_)Contenu/WikiFundi:",
+          "repl": "[["
+        },
+        {
           "pattern": "<!--2BREINSERTED(.*)-->",
           "repl": "\\1"
         }

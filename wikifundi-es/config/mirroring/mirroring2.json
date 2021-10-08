@@ -44,6 +44,10 @@
           "repl": " "
         },
         {
+          "pattern": "\\[\\[WikiFundi/2021/WikiFundi:",
+          "repl": "[["
+        },
+        {
           "pattern": "<!--2BREINSERTED(.*)-->",
           "repl": "\\1"
         }
