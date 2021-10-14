@@ -112,6 +112,17 @@
     },
     {
       "pages": [
+        "^MediaWiki:Common.js$"
+      ],
+      "substitutions": [
+        {
+          "pattern": "mw.loader.load",
+          "repl": "// removed: mw.loader.load"
+        }
+      ]
+    },
+    {
+      "pages": [
         "^Main Page$",
         "^Main_Page$"
       ],
