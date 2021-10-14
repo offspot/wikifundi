@@ -163,6 +163,7 @@
 
 # To use WikiMedia API
 from pywikibot import Site, Page, FilePage, Category
+import requests
 
 # To load JSON file config and check options
 import sys
@@ -503,7 +504,16 @@ def subsOnPage(src, dst, subs, nbPages, iTitles):
 
 
 def syncPage(
-    src, dst, force, removePrefix, checkRedirect, expandText, primary, nbPages, iTitles
+    src,
+    dst,
+    force,
+    removePrefix,
+    checkRedirect,
+    expandText,
+    primary,
+    nbPages,
+    iTitles,
+    retries=5,
 ):
     """Copy ONE wiki pages from src to dst
 
@@ -517,6 +527,7 @@ def syncPage(
     nbPages : total number of pages in copy process (for log)
     iTitles[0] : page number in copy process (for log)
     iTitles[1] : title of the page to copy
+    retries: number of attempts to retry i
 
     return true if success
     """
@@ -578,6 +589,33 @@ def syncPage(
         if dst.editpage(newPage, contentmodel=p.content_model):
             return 1
 
+    # sometimes valid articles fails to be copied with an HTTP 500 error.
+    # it seems to be a derivative of a timeout error due to insuffiscient resources
+    # pywb doesn't automatically retries on 500 obviously so we are retrying ourselves.
+    # if it's an input issue, it will fail up to `retries` time, if resoures-based
+    # there are chances one of the retry will work.
+    except requests.HTTPError as e:
+        if e.response.status_code == 500:
+            if retries:
+                retries -= 1
+                log_err(
+                    "HTTP 500 on copy page %s (%s). Retrying (%d)"
+                    % (pageTitle, e, retries)
+                )
+                return syncPage(
+                    src=src,
+                    dst=dst,
+                    force=force,
+                    removePrefix=removePrefix,
+                    checkRedirect=checkRedirect,
+                    expandText=expandText,
+                    primary=primary,
+                    nbPages=nbPages,
+                    iTitles=iTitles,
+                    retries=retries,
+                )
+            else:
+                log_err("Error on copy page %s (%s)" % (pageTitle, e))
     except Exception as e:
         log_err("Error on copy page %s (%s)" % (pageTitle, e))
 
