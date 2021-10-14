@@ -374,6 +374,10 @@ def getPagesTitleFromCategories(site, categories, depth=0):
 # Modify wiki pages
 
 
+def getWithoutPrefix(pageTitle, prefix):
+    return re.sub(r"^" + prefix, "", pageTitle)
+
+
 def removeSubPageOfProject(pageTitle, ns, removePrefix=""):
     """specific case for project pages"""
     if ns.id == 4 or ns.id == 102:
@@ -384,7 +388,7 @@ def removeSubPageOfProject(pageTitle, ns, removePrefix=""):
             else:
                 return pageTitle
     if removePrefix:
-        return re.sub(r"^" + removePrefix, "", pageTitle)
+        return getWithoutPrefix(pageTitle, removePrefix)
     return pageTitle
 
 
@@ -769,7 +773,7 @@ def getFilesFromPages(siteSrc, pages):
 # Entry points
 
 
-def modifyPages(siteSrc, siteDst, pages, modifications):
+def modifyPages(siteSrc, siteDst, pages, modifications, removePrefix=""):
     """modify wiki pages on siteDst from pages titles
 
     siteSrc : source site
@@ -801,6 +805,8 @@ def modifyPages(siteSrc, siteDst, pages, modifications):
                 pageMods.extend(mapTitle(siteDst.allpages(namespace=ns)))
 
         # apply set() on pageMods to delete duplicate
+        if removePrefix:
+            pageMods = [getWithoutPrefix(title, removePrefix) for title in pageMods]
         pageModsUniq = list(set(pageMods))
 
         if "substitutions" in mod:
@@ -1019,7 +1025,13 @@ def mirroringAndModifyPages(
     if modifications and options["modifyPages"]:
         log("============================")
         log("====== Process Modifications")
-        nbMods = modifyPages(siteSrc, siteDst, pages + templates + files, modifications)
+        nbMods = modifyPages(
+            siteSrc,
+            siteDst,
+            pages + templates + files,
+            modifications,
+            options["removePrefix"],
+        )
         log("====== Commit all pages ")
         subsOnPages(siteSrc, siteDst, pages + templates, [])
 
