@@ -790,6 +790,9 @@ def modifyPages(siteSrc, siteDst, pages, modifications, removePrefix=""):
     # add existing pages in dst
     # pages.extend(mapTitle(siteDst.allpages()))
 
+    # use final pages names, using removePrefix
+    pages = [getWithoutPrefix(title, removePrefix) for title in pages]
+
     for mod in modifications:
         pageMods = []
         if "pages" in mod:
