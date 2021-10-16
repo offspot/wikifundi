@@ -15,6 +15,7 @@ $wgNamespacesToBeSearchedDefault = [
 $wgLanguageCode = "es";
 $wgULSLanguageDetection = false; // don't detect user agent language
 $wgUploadWizardConfig['uwLanguages'] = [ 'es' => 'Spanish' ];
+$wgUploadWizardConfig['tutorial']['skip'] = true;
 
 # Database settings
 $wgDBtype        = "sqlite";
