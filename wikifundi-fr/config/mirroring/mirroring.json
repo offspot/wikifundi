@@ -134,20 +134,13 @@
           "repl": " "
         },
         {
-          "pattern": "\\[\\[(Projet|Project):WikiFundi( |_)Contenu/WikiFundi:",
+          "pattern": "\\[\\[(Projet|Project):WikiFundi( |_)Contenu/",
           "repl": "[["
         },
         {
           "pattern": "<!--2BREINSERTED(.*)-->",
           "repl": "\\1"
-        }
-      ]
-    },
-    {
-      "pages": [
-        "^WikiFundi:Ressources/es$"
-      ],
-      "substitutions": [
+        },
         {
           "pattern": "File:¿Qué es Wikipedia\\?.ogv",
           "repl": "File:¿Qué es Wikipedia.ogv"
