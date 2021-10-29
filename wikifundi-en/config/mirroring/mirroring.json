@@ -356,6 +356,10 @@
         {
           "pattern": "mw.wikibase.entity.getProperties\\(.*?\\)",
           "repl": "nil"
+        },
+        {
+          "pattern": "\\[\\[Category:WikiProject( |_)WikiFundi( |_)Content\\]\\]",
+          "repl": " "
         }
       ]
     },
