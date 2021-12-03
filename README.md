@@ -113,7 +113,3 @@ You can use `./install_sloppy_cli.sh` to install Sloppy CLI. We must define SLOP
  Author
  ------
  Florent Kaisser <florent.pro@kaisser.name>
-
- Version
- -------
- 2.0
