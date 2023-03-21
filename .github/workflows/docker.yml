@@ -8,11 +8,11 @@ on:
 jobs:
   build-and-push-en:
     name: Deploy wikifundi-en
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.4.0
       - name: Build and push wikifundi-en
-        uses: openzim/docker-publish-action@v5
+        uses: openzim/docker-publish-action@v10
         with:
           image-name: offspot/wikifundi-en
           context: wikifundi-en
@@ -28,9 +28,9 @@ jobs:
     needs: build-and-push-en
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.4.0
       - name: Build and push wikifundi-fr
-        uses: openzim/docker-publish-action@v5
+        uses: openzim/docker-publish-action@v10
         with:
           image-name: offspot/wikifundi-fr
           context: wikifundi-fr
@@ -44,11 +44,11 @@ jobs:
   build-and-push-es:
     name: Deploy wikifundi-es
     needs: build-and-push-en
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.4.0
       - name: Build and push wikifundi-es
-        uses: openzim/docker-publish-action@v5
+        uses: openzim/docker-publish-action@v10
         with:
           image-name: offspot/wikifundi-es
           context: wikifundi-es
