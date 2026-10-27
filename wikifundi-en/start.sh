@@ -27,7 +27,7 @@ then
   ln -fs index_mirroring.php index.php
 
   echo "> Starting Mediawiki"
-  service php7.3-fpm start
+  service php8.4-fpm start
   service nginx start
 
   echo "> Mirroring ..."
@@ -43,7 +43,7 @@ then
 
   echo "> Stopping Mediawiki"
   service nginx stop
-  service php7.3-fpm stop
+  service php8.4-fpm stop
 
   echo "> Deleting extra pages"
   php maintenance/deleteBatch.php  --conf ./LocalSettings.php -u botimport -r "No needed for Wikifundi" ./deleteBatch.txt
@@ -106,7 +106,7 @@ if [ ${GO_BASH}  ]
 then
   /bin/bash
 else
-  service php7.3-fpm start && \
+  service php8.4-fpm start && \
   service cron start
 
   echo "Starting…"
