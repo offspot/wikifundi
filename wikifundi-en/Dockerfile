@@ -1,4 +1,4 @@
-FROM ghcr.io/offspot/mediawiki:1.36.1
+FROM ghcr.io/offspot/mediawiki:1.43.11
 LABEL org.opencontainers.image.source https://github.com/offspot/wikifundi
 
 ENV PYWIKIBOT_CONFIG_FILE ./config/pywikibot/user-config.py
@@ -20,13 +20,13 @@ ENV MEDIAWIKI_ADMIN_PASSWORD adminadmin
 
 # Install PyWikiBot library
 RUN apt-get update \
-   && apt-get install -y --no-install-recommends python3-pip \
-   && pip3 install --no-cache-dir -U setuptools wheel \
-   && pip3 install --no-cache-dir "mwparserfromhell==0.6.3" \
-   && pip3 install --no-cache-dir https://pywikibot.toolforge.org/core.zip
+   && apt-get install -y --no-install-recommends python3-pip ghostscript \
+   && pip3 install --no-cache-dir --break-system-packages --ignore-installed -U setuptools wheel \
+   && pip3 install --no-cache-dir --break-system-packages "mwparserfromhell==0.7.2" \
+   && pip3 install --no-cache-dir --break-system-packages "pywikibot==11.9.0"
 
 # Configure PHP-fpm
-COPY config/php-fpm/*.conf /etc/php/7.3/fpm/pool.d/
+COPY config/php-fpm/*.conf /etc/php/8.4/fpm/pool.d/
 
 # Configure Pywikibot (must be in same directory of wikimedia_sync.py)
 COPY ${PYWIKIBOT_CONFIG_FILE} ${PYWIKIBOT_DIR}/
