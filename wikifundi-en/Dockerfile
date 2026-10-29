@@ -57,6 +57,16 @@ RUN { \
   chmod a+x /usr/bin/gs ; \
 }
 
+# Fix Echo extension's SQLite migration patch: it uses MySQL's
+# "auto_increment" (invalid SQLite syntax) and a MySQL-only index
+# prefix-length suffix, instead of the valid SQLite forms used by the
+# extension's own generated schema (sql/sqlite/tables-generated.sql).
+# Unfixed upstream as of 2026-10: https://github.com/wikimedia/mediawiki-extensions-Echo/blob/master/sql/sqlite/patch-cleanup-push_subscription-foreign-keys-indexes.sql
+RUN sed -i \
+  -e 's/eps_id INT UNSIGNED NOT NULL PRIMARY KEY auto_increment,/eps_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,/' \
+  -e 's/(eps_token(10))/(eps_token)/' \
+  extensions/Echo/sql/sqlite/patch-cleanup-push_subscription-foreign-keys-indexes.sql
+
 # Copy script used by start.sh to sync wikimedia pages
 COPY ./wikimedia_sync.py /usr/local/bin/wikimedia_sync
 RUN chmod a+x /usr/local/bin/wikimedia_sync
