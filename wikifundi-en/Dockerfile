@@ -1,4 +1,4 @@
-FROM ghcr.io/offspot/mediawiki:1.43.11
+FROM ghcr.io/offspot/mediawiki:1.43.12
 LABEL org.opencontainers.image.source https://github.com/offspot/wikifundi
 
 ENV PYWIKIBOT_CONFIG_FILE ./config/pywikibot/user-config.py
